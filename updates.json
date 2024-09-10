@@ -1,0 +1,22 @@
+[
+  {
+    "updateText": "update 4",
+    "description": "This is the most recent update, showing current changes and status."
+  },
+  {
+    "updateText": "update 5",
+    "description": "Introduced new features and improvements based on user feedback."
+  },
+  {
+    "updateText": "update 6",
+    "description": "Refined the home page content to be more engaging and humorous for users. Updated endpoint explanations to be straightforward and simple."
+  },
+  {
+    "updateText": "update 7 (current)",
+    "description": "Added security enhancements using Helmet middleware to protect against common vulnerabilities. Implemented a custom 404 error handler for better user experience when accessing unknown routes."
+  },
+  {
+    "updateText": "update 8",
+    "description": "In this latest refinement, we have meticulously improved our documentation to offer clarity befitting of a well-bred gentleman's discourse. Should you find earlier updates absent, it is by design, to conserve precious server space as per the most prudent measures of our time."
+  }
+]
