@@ -40,6 +40,15 @@ Upon the root route, ye shall find:
 - **Available Endpoints**: A list of accessible routes, displayed for your perusal.
 - **Recent Updates**: Behold updates, dynamically loaded from the JSON scrolls.
 
+CodeQL Badge:
+[![CodeQL](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
+
+CodeQL Advanced Badge:
+[![CodeQL Advanced](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
+
+njsscan Badge:
+[![njsscan sarif](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml)
+
 ### The Testing Route `/testing`
 The `/testing` endpoint offers knowledge most curious, providing thee with:
 - A **random fact** about the **first computer chip**, a marvel of modern technology.
@@ -48,17 +57,6 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
 
 #### Example response from `/testing`:
 ```json
-
-🛡️ _Code Scanning Badges_
-
-https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
-
-(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
-
-
-(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml)
-
-
 {
   "id": "fact1",
   "testText": "Behold the wondrous tale of the silicon marvel known as the first computer chip!",
