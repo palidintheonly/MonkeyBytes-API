@@ -54,12 +54,10 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
   "testImg": "https://picsum.photos/300/200?random=1",
   "dateUnixUK": 1693939200
 }
-🛡️ Code Scanning Badges
-CodeQL Badge:
-[![CodeQL](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
+🛡️ _Code Scanning Badges_
+(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
 
-CodeQL Advanced Badge:
-[![CodeQL Advanced](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
+(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
 
-njsscan Badge:
-[![njsscan sarif](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml)
+
+(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml)
