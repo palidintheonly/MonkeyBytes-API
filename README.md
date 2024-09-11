@@ -40,6 +40,7 @@ Upon the root route, ye shall find:
 - **Available Endpoints**: A list of accessible routes, displayed for your perusal.
 - **Recent Updates**: Behold updates, dynamically loaded from the JSON scrolls.
 
+###  Code Scanning Badges 🛡️
 CodeQL Badge:
 [![CodeQL](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
 
