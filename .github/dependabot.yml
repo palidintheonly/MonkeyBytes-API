@@ -8,5 +8,5 @@ updates:
   - package-ecosystem: "npm" # Use "npm" for Node.js projects
     directory: "/" # Location of package.json (root directory)
     schedule:
-      interval: "weekly" # Updates will be checked weekly
+      interval: "HOURLY" # Updates will be checked weekly
 
