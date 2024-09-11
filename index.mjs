@@ -1,14 +1,19 @@
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import winston from 'winston';
 import helmet from 'helmet';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 21560;
 
 // Utilize helmet for enhanced security
-app.use(helmet()); 
+app.use(helmet());
 
 // Record the commencement time of the server
 const serverStartTime = Date.now();
@@ -34,6 +39,44 @@ const logger = winston.createLogger({
         winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
     ),
     transports: [new winston.transports.Console()]
+});
+
+// Function to load updates dynamically from the updates.json file
+async function getUpdates() {
+    try {
+        const data = await fs.readFile(path.join(__dirname, 'updates.json'), 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        logger.error('Error reading updates.json:', error);
+        return [];
+    }
+}
+
+// Root route '/'
+app.get('/', async (req, res) => {
+    const uptime = formatUptime(Date.now() - serverStartTime);
+
+    // Fetch the updates from the updates.json file
+    const updates = await getUpdates();
+
+    // Create HTML for recent updates
+    let updatesHtml = updates.map(update => 
+        `<li><strong>${update.updateText}</strong> - ${update.description}</li>`
+    ).join('');
+
+    res.send(`
+        <h1>Welcome, noble traveler, to the MonkeyBytes-API!</h1>
+        <p>Prithee, peruse our available endpoints and enjoy the fruits of our labor:</p>
+        <ul>
+            <li><strong>/</strong> - This very page, offering thee warm greetings and server status.</li>
+            <li><strong>/testing</strong> - A wondrous route, offering random tales of the first computer chip.</li>
+        </ul>
+        <p><strong>Recent Updates:</strong></p>
+        <ul>
+            ${updatesHtml}
+        </ul>
+        <p>The server hath been running for ${uptime}.</p>
+    `);
 });
 
 // /testing route with random images from Lorem Picsum
