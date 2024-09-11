@@ -1,8 +1,8 @@
 # MonkeyBytes-API 🐵💻
 
-**Welcome to the MonkeyBytes-API!** – the API built for the future of managing APIs, providing robust, secure, and efficient solutions for any project. MonkeyBytes-API is part of the **Monkey Network (MN)**, and this can easily be **your API** as well.
+**Welcome to the MonkeyBytes-API!** – an API built for the future of managing APIs, providing robust, secure, and efficient solutions for any project. MonkeyBytes-API is part of the **Monkey Network (MN)**, and this can easily be **your API** as well.
 
-> **_opensource_**
+> **_Open-source_**
 
 [![CodeQL Advanced](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
 [![CodeQL](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
@@ -11,49 +11,49 @@
 
 ## 🎯 Overview
 
-MonkeyBytes-API is a secure, performant, and easily extendable API designed using Node.js and Express. It is equipped with a range of modern security practices using Helmet, efficient logging with Winston, and dynamic data handling with FS Promises.
+MonkeyBytes-API is a secure, performant, and easily extendable API designed using **Node.js** and **Express**. It includes modern security practices with **Helmet**, structured logging using **Winston**, and dynamic data management via **FS Promises**.
 
 ### Features:
-- **Customizable API** – Can be tailored for any API project.
-- **Secure by Design** – Incorporates [Helmet.js](https://helmetjs.github.io/) for security best practices.
-- **Structured Logging** – Built-in logging with [Winston](https://github.com/winstonjs/winston) for better monitoring.
-- **Dynamic Data Loading** – Updates and data are dynamically fetched from JSON files.
-- **Server Uptime** – Displays the server uptime in an intuitive format.
-- **Fun Facts Endpoint** – `/testing` endpoint provides random facts about the **first computer chip** with images, timestamps, and more.
-- **Error Handling** – Custom 404 error handling.
+- **Customizable API** – Tailor it to your specific project needs.
+- **Secure by Design** – Uses [Helmet.js](https://helmetjs.github.io/) for comprehensive security.
+- **Structured Logging** – Built-in logging via [Winston](https://github.com/winstonjs/winston) for easy monitoring.
+- **Dynamic Data Loading** – Load updates dynamically from JSON files.
+- **Server Uptime** – Displays server uptime and current time.
+- **Fun Facts Endpoint** – `/testing` provides random facts about the **first computer chip** with images and Unix timestamps.
+- **Error Handling** – Custom 404 error handling ensures clarity for users.
 
 ---
 
 ## 🛠️ Technologies
 
-This API is built using the following technologies:
+MonkeyBytes-API is built using the following technologies:
 
-- **Node.js** – JavaScript runtime built on Chrome's V8 JavaScript engine.
-- **Express.js** – Fast, unopinionated, minimalist web framework for Node.js.
-- **Winston** – A versatile logging library.
-- **Helmet** – Security for Express apps.
-- **FS Promises** – File system module for asynchronous operations.
-- **Path** – Module to handle file and directory paths.
+- **Node.js** – JavaScript runtime built on Chrome's V8 engine.
+- **Express.js** – Minimalist web framework for building APIs.
+- **Winston** – Versatile logging library.
+- **Helmet** – Security middleware for Express.
+- **FS Promises** – Asynchronous file system module.
+- **Path** – Utility to work with file and directory paths.
 
 ---
 
 ## 📂 API Endpoints
 
-Here are the current routes available in the API:
+Here are the available API endpoints:
 
 ### Root Route `/`
-The root endpoint returns a welcome message and displays the following:
-- **Server Status**: Current uptime and time in GMT/BST.
-- **Available Endpoints**: A guide to accessing different endpoints in the API.
-- **Recent Updates**: Dynamic updates loaded from a JSON file.
+The root route provides a welcome message and displays:
+- **Server Status**: Shows uptime and current time (in GMT/BST).
+- **Available Endpoints**: Lists accessible routes in the API.
+- **Recent Updates**: Displays dynamic updates loaded from a JSON file.
 
 ### Testing Route `/testing`
-This endpoint provides random **facts** about the **first computer chip**. Each response contains:
-- A **random fact** about the chip's history.
-- An associated **image** (royalty-free).
+This endpoint provides random **facts** about the **first computer chip**. Each response includes:
+- A **random fact** about the history of the chip.
+- A **royalty-free image** associated with the fact.
 - The current **Unix timestamp**.
 
-> Example response from `/testing`:
+#### Example response from `/testing`:
 ```json
 {
   "id": "fact1",
