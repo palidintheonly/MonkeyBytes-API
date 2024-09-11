@@ -41,13 +41,13 @@ Upon the root route, ye shall find:
 - **Recent Updates**: Behold updates, dynamically loaded from the JSON scrolls.
 
 ###  Code Scanning Badges 🛡️
-CodeQL Badge:
+- CodeQL Badge:
 [![CodeQL](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
 
-CodeQL Advanced Badge:
+- CodeQL Advanced Badge:
 [![CodeQL Advanced](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
 
-njsscan Badge:
+- njsscan Badge:
 [![njsscan sarif](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml)
 
 ### The Testing Route `/testing`
