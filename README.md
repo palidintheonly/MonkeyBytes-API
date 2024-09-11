@@ -54,10 +54,5 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
   "testImg": "https://picsum.photos/300/200?random=1",
   "dateUnixUK": 1693939200
 }
+
 🛡️ _Code Scanning Badges_
-(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
-
-(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
-
-
-(https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/njsscan.yml)
