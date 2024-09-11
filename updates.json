@@ -1,20 +1,14 @@
 [
-  {
-    "updateText": "update 5",
-    "description": "By decree of the people, new features and improvements hath been introduced, all based upon the valued feedback of our good users. This fine update hath ensured the API runs with greater efficiency and grace."
-  },
-  {
-    "updateText": "update 6",
-    "description": "The home page, once plain, hath been refined to charm the good folk who visit. Content now speaks with jest and joy, whilst the explanations of our endpoints have been made simple and clear, as one would address the common man."
-  },
-  {
-    "updateText": "update 7",
-    "description": "In this noble update, protections against the dark forces of the web have been strengthened. The wise Helmet middleware shields the API from common threats, whilst a custom 404 handler hath been implemented to guide wayward travelers upon unknown paths."
-  },
-  {
-    "updateText": "update 8",
-    "description": "Documentation hath been elevated to the level of a gentleman’s discourse. Clear, concise, and proper, these updates ensure that even the most learned scholars shall find no fault. Past records, now absent, have been wisely conserved to preserve server space, a prudent measure indeed."
-  },
-  {
-    "updateText": "update 9 (current)",
-    "description": "Lo, in this ninth update, we hath introduced the creation and deletion of files, notably in the form of the wondrous `.md` and `.txt` formats, bringing order to the realm of documentation.
+    {
+        "updateText": "Update 9",
+        "description": "Lo, in this ninth update, we hath introduced the creation and deletion of files, notably in the form of the wondrous .md and .txt formats."
+    },
+    {
+        "updateText": "Update 8",
+        "description": "Documentation hath been elevated to the level of a gentleman’s discourse."
+    },
+    {
+        "updateText": "Update 7",
+        "description": "Added security enhancements using Helmet middleware and a custom 404 error handler."
+    }
+]
