@@ -2,12 +2,6 @@
 
 **Welcome to the MonkeyBytes-API!** – an API built for the future of managing APIs, providing robust, secure, and efficient solutions for any project. MonkeyBytes-API is part of the **Monkey Network (MN)**, and this can easily be **your API** as well.
 
-> **_Open-source_**
-
-[![CodeQL Advanced](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/codeql.yml)
-[![CodeQL](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/palidintheonly/MonkeyBytes-API/actions/workflows/github-code-scanning/codeql)
-
----
 
 ## 🎯 Overview
 
