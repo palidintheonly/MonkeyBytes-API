@@ -15,6 +15,10 @@ const PORT = 21560;
 // Utilize helmet for enhanced security
 app.use(helmet());
 
+// Enable JSON and URL-encoded body parsing (to handle POST requests with Unicode data)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Record the commencement time of the server
 const serverStartTime = Date.now();
 
@@ -69,6 +73,8 @@ app.get('/', async (req, res) => {
         updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
     }
 
+    // Ensure response is served with UTF-8 encoding
+    res.set('Content-Type', 'text/html; charset=utf-8');
     res.send(`
         <h1>Welcome to the MonkeyBytes-API</h1>
         <p>The MonkeyBytes-API is a robust and dynamic service designed to deliver both insightful information and reliable performance. Below, we provide an overview of the available endpoints and a detailed explanation of the server’s functionality.</p>
