@@ -81,8 +81,8 @@ async function getRandomProfilePicture() {
 
 // Function to generate a random bot name
 function generateRandomBotName() {
-    const adjectives = ['Mighty', 'Swift', 'Bold', 'Noble', 'Clever'];
-    const nouns = ['Coder', 'Knight', 'Fox', 'Wizard', 'Paladin'];
+    const adjectives = ['Epic', 'Unknown', 'Incogneto', 'Honour', 'Monkey'];
+    const nouns = ['Coder', 'Royal', 'Hawk', 'God', 'Palidin'];
     
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
@@ -193,7 +193,7 @@ app.get('/testing', async (req, res) => {
 
 // 404 Error Handler
 app.use((req, res) => {
-    res.status(404).send("Oh dear! The page thou seekest is not to be found.");
+    res.status(404).json({ error: "Oh dear! The page thou seekest is not to be found." });
 });
 
 // Start the server
