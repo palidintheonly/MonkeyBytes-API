@@ -103,6 +103,12 @@ async function fetchRedditRSS() {
     }
 }
 
+// Helper function to clean HTML tags from the post content
+function cleanHtmlContent(htmlContent) {
+    // Remove all HTML tags using regex
+    return htmlContent.replace(/<\/?[^>]+(>|$)/g, '').trim();
+}
+
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new.rss';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
@@ -123,7 +129,8 @@ async function postNewestToDiscord() {
         const postTitle = post.title[0];
         const postLink = post.link[0].$.href;
         const postAuthor = post.author[0].name[0];
-        const postContent = post.content ? post.content[0]._ : 'No content provided';
+        const postContentRaw = post.content ? post.content[0]._ : 'No content provided';
+        const postContent = cleanHtmlContent(postContentRaw); // Clean the HTML content to make it human-readable
         const postImage = post['media:thumbnail'] ? post['media:thumbnail'][0].$.url : null; // Optional image
 
         return {
