@@ -107,7 +107,7 @@ async function fetchRedditRSS() {
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new.rss';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 
-// Function to post the 5 newest posts from the Reddit RSS feed to Discord using embeds and content
+// Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
     const redditData = await fetchRedditRSS();
 
@@ -118,39 +118,31 @@ async function postNewestToDiscord() {
 
     const newestPosts = redditData.feed.entry.slice(0, 5);
 
+    // Correct the structure of the embed for Discord
     const embeds = newestPosts.map((post, index) => {
         const postTitle = post.title[0];
         const postLink = post.link[0].$.href;
         const postAuthor = post.author[0].name[0];
         const postContent = post.content ? post.content[0]._ : 'No content provided';
-        const postImage = post['media:thumbnail'] ? post['media:thumbnail'][0].$.url : 'https://via.placeholder.com/150';
+        const postImage = post['media:thumbnail'] ? post['media:thumbnail'][0].$.url : null; // Optional image
 
         return {
-            title: `${index + 1}. ${postTitle}`,
-            url: postLink,
-            description: `Posted by ${postAuthor}: [${postTitle}](${postLink})`,
-            image: { url: postImage },
-            color: 3447003,
-            author: { name: postAuthor },
-            fields: [
-                {
-                    name: 'Post Content',
-                    value: postContent.length > 1024 ? `${postContent.slice(0, 1020)}...` : postContent,
-                }
-            ]
+            title: postTitle, // Embed title
+            url: postLink, // Embed URL (makes the title clickable)
+            description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent, // Embed description
+            author: {
+                name: `Posted by ${postAuthor}`
+            },
+            image: postImage ? { url: postImage } : undefined, // Embed image (optional)
         };
     });
 
-    const contentMessage = `📢 **Here are the 5 newest posts from Reddit!**\nFetched at: ${new Date().toLocaleTimeString()}`;
+    // Send message with content and embeds
+    const payload = {
+        content: `📢 **Here are the 5 newest posts from Reddit!**\nFetched at: ${new Date().toLocaleTimeString()}`,
+        embeds: embeds // Embeds array
+    };
 
-    await postToDiscord({
-        content: contentMessage,
-        embeds: embeds
-    });
-}
-
-// Function to post the content (including embeds) to Discord
-async function postToDiscord(payload) {
     try {
         await axios.post(DISCORD_WEBHOOK_URL, payload);
         logger.info('Message posted to Discord successfully.');
@@ -159,8 +151,8 @@ async function postToDiscord(payload) {
     }
 }
 
-// Schedule to post every 3 minutes (180,000 ms)
-setInterval(postNewestToDiscord, 180000);
+// Schedule to post every 30 seconds (30,000 ms)
+setInterval(postNewestToDiscord, 30000);
 
 // Root route '/'
 app.get('/', async (req, res) => {
