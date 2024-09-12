@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import winston from 'winston';
 import helmet from 'helmet';
 import axios from 'axios'; // Ensure axios is installed using: npm install axios
+import xml2js from 'xml2js'; // For parsing Reddit RSS feeds
+import crypto from 'crypto'; // Import the crypto module for secure random numbers
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -68,10 +70,11 @@ async function getRandomFoxImage() {
     }
 }
 
-// Function to get a random robohash profile picture
+// Function to get a random robohash profile picture using crypto for a secure random seed
 async function getRandomProfilePicture() {
     try {
-        const randomSeed = Math.floor(Math.random() * 1000); // Generate a random seed for RoboHash
+        // Generate a cryptographically secure random seed
+        const randomSeed = crypto.randomBytes(4).toString('hex'); // Convert 4 random bytes to a hexadecimal string
         return `https://robohash.org/${randomSeed}.png`; // Return the RoboHash image URL
     } catch (error) {
         logger.error(`Error fetching random profile picture: ${error.message}`);
@@ -89,6 +92,64 @@ function generateRandomBotName() {
     
     return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`; // Generate a random bot name
 }
+
+// Reddit RSS and Discord webhook URLs
+const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new.rss';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+
+// Function to post to Discord
+async function postToDiscord(message) {
+    try {
+        await axios.post(DISCORD_WEBHOOK_URL, {
+            content: message,
+        });
+        logger.info('Message posted to Discord successfully.');
+    } catch (error) {
+        logger.error(`Error posting to Discord: ${error.message}`);
+    }
+}
+
+// Function to fetch and parse Reddit RSS feed
+async function fetchRedditRSS() {
+    try {
+        const response = await axios.get(REDDIT_RSS_URL);
+        const rssData = response.data;
+
+        // Parse the XML response to JSON
+        const parser = new xml2js.Parser();
+        const jsonData = await parser.parseStringPromise(rssData);
+        return jsonData;
+    } catch (error) {
+        logger.error(`Error fetching Reddit RSS feed: ${error.message}`);
+        return null;
+    }
+}
+
+// Function to post the 5 newest posts from the Reddit RSS feed to Discord
+async function postNewestToDiscord() {
+    const redditData = await fetchRedditRSS();
+
+    if (!redditData || !redditData.feed || !redditData.feed.entry) {
+        logger.error('Invalid Reddit RSS feed data.');
+        return;
+    }
+
+    // Extract the 5 newest posts
+    const newestPosts = redditData.feed.entry.slice(0, 5);
+    let message = 'Here are the 5 newest posts from Reddit:\n\n';
+
+    newestPosts.forEach((post, index) => {
+        const postTitle = post.title[0];
+        const postLink = post.link[0].$.href;
+        message += `**${index + 1}. ${postTitle}**\n${postLink}\n\n`;
+    });
+
+    // Post the message to Discord
+    await postToDiscord(message);
+}
+
+// Schedule to post every 3 minutes (180,000 ms)
+setInterval(postNewestToDiscord, 180000);
 
 // Root route '/'
 app.get('/', async (req, res) => {
@@ -199,4 +260,7 @@ app.use((req, res) => {
 // Start the server
 app.listen(PORT, () => {
     logger.info(`The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`);
+
+    // Immediately post the newest entries on server start
+    postNewestToDiscord();
 });
