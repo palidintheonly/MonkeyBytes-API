@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import winston from 'winston';
 import helmet from 'helmet';
+import axios from 'axios'; // Ensure axios is installed using: npm install axios
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -53,6 +54,17 @@ async function getUpdates() {
     } catch (error) {
         logger.error(`Error reading updates.json: ${error.message}`);
         return [];
+    }
+}
+
+// Function to get a random fox image URL from randomfox.ca
+async function getRandomFoxImage() {
+    try {
+        const response = await axios.get('https://randomfox.ca/floof/');
+        return response.data.image;
+    } catch (error) {
+        logger.error(`Error fetching random fox image: ${error.message}`);
+        return 'https://via.placeholder.com/300x200?text=Error+fetching+image'; // Placeholder if there's an issue fetching the fox image
     }
 }
 
@@ -115,25 +127,38 @@ app.get('/', async (req, res) => {
 });
 
 // /testing route with random images from randomfox.ca
-app.get('/testing', (req, res) => {
-    // List of facts about coding with random fox images
+app.get('/testing', async (req, res) => {
+    // List of facts about coding
     const facts = [
-        { id: 'fact1', testText: "Lo, in the early days of computing, the first line of code was but a humble command to display 'Hello, World!'.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact2', testText: "Verily, the art of debugging was born when Grace Hopper did discover a moth within the bowels of a machine, causing malfunctions.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact3', testText: "Know ye this—coding languages, like Latin and Greek of old, are structured and precise, yet oft misunderstood by mere mortals.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact4', testText: "Tarry not, for the first computer virus, known as the 'Creeper', did spread its mischief in the year 1971.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact5', testText: "In days long past, the COBOL language was crafted with great care to manage the ledgers of vast kingdoms, and it remains in use even unto this day.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact6', testText: "Lo! The code repository, a storehouse of wisdom, wherein the wise of old did place their scrolls of logic and function.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact7', testText: "The revered Alan Turing, father of modern computing, devised algorithms which did unlock the secrets of the Enigma machine in the war of yore.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact8', testText: "Hark! In the ancient land of Bell Labs, a language known as 'C' was crafted, the foundation of many tongues spoken by computers to this day.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact9', testText: "Before the birth of Git, the wise did manage their changes by hand, a perilous task fraught with error and woe.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact10', testText: "Let it be known that the coding of yore was done upon vast tapes and punch cards, which did make a most satisfying 'clack' as they were written upon.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) }
+        { id: 'fact1', testText: "Lo, in the early days of computing, the first line of code was but a humble command to display 'Hello, World!'.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact2', testText: "Verily, the art of debugging was born when Grace Hopper did discover a moth within the bowels of a machine, causing malfunctions.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact3', testText: "Know ye this—coding languages, like Latin and Greek of old, are structured and precise, yet oft misunderstood by mere mortals.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact4', testText: "Tarry not, for the first computer virus, known as the 'Creeper', did spread its mischief in the year 1971.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact5', testText: "In days long past, the COBOL language was crafted with great care to manage the ledgers of vast kingdoms, and it remains in use even unto this day.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact6', testText: "Lo! The code repository, a storehouse of wisdom, wherein the wise of old did place their scrolls of logic and function.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact7', testText: "The revered Alan Turing, father of modern computing, devised algorithms which did unlock the secrets of the Enigma machine in the war of yore.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact8', testText: "Hark! In the ancient land of Bell Labs, a language known as 'C' was crafted, the foundation of many tongues spoken by computers to this day.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact9', testText: "Before the birth of Git, the wise did manage their changes by hand, a perilous task fraught with error and woe.", dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact10', testText: "Let it be known that the coding of yore was done upon vast tapes and punch cards, which did make a most satisfying 'clack' as they were written upon.", dateUnixUK: Math.floor(Date.now() / 1000) }
     ];
 
-    // Choose a random fact
-    const randomFact = facts[Math.floor(Math.random() * facts.length)];
+    try {
+        // Fetch a random fox image
+        const foxImageResponse = await axios.get('https://randomfox.ca/floof/');
+        const foxImageUrl = foxImageResponse.data.image;
 
-    res.json(randomFact);
+        // Choose a random fact from the list
+        const randomFact = facts[Math.floor(Math.random() * facts.length)];
+
+        // Add the random fox image URL to the chosen fact
+        randomFact.testImg = foxImageUrl;
+
+        // Send the selected fact and image back as JSON
+        res.json(randomFact);
+    } catch (error) {
+        // In case of an error (e.g., fetching the fox image fails), return a 500 response
+        res.status(500).json({ error: "Error fetching random fox image, please try again later." });
+    }
 });
 
 // 404 Error Handler
