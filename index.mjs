@@ -34,7 +34,6 @@ function formatUptime(ms) {
     totalSeconds %= 3600;
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
@@ -73,7 +72,6 @@ async function getRandomFoxImage() {
 // Function to get a random robohash profile picture using crypto for a secure random seed
 async function getRandomProfilePicture() {
     try {
-        // Generate a cryptographically secure random seed
         const randomSeed = crypto.randomBytes(4).toString('hex'); // Convert 4 random bytes to a hexadecimal string
         return `https://robohash.org/${randomSeed}.png`; // Return the RoboHash image URL
     } catch (error) {
@@ -84,12 +82,10 @@ async function getRandomProfilePicture() {
 
 // Function to generate a random bot name
 function generateRandomBotName() {
-    const adjectives = ['Epic', 'Unknown', 'Incogneto', 'Honour', 'Monkey'];
-    const nouns = ['Coder', 'Royal', 'Hawk', 'God', 'Palidin'];
-    
+    const adjectives = ['Epic', 'Unknown', 'Incognito', 'Honour', 'Monkey'];
+    const nouns = ['Coder', 'Royal', 'Hawk', 'God', 'Paladin'];
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    
     return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`; // Generate a random bot name
 }
 
@@ -98,8 +94,6 @@ async function fetchRedditRSS() {
     try {
         const response = await axios.get(REDDIT_RSS_URL);
         const rssData = response.data;
-
-        // Parse the XML response to JSON
         const parser = new xml2js.Parser();
         const jsonData = await parser.parseStringPromise(rssData);
         return jsonData;
@@ -122,44 +116,36 @@ async function postNewestToDiscord() {
         return;
     }
 
-    // Extract the 5 newest posts
     const newestPosts = redditData.feed.entry.slice(0, 5);
 
-    // Create an array of embeds for each post
     const embeds = newestPosts.map((post, index) => {
-        const postTitle = post.title[0]; // Get post title
-        const postLink = post.link[0].$.href; // Get post link
-        const postAuthor = post.author[0].name[0]; // Get the author
-        const postContent = post.content ? post.content[0]._ : 'No content provided'; // Get post content (fallback to 'No content')
-        const postImage = post['media:thumbnail'] ? post['media:thumbnail'][0].$.url : 'https://via.placeholder.com/150'; // Use Reddit image or a placeholder if unavailable
+        const postTitle = post.title[0];
+        const postLink = post.link[0].$.href;
+        const postAuthor = post.author[0].name[0];
+        const postContent = post.content ? post.content[0]._ : 'No content provided';
+        const postImage = post['media:thumbnail'] ? post['media:thumbnail'][0].$.url : 'https://via.placeholder.com/150';
 
         return {
             title: `${index + 1}. ${postTitle}`,
             url: postLink,
-            description: `Posted by ${postAuthor}: [${postTitle}](${postLink})`, // Link and author info
-            image: {
-                url: postImage, // Reddit image (or a placeholder)
-            },
-            color: 3447003, // Optional: set a color for the embed bar
-            author: {
-                name: postAuthor, // Display the author's name
-            },
+            description: `Posted by ${postAuthor}: [${postTitle}](${postLink})`,
+            image: { url: postImage },
+            color: 3447003,
+            author: { name: postAuthor },
             fields: [
                 {
                     name: 'Post Content',
-                    value: postContent.length > 1024 ? `${postContent.slice(0, 1020)}...` : postContent, // Ensure content isn't too long
-                },
-            ],
+                    value: postContent.length > 1024 ? `${postContent.slice(0, 1020)}...` : postContent,
+                }
+            ]
         };
     });
 
-    // Add a brief summary in the content field
     const contentMessage = `📢 **Here are the 5 newest posts from Reddit!**\nFetched at: ${new Date().toLocaleTimeString()}`;
 
-    // Post the content and embeds to Discord
     await postToDiscord({
-        content: contentMessage, // Add a message at the top
-        embeds: embeds, // Include the embeds
+        content: contentMessage,
+        embeds: embeds
     });
 }
 
@@ -182,25 +168,18 @@ app.get('/', async (req, res) => {
 
     let updatesHtml = '';
     try {
-        // Fetch the updates from the updates.json file
         const updates = await getUpdates();
-
-        // Create HTML for recent updates
-        updatesHtml = updates.map(update => 
-            `<li><strong>${update.updateText}</strong> - ${update.description}</li>`
-        ).join('');
+        updatesHtml = updates.map(update => `<li><strong>${update.updateText}</strong> - ${update.description}</li>`).join('');
     } catch (error) {
         updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
     }
 
-    // Ensure response is served with UTF-8 encoding
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.send(`
         <h1>Welcome to the MonkeyBytes-API</h1>
         <p>The MonkeyBytes-API is a robust and dynamic service designed to deliver both insightful information and reliable performance. Below, we provide an overview of the available endpoints and a detailed explanation of the server’s functionality.</p>
 
         <h2>Available Endpoints</h2>
-        <p>The MonkeyBytes-API offers the following endpoints for users to interact with:</p>
         <ul>
             <li><strong>/</strong> - The root endpoint provides an overview of the server’s status, including its uptime and the most recent updates, which are dynamically fetched from the <em>updates.json</em> file.</li>
             <li><strong>/testing</strong> - This endpoint delivers random facts about coding, each accompanied by an image from randomfox.ca.</li>
@@ -210,12 +189,9 @@ app.get('/', async (req, res) => {
         <p>The server’s uptime is dynamically calculated in a human-readable format (days, hours, minutes, and seconds). This information is displayed on the root page, allowing users to understand how long the server has been running without interruption.</p>
 
         <h2>Recent Updates</h2>
-        <ul>
-            ${updatesHtml}
-        </ul>
+        <ul>${updatesHtml}</ul>
 
         <h2>Technical Overview</h2>
-        <p>The MonkeyBytes-API employs several key technologies to ensure security and performance:</p>
         <ul>
             <li><strong>Helmet</strong> - Helmet is used to enhance the API's security by setting appropriate HTTP headers, protecting the server from common vulnerabilities.</li>
             <li><strong>Winston</strong> - Winston is integrated as the logging system. It captures and logs all significant server events, such as server startup, requests, and error messages, in a structured and readable format.</li>
@@ -225,18 +201,15 @@ app.get('/', async (req, res) => {
         <p>When the <strong>/testing</strong> endpoint is accessed, a random fact about coding is provided. Each response includes a historical fact along with an associated image from randomfox.ca, creating an engaging and informative experience for the user. The facts are pre-defined within the code, ensuring consistency across requests.</p>
 
         <h2>Error Handling</h2>
-        <p>If a user attempts to access a non-existent route, the API returns a custom 404 error message: <em>"Oh dear! The page thou seekest is not to be found."</em> This ensures that users are promptly informed when they encounter an unavailable resource, helping maintain a seamless user experience.</p>
+        <p>If a user attempts to access a non-existent route, the API returns a custom 404 error message: <em>"Oh dear! The page thou seekest is not to be found."</em></p>
 
         <h2>Server Startup</h2>
         <p>Upon server startup, Winston logs a message indicating that the server is operational and ready to handle requests. This message reads: <em>"The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!"</em></p>
-
-        <p>In conclusion, the MonkeyBytes-API is designed with both functionality and security in mind, offering users a reliable and engaging interface. With its dynamic content, robust logging, and secure architecture, the API is well-equipped to handle a variety of use cases.</p>
     `);
 });
 
 // /testing route with random images from randomfox.ca, random RoboHash profile picture, and random bot name
 app.get('/testing', async (req, res) => {
-    // List of facts about coding
     const facts = [
         { id: 'fact1', testText: "Lo, in the early days of computing, the first line of code was but a humble command to display 'Hello, World!'.", dateUnixUK: Math.floor(Date.now() / 1000) },
         { id: 'fact2', testText: "Verily, the art of debugging was born when Grace Hopper did discover a moth within the bowels of a machine, causing malfunctions.", dateUnixUK: Math.floor(Date.now() / 1000) },
@@ -251,28 +224,17 @@ app.get('/testing', async (req, res) => {
     ];
 
     try {
-        // Fetch a random fox image
-        const foxImageResponse = await axios.get('https://randomfox.ca/floof/');
-        const foxImageUrl = foxImageResponse.data.image;
-
-        // Fetch a random profile picture from RoboHash
+        const foxImageUrl = await getRandomFoxImage();
         const profilePictureUrl = await getRandomProfilePicture();
-
-        // Generate a random bot name
         const botName = generateRandomBotName();
-
-        // Choose a random fact from the list
         const randomFact = facts[Math.floor(Math.random() * facts.length)];
 
-        // Add the random fox image, random profile picture, and random bot name to the chosen fact
         randomFact.testImg = foxImageUrl;
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
-        // Send the selected fact, image, profile picture, and bot name back as JSON
         res.json(randomFact);
     } catch (error) {
-        // In case of an error (e.g., fetching the fox image fails), return a 500 response
         res.status(500).json({ error: "Error fetching data, please try again later." });
     }
 });
@@ -285,8 +247,5 @@ app.use((req, res) => {
 // Start the server
 app.listen(PORT, () => {
     logger.info(`The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`);
-
-    // Immediately post the newest entries on server start
     postNewestToDiscord();
-    
 });
