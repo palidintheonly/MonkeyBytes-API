@@ -83,7 +83,7 @@ app.get('/', async (req, res) => {
         <p>The MonkeyBytes-API offers the following endpoints for users to interact with:</p>
         <ul>
             <li><strong>/</strong> - The root endpoint provides an overview of the server’s status, including its uptime and the most recent updates, which are dynamically fetched from the <em>updates.json</em> file.</li>
-            <li><strong>/testing</strong> - This endpoint delivers random facts about the first computer chip, each accompanied by an image. The facts are selected randomly from a predefined list, ensuring a new insight with every request.</li>
+            <li><strong>/testing</strong> - This endpoint delivers random facts about coding, each accompanied by an image from randomfox.ca.</li>
         </ul>
 
         <h2>Server Status</h2>
@@ -102,7 +102,7 @@ app.get('/', async (req, res) => {
         </ul>
 
         <h2>The /testing Endpoint</h2>
-        <p>When the <strong>/testing</strong> endpoint is accessed, a random fact about the first computer chip is provided. Each response includes a historical fact along with an associated image, creating an engaging and informative experience for the user. The facts are pre-defined within the code, ensuring consistency across requests.</p>
+        <p>When the <strong>/testing</strong> endpoint is accessed, a random fact about coding is provided. Each response includes a historical fact along with an associated image from randomfox.ca, creating an engaging and informative experience for the user. The facts are pre-defined within the code, ensuring consistency across requests.</p>
 
         <h2>Error Handling</h2>
         <p>If a user attempts to access a non-existent route, the API returns a custom 404 error message: <em>"Oh dear! The page thou seekest is not to be found."</em> This ensures that users are promptly informed when they encounter an unavailable resource, helping maintain a seamless user experience.</p>
@@ -114,20 +114,20 @@ app.get('/', async (req, res) => {
     `);
 });
 
-// /testing route with random images from Lorem Picsum
+// /testing route with random images from randomfox.ca
 app.get('/testing', (req, res) => {
-    // List of facts about the first computer chip with Lorem Picsum URLs
+    // List of facts about coding with random fox images
     const facts = [
-        { id: 'fact1', testText: "Behold the wondrous tale of the silicon marvel known as the first computer chip!", testImg: 'https://picsum.photos/300/200?random=1', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact2', testText: "In the year of our Lord 1958, a man named Jack Kilby did fashion this wondrous device.", testImg: 'https://picsum.photos/300/200?random=2', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact3', testText: "Lo and behold, the first chip did indeed bear but a modest handful of transistors.", testImg: 'https://picsum.photos/300/200?random=3', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact4', testText: "The very first chip was but a mere 10 millimeters square in size.", testImg: 'https://picsum.photos/300/200?random=4', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact5', testText: "Upon this tiny silicon platform, the circuitry was etched with great precision.", testImg: 'https://picsum.photos/300/200?random=5', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact6', testText: "The advent of this chip marked the dawn of an age where vast calculations could be performed with great speed.", testImg: 'https://picsum.photos/300/200?random=6', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact7', testText: "Before this momentous invention, computing devices were vast contraptions of metal and wire.", testImg: 'https://picsum.photos/300/200?random=7', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact8', testText: "Each chip was crafted with care by means of intricate processes.", testImg: 'https://picsum.photos/300/200?random=8', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact9', testText: "In the days prior, computing was a realm reserved for the grandest of machines.", testImg: 'https://picsum.photos/300/200?random=9', dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact10', testText: "Yet with this breakthrough, the march of progress did hasten forward with unparalleled fervor.", testImg: 'https://picsum.photos/300/200?random=10', dateUnixUK: Math.floor(Date.now() / 1000) }
+        { id: 'fact1', testText: "Lo, in the early days of computing, the first line of code was but a humble command to display 'Hello, World!'.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact2', testText: "Verily, the art of debugging was born when Grace Hopper did discover a moth within the bowels of a machine, causing malfunctions.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact3', testText: "Know ye this—coding languages, like Latin and Greek of old, are structured and precise, yet oft misunderstood by mere mortals.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact4', testText: "Tarry not, for the first computer virus, known as the 'Creeper', did spread its mischief in the year 1971.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact5', testText: "In days long past, the COBOL language was crafted with great care to manage the ledgers of vast kingdoms, and it remains in use even unto this day.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact6', testText: "Lo! The code repository, a storehouse of wisdom, wherein the wise of old did place their scrolls of logic and function.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact7', testText: "The revered Alan Turing, father of modern computing, devised algorithms which did unlock the secrets of the Enigma machine in the war of yore.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact8', testText: "Hark! In the ancient land of Bell Labs, a language known as 'C' was crafted, the foundation of many tongues spoken by computers to this day.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact9', testText: "Before the birth of Git, the wise did manage their changes by hand, a perilous task fraught with error and woe.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) },
+        { id: 'fact10', testText: "Let it be known that the coding of yore was done upon vast tapes and punch cards, which did make a most satisfying 'clack' as they were written upon.", testImg: 'https://randomfox.ca/floof/', dateUnixUK: Math.floor(Date.now() / 1000) }
     ];
 
     // Choose a random fact
