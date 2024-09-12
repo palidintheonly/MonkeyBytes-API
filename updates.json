@@ -1,5 +1,9 @@
 [
     {
+        "updateText": "Update 10 (current)",
+        "description": "Verily, the tenth update hath brought forth a new and wondrous integration. Now, the `/testing` endpoint doth provide random coding facts, each adorned with the image of a noble fox from the distant realm of `randomfox.ca`. Additionally, the code hath been fortified with error handling to ensure stability when fetching said images."
+    },
+    {
         "updateText": "Update 9",
         "description": "Lo, in this ninth update, we hath introduced the creation and deletion of files, notably in the form of the wondrous .md and .txt formats."
     },
