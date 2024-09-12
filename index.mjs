@@ -288,4 +288,5 @@ app.listen(PORT, () => {
 
     // Immediately post the newest entries on server start
     postNewestToDiscord();
+    
 });
