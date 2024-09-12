@@ -97,35 +97,7 @@ function generateRandomBotName() {
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new.rss';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 
-// Function to post to Discord
-async function postToDiscord(message) {
-    try {
-        await axios.post(DISCORD_WEBHOOK_URL, {
-            content: message,
-        });
-        logger.info('Message posted to Discord successfully.');
-    } catch (error) {
-        logger.error(`Error posting to Discord: ${error.message}`);
-    }
-}
-
-// Function to fetch and parse Reddit RSS feed
-async function fetchRedditRSS() {
-    try {
-        const response = await axios.get(REDDIT_RSS_URL);
-        const rssData = response.data;
-
-        // Parse the XML response to JSON
-        const parser = new xml2js.Parser();
-        const jsonData = await parser.parseStringPromise(rssData);
-        return jsonData;
-    } catch (error) {
-        logger.error(`Error fetching Reddit RSS feed: ${error.message}`);
-        return null;
-    }
-}
-
-// Function to post the 5 newest posts from the Reddit RSS feed to Discord with Markdown formatting
+// Function to post the 5 newest posts from the Reddit RSS feed to Discord using embeds and content
 async function postNewestToDiscord() {
     const redditData = await fetchRedditRSS();
 
@@ -136,16 +108,53 @@ async function postNewestToDiscord() {
 
     // Extract the 5 newest posts
     const newestPosts = redditData.feed.entry.slice(0, 5);
-    let message = '__**Here are the 5 newest posts from Reddit:**__\n\n'; // Underline and bold
 
-    newestPosts.forEach((post, index) => {
-        const postTitle = post.title[0];
-        const postLink = post.link[0].$.href;
-        message += `**${index + 1}. [${postTitle}](${postLink})**\n`; // Bold post number and hyperlink title
+    // Create an array of embeds for each post
+    const embeds = newestPosts.map((post, index) => {
+        const postTitle = post.title[0]; // Get post title
+        const postLink = post.link[0].$.href; // Get post link
+        const postAuthor = post.author[0].name[0]; // Get the author
+        const postContent = post.content ? post.content[0]._ : 'No content provided'; // Get post content (fallback to 'No content')
+        const postImage = post['media:thumbnail'] ? post['media:thumbnail'][0].$.url : 'https://via.placeholder.com/150'; // Use Reddit image or a placeholder if unavailable
+
+        return {
+            title: `${index + 1}. ${postTitle}`,
+            url: postLink,
+            description: `Posted by ${postAuthor}: [${postTitle}](${postLink})`, // Link and author info
+            image: {
+                url: postImage, // Reddit image (or a placeholder)
+            },
+            color: 3447003, // Optional: set a color for the embed bar
+            author: {
+                name: postAuthor, // Display the author's name
+            },
+            fields: [
+                {
+                    name: 'Post Content',
+                    value: postContent.length > 1024 ? `${postContent.slice(0, 1020)}...` : postContent, // Ensure content isn't too long
+                },
+            ],
+        };
     });
 
-    // Post the formatted message to Discord
-    await postToDiscord(message);
+    // Add a brief summary in the content field
+    const contentMessage = `📢 **Here are the 5 newest posts from Reddit!**\nFetched at: ${new Date().toLocaleTimeString()}`;
+
+    // Post the content and embeds to Discord
+    await postToDiscord({
+        content: contentMessage, // Add a message at the top
+        embeds: embeds, // Include the embeds
+    });
+}
+
+// Function to post the content (including embeds) to Discord
+async function postToDiscord(payload) {
+    try {
+        await axios.post(DISCORD_WEBHOOK_URL, payload);
+        logger.info('Message posted to Discord successfully.');
+    } catch (error) {
+        logger.error(`Error posting to Discord: ${error.message}`);
+    }
 }
 
 // Schedule to post every 3 minutes (180,000 ms)
