@@ -93,6 +93,22 @@ function generateRandomBotName() {
     return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`; // Generate a random bot name
 }
 
+// Function to fetch and parse Reddit RSS feed
+async function fetchRedditRSS() {
+    try {
+        const response = await axios.get(REDDIT_RSS_URL);
+        const rssData = response.data;
+
+        // Parse the XML response to JSON
+        const parser = new xml2js.Parser();
+        const jsonData = await parser.parseStringPromise(rssData);
+        return jsonData;
+    } catch (error) {
+        logger.error(`Error fetching Reddit RSS feed: ${error.message}`);
+        return null;
+    }
+}
+
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new.rss';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
