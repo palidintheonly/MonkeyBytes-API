@@ -125,7 +125,7 @@ async function fetchRedditRSS() {
     }
 }
 
-// Function to post the 5 newest posts from the Reddit RSS feed to Discord
+// Function to post the 5 newest posts from the Reddit RSS feed to Discord with Markdown formatting
 async function postNewestToDiscord() {
     const redditData = await fetchRedditRSS();
 
@@ -136,15 +136,15 @@ async function postNewestToDiscord() {
 
     // Extract the 5 newest posts
     const newestPosts = redditData.feed.entry.slice(0, 5);
-    let message = 'Here are the 5 newest posts from Reddit:\n\n';
+    let message = '__**Here are the 5 newest posts from Reddit:**__\n\n'; // Underline and bold
 
     newestPosts.forEach((post, index) => {
         const postTitle = post.title[0];
         const postLink = post.link[0].$.href;
-        message += `**${index + 1}. ${postTitle}**\n${postLink}\n\n`;
+        message += `**${index + 1}. [${postTitle}](${postLink})**\n`; // Bold post number and hyperlink title
     });
 
-    // Post the message to Discord
+    // Post the formatted message to Discord
     await postToDiscord(message);
 }
 
