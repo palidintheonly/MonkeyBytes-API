@@ -76,11 +76,15 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
 
 2. Install Dependencies:
 cd MonkeyBytes-API
-```npm install```
+```bash
+npm install```
 
 3. Run the Server:
-```node index.mjs```
-
+```bash
+{
+node index.mjs
+} 
+```
 ```json
 {
   "id": "fact7",
