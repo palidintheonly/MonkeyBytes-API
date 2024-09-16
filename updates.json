@@ -1,7 +1,7 @@
 [
     {
         "updateText": "Update 11 (current)",
-        "description": "Hear ye! In this eleventh update, the code hath been refined to ensure that the 'Latest Decrees' are faithfully drawn from the sacred 'updates.json' scroll. The server now readeth the updates correctly and displayeth them upon the root pathway, restoring the flow of knowledge to all noble visitors. Verily, error handling hath been fortified to gracefully manage any misfortunes whilst reading the scrolls, ensuring the stability and prosperity of our realm."
+        "description": "Hear ye! In this eleventh update, we have undertaken a grand endeavor to mend various ailments that have beset our noble code. The parsing and accessing of the Reddit RSS feed within `postNewestToDiscord` hath been corrected, banishing the runtime errors that plagued our realm. We have ensured that `htmlContent` is ever a string before it is processed in `cleanHtmlContent`, thus remedying the foul `htmlContent.replace is not a function` error. Duplicate import statements were expunged to resolve the grave 'Identifier 'express' has already been declared' syntax error.\n\nFurthermore, we have affirmed that the random facts bestowed upon thee by the `/testing` pathway remain truly random. The '?? Latest Decrees' section now faithfully readeth from the sacred 'updates.json' scroll, ensuring that all proclamations are displayed to our esteemed visitors. We have also enhanced error handling and logging, fortifying our code against unforeseen misfortunes.\n\nLet it be known that the original code hath been preserved with utmost care whilst these adjustments were wrought, ensuring stability and prosperity for all who traverse our domain."
     },
     {
         "updateText": "Update 10",
