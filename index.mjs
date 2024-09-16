@@ -1,3 +1,5 @@
+// index.mjs
+
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
@@ -6,7 +8,7 @@ import winston from 'winston';
 import helmet from 'helmet';
 import axios from 'axios'; // Ensure axios is installed using: npm install axios
 import xml2js from 'xml2js'; // For parsing Reddit RSS feeds
-import crypto from 'crypto'; // Import the crypto module for secure random numbers
+import crypto from 'crypto'; // For secure random numbers
 import { decode } from 'html-entities'; // For decoding HTML entities
 
 // Get __dirname equivalent in ES modules
@@ -101,7 +103,12 @@ async function fetchRedditRSS() {
         const response = await axios.get(REDDIT_RSS_URL);
         const rssData = response.data;
         // Adjusted parser options
-        const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: false });
+        const parser = new xml2js.Parser({
+            explicitArray: false,
+            explicitCharkey: false,
+            mergeAttrs: true,
+            attrkey: 'attributes'
+        });
         const jsonData = await parser.parseStringPromise(rssData);
         return jsonData;
     } catch (error) {
@@ -121,7 +128,7 @@ function cleanHtmlContent(htmlContent) {
 
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
+const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your actual webhook URL
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
@@ -132,36 +139,52 @@ async function postNewestToDiscord() {
         return;
     }
 
-    const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
+    const entries = Array.isArray(redditData.feed.entry)
+        ? redditData.feed.entry
+        : [redditData.feed.entry];
     const newestPosts = entries.slice(0, 5);
 
     // Correct the structure of the embed for Discord
     const embeds = newestPosts.map((post) => {
         const postTitle = decode(post.title);
-        const postLink = post.link.href || post.link[0].$.href;
+
+        // Safely extract the post link
+        let postLink = '';
+        if (Array.isArray(post.link)) {
+            const alternateLink = post.link.find((l) => l.rel === 'alternate');
+            postLink = alternateLink ? alternateLink.href : '';
+        } else if (typeof post.link === 'object') {
+            postLink = post.link.href || '';
+        }
+
         const postAuthor = post.author.name;
         const postContentRaw = post.content || 'No content provided';
         const postContent = cleanHtmlContent(postContentRaw); // Clean the HTML content to make it human-readable
 
         // Limit fields to Discord's character limits
         const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
-        const description = postContent.length > 4096 ? postContent.slice(0, 4093) + '...' : postContent;
-        const authorName = postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor;
+        const description =
+            postContent.length > 4096 ? postContent.slice(0, 4093) + '...' : postContent;
+        const authorName =
+            postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor;
 
         // Optional image
-        const postImage = post['media:thumbnail'] ? post['media:thumbnail'].$.url : null;
+        let postImage = null;
+        if (post['media:thumbnail']) {
+            postImage = post['media:thumbnail'].url || post['media:thumbnail'].attributes.url;
+        }
 
         // Construct the embed object
         const embed = {
             title: title,
             url: postLink,
-            description: description
+            description: description,
         };
 
         // Add author if authorName is available
         if (authorName) {
             embed.author = {
-                name: `Posted by ${authorName}`
+                name: `Posted by ${authorName}`,
             };
         }
 
@@ -179,13 +202,13 @@ async function postNewestToDiscord() {
         hour12: false,
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit'
+        second: '2-digit',
     });
 
     // Send message with content and embeds
     const payload = {
         content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
-        embeds: embeds
+        embeds: embeds,
     };
 
     try {
@@ -209,7 +232,9 @@ app.get('/', async (req, res) => {
     let updatesHtml = '';
     try {
         const updates = await getUpdates();
-        updatesHtml = updates.map(update => `<li><strong>${update.updateText}</strong> - ${update.description}</li>`).join('');
+        updatesHtml = updates
+            .map((update) => `<li><strong>${update.updateText}</strong> - ${update.description}</li>`)
+            .join('');
     } catch (error) {
         updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
     }
@@ -251,16 +276,66 @@ app.get('/', async (req, res) => {
 // /testing route with random images from random.dog, random RoboHash profile picture, and random bot name
 app.get('/testing', async (req, res) => {
     const facts = [
-        { id: 'fact1', testText: "Hear ye! In ancient times, craftsmen didst fashion a mechanical knight, moving by wondrous gears and pulleys.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact2', testText: "Lo, the first automaton did stir, forged by the hands of cunning artificers in days of yore.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact3', testText: "Verily, the ancients did create a metal man, who could stand and raise his visor upon command.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact4', testText: "T'was said that a wondrous contraption, resembling a knight, could move of its own accord.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact5', testText: "Behold! A mechanical marvel, built to mimic the movements of a valiant warrior.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact6', testText: "In the annals of history, tales speak of a metal knight, brought to life by ingenious invention.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact7', testText: "Know ye that men of wisdom did conceive a device, an automaton, to emulate human motion.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact8', testText: "In days long past, a lifelike figure was wrought, moving as if endowed with spirit.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact9', testText: "The lords of old did marvel at a creation that mimicked life, a precursor to our modern wonders.", dateUnixUK: Math.floor(Date.now() / 1000) },
-        { id: 'fact10', testText: "Let it be known that the first of automata did rise, a testament to man's desire to animate the inanimate.", dateUnixUK: Math.floor(Date.now() / 1000) }
+        {
+            id: 'fact1',
+            testText:
+                'Hear ye! In ancient times, craftsmen didst fashion a mechanical knight, moving by wondrous gears and pulleys.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact2',
+            testText:
+                'Lo, the first automaton did stir, forged by the hands of cunning artificers in days of yore.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact3',
+            testText:
+                'Verily, the ancients did create a metal man, who could stand and raise his visor upon command.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact4',
+            testText:
+                "T'was said that a wondrous contraption, resembling a knight, could move of its own accord.",
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact5',
+            testText:
+                'Behold! A mechanical marvel, built to mimic the movements of a valiant warrior.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact6',
+            testText:
+                'In the annals of history, tales speak of a metal knight, brought to life by ingenious invention.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact7',
+            testText:
+                'Know ye that men of wisdom did conceive a device, an automaton, to emulate human motion.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact8',
+            testText:
+                'In days long past, a lifelike figure was wrought, moving as if endowed with spirit.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact9',
+            testText:
+                'The lords of old did marvel at a creation that mimicked life, a precursor to our modern wonders.',
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
+        {
+            id: 'fact10',
+            testText:
+                "Let it be known that the first of automata did rise, a testament to man's desire to animate the inanimate.",
+            dateUnixUK: Math.floor(Date.now() / 1000),
+        },
     ];
 
     try {
@@ -275,17 +350,21 @@ app.get('/testing', async (req, res) => {
 
         res.json(randomFact);
     } catch (error) {
-        res.status(500).json({ error: "Alas! An error hath occurred while fetching data. Please try again later." });
+        res.status(500).json({
+            error: 'Alas! An error hath occurred while fetching data. Please try again later.',
+        });
     }
 });
 
 // 404 Error Handler
 app.use((req, res) => {
-    res.status(404).json({ error: "Oh dear! The page thou seekest is not to be found." });
+    res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
 // Start the server
 app.listen(PORT, () => {
-    logger.info(`The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`);
+    logger.info(
+        `The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`
+    );
     postNewestToDiscord();
 });
