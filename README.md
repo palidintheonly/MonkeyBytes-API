@@ -78,7 +78,7 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
 cd MonkeyBytes-API
 ```npm install```
 
-3. Run the Server:
+3. Run the Server: 
 ```node index.mjs```
 
 ```json
