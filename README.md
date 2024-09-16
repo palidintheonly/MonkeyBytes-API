@@ -89,13 +89,13 @@ cd MonkeyBytes-API
 2. Install Dependencies:
 cd MonkeyBytes-API
 ```bash
-npm install```
-
+npm install
+```
+```
 3. Run the Server:
-```bash
-{
+```
+```npm
 node index.mjs
-} 
 ```
 ```json
 {
