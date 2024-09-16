@@ -69,6 +69,18 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
 
 #### Example Response from `/testing`:
 
+
+### 📜 How to Begin Thy Journey
+1. Clone the Repository:
+```git clone https://github.com/palidintheonly/MonkeyBytes-API.git```
+
+2. Install Dependencies:
+cd MonkeyBytes-API
+```npm install```
+
+3. Run the Server:
+```node index.mjs```
+
 ```json
 {
   "id": "fact7",
@@ -79,15 +91,3 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
   "testingBotName": "GallantSquire789"
 }
 ```
-
-📜 How to Begin Thy Journey
-1. Clone the Repository:
-```git clone https://github.com/palidintheonly/MonkeyBytes-API.git```
-
-2. Install Dependencies:
-cd MonkeyBytes-API
-```npm install```
-
-3. Run the Server:
-```bash
-node index.mjs```
