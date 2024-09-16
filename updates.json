@@ -1,6 +1,10 @@
 [
     {
-        "updateText": "Update 10 (current)",
+        "updateText": "Update 11 (current)",
+        "description": "Hear ye! In this eleventh update, we have undertaken a grand endeavor to mend various ailments that have beset our noble code. The parsing and accessing of the Reddit RSS feed within `postNewestToDiscord` hath been corrected, banishing the runtime errors that plagued our realm. We have ensured that `htmlContent` is ever a string before it is processed in `cleanHtmlContent`, thus remedying the foul `htmlContent.replace is not a function` error. Duplicate import statements were expunged to resolve the grave 'Identifier 'express' has already been declared' syntax error.\n\nFurthermore, we have affirmed that the random facts bestowed upon thee by the `/testing` pathway remain truly random. The '?? Latest Decrees' section now faithfully readeth from the sacred 'updates.json' scroll, ensuring that all proclamations are displayed to our esteemed visitors. We have also enhanced error handling and logging, fortifying our code against unforeseen misfortunes.\n\nLet it be known that the original code hath been preserved with utmost care whilst these adjustments were wrought, ensuring stability and prosperity for all who traverse our domain."
+    },
+    {
+        "updateText": "Update 10",
         "description": "Verily, the tenth update hath brought forth a new and wondrous integration. Now, the `/testing` endpoint doth provide random coding facts, each adorned with the image of a noble fox from the distant realm of `randomfox.ca`. Additionally, the code hath been fortified with error handling to ensure stability when fetching said images."
     },
     {
@@ -10,9 +14,5 @@
     {
         "updateText": "Update 8",
         "description": "Documentation hath been elevated to the level of a gentleman's discourse."
-    },
-    {
-        "updateText": "Update 7",
-        "description": "Added security enhancements using Helmet middleware and a custom 404 error handler."
     }
 ]
