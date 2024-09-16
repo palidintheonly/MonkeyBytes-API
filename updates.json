@@ -1,6 +1,10 @@
 [
     {
-        "updateText": "Update 10 (current)",
+        "updateText": "Update 11 (current)",
+        "description": "Hear ye! In this eleventh update, the code hath been refined to ensure that the 'Latest Decrees' are faithfully drawn from the sacred 'updates.json' scroll. The server now readeth the updates correctly and displayeth them upon the root pathway, restoring the flow of knowledge to all noble visitors. Verily, error handling hath been fortified to gracefully manage any misfortunes whilst reading the scrolls, ensuring the stability and prosperity of our realm."
+    },
+    {
+        "updateText": "Update 10",
         "description": "Verily, the tenth update hath brought forth a new and wondrous integration. Now, the `/testing` endpoint doth provide random coding facts, each adorned with the image of a noble fox from the distant realm of `randomfox.ca`. Additionally, the code hath been fortified with error handling to ensure stability when fetching said images."
     },
     {
@@ -10,9 +14,5 @@
     {
         "updateText": "Update 8",
         "description": "Documentation hath been elevated to the level of a gentleman's discourse."
-    },
-    {
-        "updateText": "Update 7",
-        "description": "Added security enhancements using Helmet middleware and a custom 404 error handler."
     }
 ]
