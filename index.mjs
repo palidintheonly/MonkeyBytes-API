@@ -129,7 +129,7 @@ function cleanHtmlContent(htmlContent) {
 
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
+const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL_HERE'; // Replace with your actual webhook URL
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
@@ -228,53 +228,122 @@ app.get('/', async (req, res) => {
     let updatesHtml = '';
     try {
         const updates = await getUpdates();
-        console.log('Loaded updates:', updates); // Log the updates for debugging
-        if (updates && updates.length > 0) {
-            updatesHtml = updates
-                .map(
-                    (update) =>
-                        `<li><strong>${update.updateText}</strong> - ${update.description}</li>`
-                )
-                .join('');
-        } else {
-            updatesHtml = '<li>No updates available at this time.</li>';
-        }
+        logger.info('Loaded updates:', updates);
+
+        updatesHtml = updates.length
+            ? updates
+                  .map(
+                      (update) =>
+                          `<li><strong>${update.updateText}</strong> - ${update.description}</li>`
+                  )
+                  .join('')
+            : '<li>No updates available at this time.</li>';
     } catch (error) {
         logger.error(`Error in root route: ${error.message}`);
-        updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
+        updatesHtml =
+            '<li>Error loading updates. Please check the server logs for details.</li>';
     }
 
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.send(`
-        <h1>📜 Greetings, noble visitor, to the MonkeyBytes-API!</h1>
-        <p>Welcome to our humble abode, where knowledge and information flow freely like the rivers of old. Below, thou shalt find the pathways and tales that make up this grand server.</p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>MonkeyBytes-API</title>
+            <style>
+                body {
+                    background-color: #1a1a1a;
+                    color: #e0e0e0;
+                    font-family: 'Times New Roman', Times, serif;
+                    margin: 0;
+                    padding: 0;
+                }
+                a {
+                    color: #bb86fc;
+                }
+                h1, h2 {
+                    color: #bb86fc;
+                }
+                ul {
+                    list-style-type: none;
+                    padding: 0;
+                }
+                li {
+                    margin: 10px 0;
+                }
+                .container {
+                    max-width: 800px;
+                    margin: auto;
+                    padding: 40px 20px;
+                    background-image: url('https://path.to/your/wanted-background.jpg');
+                    background-size: cover;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-attachment: fixed;
+                    background-blend-mode: multiply;
+                    background-color: rgba(26, 26, 26, 0.9);
+                }
+                .content {
+                    background-color: rgba(26, 26, 26, 0.8);
+                    padding: 20px;
+                    border-radius: 10px;
+                }
+                .footer {
+                    text-align: center;
+                    margin-top: 40px;
+                    font-size: 0.9em;
+                    color: #666;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="content">
+                    <h1>📜 Greetings, noble visitor, to the MonkeyBytes-API!</h1>
+                    <p>Welcome to our humble abode, where knowledge and information flow freely like the rivers of old. Below, thou shalt find the pathways and tales that make up this grand server.</p>
 
-        <h2>⚔️ Pathways Available</h2>
-        <ul>
-            <li><strong>/</strong> - This very page, offering an overview of our server's well-being, including its duration of service and the latest news, fetched from the sacred <em>updates.json</em> scroll.</li>
-            <li><strong>/testing</strong> - A route that delivers unto thee random tales of the first mechanical knight, each accompanied by an image of a hound from distant lands.</li>
-        </ul>
+                    <h2>⚔️ Pathways Available</h2>
+                    <ul>
+                        <li><strong>/</strong> - This very page, offering an overview of our server's well-being, including its duration of service and the latest news, fetched from the sacred <em>updates.json</em> scroll.</li>
+                        <li><strong>/testing</strong> - A route that delivers unto thee random tales of the first mechanical knight, each accompanied by an image of a hound from distant lands.</li>
+                    </ul>
 
-        <h2>⏳ State of the Server</h2>
-        <p>Our server hath been steadfast for ${uptime}. May it continue to serve without falter!</p>
+                    <h2>⏳ State of the Server</h2>
+                    <p>Our server hath been steadfast for ${uptime}. May it continue to serve without falter!</p>
 
-        <h2>📰 Latest Decrees</h2>
-        <ul>${updatesHtml}</ul>
+                    <h2>📰 Latest Decrees</h2>
+                    <ul>${updatesHtml}</ul>
 
-        <h2>🔍 A Glimpse Behind the Tapestry</h2>
-        <ul>
-            <li><strong>Helmet</strong> - Like a trusty helm, Helmet guards our API with headers that ward off common threats.</li>
-            <li><strong>Winston</strong> - Our herald, Winston, records all notable events, from the dawn of the server's awakening to the requests and errors encountered on our journey.</li>
-        </ul>
+                    <h2>🔍 A Glimpse Behind the Tapestry</h2>
+                    <ul>
+                        <li><strong>Helmet</strong> - Like a trusty helm, Helmet guards our API with headers that ward off common threats.</li>
+                        <li><strong>Winston</strong> - Our herald, Winston, records all notable events, from the dawn of the server's awakening to the requests and errors encountered on our journey.</li>
+                        <li><strong>Axios</strong> - Our swift messenger, Axios, fetches tales and images from distant lands.</li>
+                        <li><strong>xml2js</strong> - The translator that converts the mystical RSS feed into a language our server can comprehend.</li>
+                        <li><strong>crypto</strong> - Provides secure randomization for various functionalities.</li>
+                        <li><strong>Reddit RSS Feed</strong> - Every 30 seconds, our server fetches the latest proclamations from Reddit and shares them on our Discord channel.</li>
+                    </ul>
 
-        <h2>📖 The /testing Pathway</h2>
-        <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale of the first automaton, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a loyal hound. These tales are penned within our code, ensuring their consistency.</p>
+                    <h2>📖 The /testing Pathway</h2>
+                    <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale of the first automaton, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a loyal hound. These tales are penned within our code, ensuring their consistency.</p>
 
-        <h2>🚫 In Case of Missteps</h2>
-        <p>Shouldst thou wander astray and seek a path unknown, our server shall gently remind thee: <em>"Oh dear! The page thou seekest is not to be found."</em></p>
+                    <h2>📡 The Reddit Herald</h2>
+                    <p>Our server doth fetch the latest missives from Reddit's realm every 30 seconds, sharing the five newest proclamations with our Discord community.</p>
 
-        <h2>🚀 The Server's Awakening</h2>
-        <p>At the moment of its grand awakening, our herald announces: <em>"The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!"</em></p>
+                    <h2>🚫 In Case of Missteps</h2>
+                    <p>Shouldst thou wander astray and seek a path unknown, our server shall gently remind thee: <em>"Oh dear! The page thou seekest is not to be found."</em></p>
+
+                    <h2>🛡️ Security and Logging</h2>
+                    <p>We employ various safeguards and loggers to ensure the smooth operation of our server and the safety of our users.</p>
+
+                    <div class="footer">
+                        &copy; ${new Date().getFullYear()} MonkeyBytes-API
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
     `);
 });
 
