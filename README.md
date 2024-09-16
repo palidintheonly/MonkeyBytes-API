@@ -76,6 +76,18 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
 
 2. Install Dependencies:
 cd MonkeyBytes-API
+```npm install```
+
+3. Run the Server: 
+```node index.mjs```
+
+
+### 📜 How to Begin Thy Journey
+1. Clone the Repository:
+```git clone https://github.com/palidintheonly/MonkeyBytes-API.git```
+
+2. Install Dependencies:
+cd MonkeyBytes-API
 ```bash
 npm install```
 
