@@ -78,6 +78,7 @@ The `/testing` endpoint offers knowledge most curious, providing thee with:
   "testingProfilePicture": "https://robohash.org/def456.png",
   "testingBotName": "GallantSquire789"
 }
+```
 
 📜 How to Begin Thy Journey
 1. Clone the Repository:
