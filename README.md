@@ -83,20 +83,23 @@ cd MonkeyBytes-API
 
 
 ### 📜 How to Begin Thy Journey
-1. Clone the Repository:
-```git clone https://github.com/palidintheonly/MonkeyBytes-API.git```
 
-2. Install Dependencies:
+### 1. Clone the Repository:
+```
+git clone https://github.com/palidintheonly/MonkeyBytes-API.git
+```
+
+### 2. Install Dependencies:
 cd MonkeyBytes-API
-```bash
+```
 npm install
 ```
+
+### 3. Run the Server:
 ```
-3. Run the Server:
-```
-```npm
 node index.mjs
 ```
+
 ```json
 {
   "id": "fact7",
@@ -107,3 +110,4 @@ node index.mjs
   "testingBotName": "GallantSquire789"
 }
 ```
+x
