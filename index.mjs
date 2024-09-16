@@ -129,7 +129,7 @@ function cleanHtmlContent(htmlContent) {
 
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL_HERE'; // Replace with your actual webhook URL
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
@@ -221,6 +221,58 @@ async function postNewestToDiscord() {
 // Schedule to post every 30 seconds (30,000 ms)
 setInterval(postNewestToDiscord, 30000);
 
+// Predefined facts array (moved outside the route handler to avoid redefining on each request)
+const facts = [
+    {
+        id: 'fact1',
+        testText:
+            'Hear ye! In ancient times, craftsmen didst fashion a mechanical knight, moving by wondrous gears and pulleys.',
+    },
+    {
+        id: 'fact2',
+        testText:
+            'In the days of old, scribes recorded the tales of valor and wisdom, preserving them for generations.',
+    },
+    {
+        id: 'fact3',
+        testText:
+            'The first automaton was a marvel of its time, demonstrating the ingenuity of its creators.',
+    },
+    {
+        id: 'fact4',
+        testText:
+            'Artisans of the medieval era crafted intricate devices that blended art with early engineering.',
+    },
+    {
+        id: 'fact5',
+        testText:
+            'Legends speak of mechanical beings that roamed the lands, serving their lords with unwavering loyalty.',
+    },
+    // Add more facts as desired
+];
+
+// /testing route with random images from random.dog, random RoboHash profile picture, and random bot name
+app.get('/testing', async (req, res) => {
+    try {
+        const dogImageUrl = await getRandomDogImage();
+        const profilePictureUrl = await getRandomProfilePicture();
+        const botName = generateRandomBotName();
+        const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] }; // Create a shallow copy
+
+        // Add dynamic properties
+        randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
+        randomFact.testImg = dogImageUrl;
+        randomFact.testingProfilePicture = profilePictureUrl;
+        randomFact.testingBotName = botName;
+
+        res.json(randomFact);
+    } catch (error) {
+        res.status(500).json({
+            error: 'Alas! An error hath occurred while fetching data. Please try again later.',
+        });
+    }
+});
+
 // Root route '/'
 app.get('/', async (req, res) => {
     const uptime = formatUptime(Date.now() - serverStartTime);
@@ -240,8 +292,7 @@ app.get('/', async (req, res) => {
             : '<li>No updates available at this time.</li>';
     } catch (error) {
         logger.error(`Error in root route: ${error.message}`);
-        updatesHtml =
-            '<li>Error loading updates. Please check the server logs for details.</li>';
+        updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
     }
 
     res.set('Content-Type', 'text/html; charset=utf-8');
@@ -276,7 +327,7 @@ app.get('/', async (req, res) => {
                     max-width: 800px;
                     margin: auto;
                     padding: 40px 20px;
-                    background-image: url('https://path.to/your/wanted-background.jpg');
+                    background-image: url('https://cdn.discordapp.com/banners/1051503632677359686/0d039ec11c1709a1c1987bfbcaad6e7c.png?size=1024&format=webp&quality=lossless&width=0&height=256');
                     background-size: cover;
                     background-repeat: no-repeat;
                     background-position: center;
@@ -338,43 +389,13 @@ app.get('/', async (req, res) => {
                     <p>We employ various safeguards and loggers to ensure the smooth operation of our server and the safety of our users.</p>
 
                     <div class="footer">
-                        &copy; ${new Date().getFullYear()} MonkeyBytes-API
+                        &copy; ${new Date().getFullYear()} MonkeyBytes-API. All rights reserved.
                     </div>
                 </div>
             </div>
         </body>
         </html>
     `);
-});
-
-// /testing route with random images from random.dog, random RoboHash profile picture, and random bot name
-app.get('/testing', async (req, res) => {
-    const facts = [
-        {
-            id: 'fact1',
-            testText:
-                'Hear ye! In ancient times, craftsmen didst fashion a mechanical knight, moving by wondrous gears and pulleys.',
-            dateUnixUK: Math.floor(Date.now() / 1000),
-        },
-        // ... [Other facts remain unchanged]
-    ];
-
-    try {
-        const dogImageUrl = await getRandomDogImage();
-        const profilePictureUrl = await getRandomProfilePicture();
-        const botName = generateRandomBotName();
-        const randomFact = facts[Math.floor(Math.random() * facts.length)];
-
-        randomFact.testImg = dogImageUrl;
-        randomFact.testingProfilePicture = profilePictureUrl;
-        randomFact.testingBotName = botName;
-
-        res.json(randomFact);
-    } catch (error) {
-        res.status(500).json({
-            error: 'Alas! An error hath occurred while fetching data. Please try again later.',
-        });
-    }
 });
 
 // 404 Error Handler
