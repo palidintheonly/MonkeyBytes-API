@@ -100,7 +100,8 @@ async function fetchRedditRSS() {
     try {
         const response = await axios.get(REDDIT_RSS_URL);
         const rssData = response.data;
-        const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
+        // Adjusted parser options
+        const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: false });
         const jsonData = await parser.parseStringPromise(rssData);
         return jsonData;
     } catch (error) {
@@ -137,9 +138,9 @@ async function postNewestToDiscord() {
     // Correct the structure of the embed for Discord
     const embeds = newestPosts.map((post) => {
         const postTitle = decode(post.title);
-        const postLink = post.link.href;
+        const postLink = post.link.href || post.link[0].$.href;
         const postAuthor = post.author.name;
-        const postContentRaw = post.content ? post.content._ : 'No content provided';
+        const postContentRaw = post.content || 'No content provided';
         const postContent = cleanHtmlContent(postContentRaw); // Clean the HTML content to make it human-readable
 
         // Limit fields to Discord's character limits
@@ -186,9 +187,6 @@ async function postNewestToDiscord() {
         content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
         embeds: embeds
     };
-
-    // Log the payload
-    console.log('Payload being sent to Discord:', JSON.stringify(payload, null, 2));
 
     try {
         await axios.post(DISCORD_WEBHOOK_URL, payload);
