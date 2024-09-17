@@ -21,14 +21,14 @@ const PORT = 21560;
 // Utilize helmet for enhanced security
 app.use(helmet());
 
-// Enable JSON and URL-encoded body parsing (to handle POST requests with Unicode data)
+// Enable JSON and URL-encoded body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Record the commencement time of the server
 const serverStartTime = Date.now();
 
-// Function to format uptime in days, hours, minutes, seconds
+// Function to format uptime
 function formatUptime(ms) {
     let totalSeconds = Math.floor(ms / 1000);
     const days = Math.floor(totalSeconds / 86400);
@@ -52,53 +52,132 @@ const logger = winston.createLogger({
     transports: [new winston.transports.Console()],
 });
 
-// Function to load updates dynamically from the updates.json file
+// Function to load updates from updates.json
 async function getUpdates() {
     try {
         const data = await fs.readFile(path.join(__dirname, 'updates.json'), 'utf-8');
-        const updates = JSON.parse(data);
-        return updates;
+        return JSON.parse(data);
     } catch (error) {
         logger.error(`Error reading updates.json: ${error.message}`);
         return [];
     }
 }
 
-// Function to get a random dog image URL from random.dog
-async function getRandomDogImage() {
-    try {
-        const response = await axios.get('https://random.dog/woof.json');
-        const url = response.data.url;
-        // Ensure the URL is a valid image (sometimes random.dog returns videos)
-        if (url.endsWith('.mp4') || url.endsWith('.webm')) {
-            return await getRandomDogImage(); // Retry if not an image
-        }
-        return url;
-    } catch (error) {
-        logger.error(`Error fetching random dog image: ${error.message}`);
-        return 'https://via.placeholder.com/300x200?text=Error+fetching+image'; // Placeholder if there's an issue fetching the dog image
-    }
+// Updated list of 10 pigeon image URLs
+const pigeonImageList = [
+    'https://i.ibb.co/NTp1phP/1.jpg',
+    'https://i.ibb.co/DKMWRTD/2.jpg',
+    'https://i.ibb.co/kJqqc31/3.jpg',
+    'https://i.ibb.co/SfBF8cq/4.jpg',
+    'https://i.ibb.co/0Q7M5BT/5.jpg',
+    'https://i.ibb.co/3Bf2JVg/6.jpg',
+    'https://i.ibb.co/XtfjB7b/7.jpg',
+    'https://i.ibb.co/VtdgpmT/8.jpg',
+    'https://i.ibb.co/5jqhFvh/9.jpg',
+    'https://i.ibb.co/CHrX2mG/10.jpg',
+];
+
+// Function to get a random pigeon image URL
+function getRandomPigeonImage() {
+    const randomIndex = Math.floor(Math.random() * pigeonImageList.length);
+    return pigeonImageList[randomIndex];
 }
 
-// Function to get a random robohash profile picture using crypto for a secure random seed
-async function getRandomProfilePicture() {
-    try {
-        const randomSeed = crypto.randomBytes(4).toString('hex'); // Convert 4 random bytes to a hexadecimal string
-        return `https://robohash.org/${randomSeed}.png`; // Return the RoboHash image URL
-    } catch (error) {
-        logger.error(`Error fetching random profile picture: ${error.message}`);
-        return 'https://via.placeholder.com/300x200?text=Error+fetching+profile+picture'; // Placeholder in case of error
-    }
+// Updated function to get a random profile picture using RoboHash API
+function getRandomProfilePicture() {
+    const randomUsername = crypto.randomBytes(4).toString('hex');
+    return `https://robohash.org/${randomUsername}.png`;
 }
 
 // Function to generate a random bot name
 function generateRandomBotName() {
     const adjectives = ['Valiant', 'Noble', 'Mighty', 'Regal', 'Gallant'];
     const nouns = ['Knight', 'Baron', 'Lord', 'Squire', 'Monarch'];
-    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`; // Generate a random bot name
+    return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${
+        nouns[Math.floor(Math.random() * nouns.length)]
+    }${Math.floor(Math.random() * 1000)}`;
 }
+
+// Predefined facts array with 10 new facts about pigeons, spoken like a royal in 1066
+const facts = [
+    {
+        id: 'fact1',
+        testText:
+            "Verily, the humble pigeon doth find its way home o'er great distances, guided by the Lord's own hand.",
+    },
+    {
+        id: 'fact2',
+        testText:
+            "Tis known that pigeons, with feathers of grey and eyes of keen sight, art messengers of import across our lands.",
+    },
+    {
+        id: 'fact3',
+        testText:
+            "In the annals of history, the pigeon hath served kings and nobles, bearing missives swift and sure.",
+    },
+    {
+        id: 'fact4',
+        testText:
+            "These birds, though common in visage, possess a loyalty unmatched, returning ever to their roosts.",
+    },
+    {
+        id: 'fact5',
+        testText:
+            "I have witnessed pigeons trained to carry tidings between castles, a marvel of God's creation.",
+    },
+    {
+        id: 'fact6',
+        testText:
+            "The pigeon, gentle of nature, doth thrive in our towns and keeps, living alongside man.",
+    },
+    {
+        id: 'fact7',
+        testText:
+            "Some say the pigeon can discern the north star, guiding itself through night and storm.",
+    },
+    {
+        id: 'fact8',
+        testText:
+            "Tis a wonder that pigeons feed their young with milk of their crop, a trait rare amongst birds.",
+    },
+    {
+        id: 'fact9',
+        testText:
+            "Their cooing songs echo in the morn, heralding the dawn as roosters do in the countryside.",
+    },
+    {
+        id: 'fact10',
+        testText:
+            "I declare, the pigeon's endurance is famed, for it flies many leagues without rest.",
+    },
+];
+
+// /testing route with random pigeon images, RoboHash avatars, and random bot name
+app.get('/testing', (req, res) => {
+    try {
+        const pigeonImageUrl = getRandomPigeonImage();
+        const profilePictureUrl = getRandomProfilePicture();
+        const botName = generateRandomBotName();
+        const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] };
+
+        // Add dynamic properties
+        randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
+        randomFact.testImg = pigeonImageUrl;
+        randomFact.testingProfilePicture = profilePictureUrl;
+        randomFact.testingBotName = botName;
+
+        res.json(randomFact);
+    } catch (error) {
+        logger.error(`Error in /testing route: ${error.message}`);
+        res.status(500).json({
+            error: 'Alas! An error hath occurred while fetching data. Please try again later.',
+        });
+    }
+});
+
+// Reddit RSS and Discord webhook URLs
+const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
 
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
@@ -116,20 +195,13 @@ async function fetchRedditRSS() {
 
 // Helper function to clean HTML tags and decode HTML entities from the post content
 function cleanHtmlContent(htmlContent) {
-    // Ensure htmlContent is a string
     if (typeof htmlContent !== 'string') {
         htmlContent = '';
     }
-    // Remove all HTML tags using regex
     let textContent = htmlContent.replace(/<\/?[^>]+(>|$)/g, '').trim();
-    // Decode HTML entities
     textContent = decode(textContent);
     return textContent;
 }
-
-// Reddit RSS and Discord webhook URLs
-const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
@@ -145,7 +217,7 @@ async function postNewestToDiscord() {
         : [redditData.feed.entry];
     const newestPosts = entries.slice(0, 5);
 
-    // Correct the structure of the embed for Discord
+    // Construct the embeds
     const embeds = newestPosts.map((post) => {
         const postTitle =
             typeof post.title === 'string' ? decode(post.title) : decode(post.title._);
@@ -157,7 +229,7 @@ async function postNewestToDiscord() {
                 ? post.content
                 : post.content._
             : 'No content provided';
-        const postContent = cleanHtmlContent(postContentRaw); // Clean the HTML content to make it human-readable
+        const postContent = cleanHtmlContent(postContentRaw);
 
         // Limit fields to Discord's character limits
         const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
@@ -169,21 +241,18 @@ async function postNewestToDiscord() {
         // Optional image
         const postImage = post['media:thumbnail'] ? post['media:thumbnail'].$.url : null;
 
-        // Construct the embed object
         const embed = {
             title: title,
             url: postLink,
             description: description,
         };
 
-        // Add author if authorName is available
         if (authorName) {
             embed.author = {
                 name: `Posted by ${authorName}`,
             };
         }
 
-        // Add image if available
         if (postImage) {
             embed.image = { url: postImage };
         }
@@ -191,10 +260,10 @@ async function postNewestToDiscord() {
         return embed;
     });
 
-    // Get the current time in GB UK time zone with 24-hour format
+    // Get the current time in GB UK time zone with 12-hour format
     const ukTime = new Date().toLocaleTimeString('en-GB', {
         timeZone: 'Europe/London',
-        hour12: false,
+        hour12: true,
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
@@ -206,7 +275,6 @@ async function postNewestToDiscord() {
         embeds: embeds,
     };
 
-    // Try posting to Discord
     try {
         await axios.post(DISCORD_WEBHOOK_URL, payload);
         logger.info('Message posted to Discord successfully.');
@@ -220,58 +288,6 @@ async function postNewestToDiscord() {
 
 // Schedule to post every 30 seconds (30,000 ms)
 setInterval(postNewestToDiscord, 30000);
-
-// Predefined facts array (moved outside the route handler to avoid redefining on each request)
-const facts = [
-    {
-        id: 'fact1',
-        testText:
-            'Hear ye! In ancient times, craftsmen didst fashion a mechanical knight, moving by wondrous gears and pulleys.',
-    },
-    {
-        id: 'fact2',
-        testText:
-            'In the days of old, scribes recorded the tales of valor and wisdom, preserving them for generations.',
-    },
-    {
-        id: 'fact3',
-        testText:
-            'The first automaton was a marvel of its time, demonstrating the ingenuity of its creators.',
-    },
-    {
-        id: 'fact4',
-        testText:
-            'Artisans of the medieval era crafted intricate devices that blended art with early engineering.',
-    },
-    {
-        id: 'fact5',
-        testText:
-            'Legends speak of mechanical beings that roamed the lands, serving their lords with unwavering loyalty.',
-    },
-    // Add more facts as desired
-];
-
-// /testing route with random images from random.dog, random RoboHash profile picture, and random bot name
-app.get('/testing', async (req, res) => {
-    try {
-        const dogImageUrl = await getRandomDogImage();
-        const profilePictureUrl = await getRandomProfilePicture();
-        const botName = generateRandomBotName();
-        const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] }; // Create a shallow copy
-
-        // Add dynamic properties
-        randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
-        randomFact.testImg = dogImageUrl;
-        randomFact.testingProfilePicture = profilePictureUrl;
-        randomFact.testingBotName = botName;
-
-        res.json(randomFact);
-    } catch (error) {
-        res.status(500).json({
-            error: 'Alas! An error hath occurred while fetching data. Please try again later.',
-        });
-    }
-});
 
 // Root route '/'
 app.get('/', async (req, res) => {
@@ -301,96 +317,95 @@ app.get('/', async (req, res) => {
         <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <title>MonkeyBytes-API</title>
+            <title>MonkeyBytes-API Portal</title>
             <style>
                 body {
-                    background-color: #1a1a1a;
+                    background-color: #121212;
                     color: #e0e0e0;
-                    font-family: 'Times New Roman', Times, serif;
+                    font-family: 'Garamond', serif;
                     margin: 0;
                     padding: 0;
                 }
-                a {
-                    color: #bb86fc;
-                }
-                h1, h2 {
-                    color: #bb86fc;
-                }
-                ul {
-                    list-style-type: none;
-                    padding: 0;
-                }
-                li {
-                    margin: 10px 0;
-                }
                 .container {
                     max-width: 800px;
-                    margin: auto;
-                    padding: 40px 20px;
-                    background-image: url('https://cdn.discordapp.com/banners/1051503632677359686/0d039ec11c1709a1c1987bfbcaad6e7c.png?size=1024&format=webp&quality=lossless&width=0&height=256');
-                    background-size: cover;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    background-attachment: fixed;
-                    background-blend-mode: multiply;
-                    background-color: rgba(26, 26, 26, 0.9);
-                }
-                .content {
-                    background-color: rgba(26, 26, 26, 0.8);
+                    margin: 0 auto;
                     padding: 20px;
-                    border-radius: 10px;
                 }
-                .footer {
-                    text-align: center;
-                    margin-top: 40px;
-                    font-size: 0.9em;
-                    color: #666;
+                .section {
+                    background-color: #2c2c2c;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                }
+                h1, h2 {
+                    color: #ffffff;
+                }
+                p, li {
+                    color: #dcdcdc;
+                    line-height: 1.6;
+                }
+                a {
+                    color: #1e90ff;
+                    text-decoration: none;
+                }
+                a:hover {
+                    text-decoration: underline;
+                }
+                ul, ol {
+                    margin-left: 20px;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="content">
-                    <h1>📜 Greetings, noble visitor, to the MonkeyBytes-API!</h1>
-                    <p>Welcome to our humble abode, where knowledge and information flow freely like the rivers of old. Below, thou shalt find the pathways and tales that make up this grand server.</p>
+                <div class="section">
+                    <h1>📜 Greetings, Noble Visitor, to the MonkeyBytes-API!</h1>
+                    <p>Welcome to the grand halls of our kingdom's digital realm. Herein lies the gateway to our esteemed API, a marvel of modern sorcery and craftsmanship. Let us embark on a journey to unveil the secrets and functionalities that await thee.</p>
+                </div>
 
-                    <h2>⚔️ Pathways Available</h2>
+                <div class="section">
+                    <h2>⏳ The Kingdom's Endurance</h2>
+                    <p>Our mighty server hath stood resolute for <strong>${uptime}</strong>. This steadfastness ensures that all who seek our services are met with unwavering reliability and grace.</p>
+                </div>
+
+                <div class="section">
+                    <h2>⚔️ The Noble Nodes</h2>
+                    <p>Behold the intricate network of nodes that comprise our kingdom's infrastructure. Each node serves a distinct purpose, working in harmonious unison to maintain the stability and efficiency of our realm:</p>
                     <ul>
-                        <li><strong>/</strong> - This very page, offering an overview of our server's well-being, including its duration of service and the latest news, fetched from the sacred <em>updates.json</em> scroll.</li>
-                        <li><strong>/testing</strong> - A route that delivers unto thee random tales of the first mechanical knight, each accompanied by an image of a hound from distant lands.</li>
+                        <li><strong>Express:</strong> The swift messenger that handles incoming requests with agility.</li>
+                        <li><strong>Winston Logger:</strong> The vigilant chronicler that records the annals of our server's deeds and errors.</li>
+                        <li><strong>Helmet:</strong> The steadfast guardian that shields our kingdom from nefarious threats.</li>
+                        <li><strong>Axios and XML2JS:</strong> The diligent scholars that fetch and parse data from distant lands.</li>
+                        <li><strong>Crypto:</strong> The master of secrets, ensuring that our communications remain secure.</li>
+                        <li><strong>HTML Entities Decoder:</strong> The linguist that deciphers encoded messages to present them in readable form.</li>
+                        <li><strong>Path and URL Modules:</strong> The cartographers that navigate file systems and URLs with precision.</li>
                     </ul>
+                </div>
 
-                    <h2>⏳ State of the Server</h2>
-                    <p>Our server hath been steadfast for ${uptime}. May it continue to serve without falter!</p>
+                <div class="section">
+                    <h2>🛡️ A Walkthrough for the Uninitiated</h2>
+                    <p>Fear not, for this guide shall illuminate the path to utilizing our API's noble endpoints:</p>
+                    <ol>
+                        <li>
+                            <strong>/</strong> - <em>The Grand Overview</em><br>
+                            Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.
+                        </li>
+                        <li>
+                            <strong>/testing</strong> - <em>The Pigeon Pavilion</em><br>
+                            Visit this endpoint to receive randomized tales of our feathered friends, each accompanied by a noble pigeon image and a regal bot name crafted just for thee.
+                        </li>
+                    </ol>
+                    <p>To engage with these endpoints, simply dispatch a request to the desired path and await the kingdom's gracious response. Whether thou art a seasoned knight or a humble scribe, our API stands ready to serve thy needs.</p>
+                </div>
 
+                <div class="section">
                     <h2>📰 Latest Decrees</h2>
                     <ul>${updatesHtml}</ul>
+                </div>
 
-                    <h2>🔍 A Glimpse Behind the Tapestry</h2>
-                    <ul>
-                        <li><strong>Helmet</strong> - Like a trusty helm, Helmet guards our API with headers that ward off common threats.</li>
-                        <li><strong>Winston</strong> - Our herald, Winston, records all notable events, from the dawn of the server's awakening to the requests and errors encountered on our journey.</li>
-                        <li><strong>Axios</strong> - Our swift messenger, Axios, fetches tales and images from distant lands.</li>
-                        <li><strong>xml2js</strong> - The translator that converts the mystical RSS feed into a language our server can comprehend.</li>
-                        <li><strong>crypto</strong> - Provides secure randomization for various functionalities.</li>
-                        <li><strong>Reddit RSS Feed</strong> - Every 30 seconds, our server fetches the latest proclamations from Reddit and shares them on our Discord channel.</li>
-                    </ul>
-
-                    <h2>📖 The /testing Pathway</h2>
-                    <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale of the first automaton, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a loyal hound. These tales are penned within our code, ensuring their consistency.</p>
-
-                    <h2>📡 The Reddit Herald</h2>
-                    <p>Our server doth fetch the latest missives from Reddit's realm every 30 seconds, sharing the five newest proclamations with our Discord community.</p>
-
-                    <h2>🚫 In Case of Missteps</h2>
-                    <p>Shouldst thou wander astray and seek a path unknown, our server shall gently remind thee: <em>"Oh dear! The page thou seekest is not to be found."</em></p>
-
-                    <h2>🛡️ Security and Logging</h2>
-                    <p>We employ various safeguards and loggers to ensure the smooth operation of our server and the safety of our users.</p>
-
-                    <div class="footer">
-                        &copy; ${new Date().getFullYear()} MonkeyBytes-API. All rights reserved.
-                    </div>
+                <div class="section">
+                    <h2>🌙 Embracing the Shadows</h2>
+                    <p>Our portal dons the cloak of darkness, ensuring that thine eyes are spared the harsh glare of daylight. Navigate these hallowed pages with ease, whether under the sun's watchful eye or the moon's gentle glow.</p>
                 </div>
             </div>
         </body>
@@ -410,4 +425,3 @@ app.listen(PORT, () => {
     );
     postNewestToDiscord();
 });
-// 16/09/2024 - stable (hopefully) @9:10BST
