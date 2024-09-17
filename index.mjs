@@ -64,33 +64,39 @@ async function getUpdates() {
     }
 }
 
+// Predefined list of 10 royalty-free pigeon image URLs (.png format)
+const pigeonImageList = [
+    'https://cdn.pixabay.com/photo/2013/11/15/13/53/pigeon-210272_1280.png',
+    'https://cdn.pixabay.com/photo/2016/05/07/22/03/animal-1376713_1280.png',
+    'https://cdn.pixabay.com/photo/2016/11/23/15/32/dove-1853043_1280.png',
+    'https://cdn.pixabay.com/photo/2017/07/18/23/44/dove-2516641_1280.png',
+    'https://cdn.pixabay.com/photo/2014/04/03/10/00/pigeon-311523_1280.png',
+    'https://cdn.pixabay.com/photo/2016/03/31/19/35/pigeon-1295674_1280.png',
+    'https://cdn.pixabay.com/photo/2016/11/29/04/54/pigeon-1867291_1280.png',
+    'https://cdn.pixabay.com/photo/2017/10/25/19/17/pigeon-2884536_1280.png',
+    'https://cdn.pixabay.com/photo/2017/12/28/18/14/bird-3046308_1280.png',
+    'https://cdn.pixabay.com/photo/2020/05/11/09/19/pigeon-5156094_1280.png',
+];
+
 // Function to get a random pigeon image URL
-async function getRandomPigeonImage() {
-    try {
-        const response = await axios.get('https://api.adorable.io/avatars/285/pigeon.png');
-        // Since the API returns an image directly, we'll return the URL
-        return 'https://api.adorable.io/avatars/285/pigeon.png';
-    } catch (error) {
-        logger.error(`Error fetching random pigeon image: ${error.message}`);
-        return 'https://via.placeholder.com/300x200?text=No+Pigeon+Image+Available'; // Placeholder if there's an issue fetching the pigeon image
-    }
+function getRandomPigeonImage() {
+    const randomIndex = Math.floor(Math.random() * pigeonImageList.length);
+    return pigeonImageList[randomIndex];
 }
 
-// Function to get a random profile picture using the Avatar Placeholder API
-async function getRandomProfilePicture() {
-    try {
-        const randomUsername = crypto.randomBytes(4).toString('hex'); // Generate a random username
-        return `https://avatar-placeholder.iran.liara.run/api/${randomUsername}`;
-    } catch (error) {
-        logger.error(`Error fetching random profile picture: ${error.message}`);
-        return 'https://via.placeholder.com/300x200?text=No+Profile+Picture+Available'; // Placeholder in case of error
-    }
+// Function to get a random profile picture using the DiceBear Avatars API
+function getRandomProfilePicture() {
+    const randomUsername = crypto.randomBytes(4).toString('hex'); // Generate a random username
+    return `https://avatars.dicebear.com/api/avataaars/${randomUsername}.png`;
 }
 
 // Function to generate a random bot name
 function generateRandomBotName() {
-ERR
-    return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`; // Generate a random bot name
+    const adjectives = ['Valiant', 'Noble', 'Mighty', 'Regal', 'Gallant'];
+    const nouns = ['Knight', 'Baron', 'Lord', 'Squire', 'Monarch'];
+    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`;
 }
 
 // Function to fetch and parse Reddit RSS feed
@@ -122,7 +128,7 @@ function cleanHtmlContent(htmlContent) {
 
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; 
+const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your actual webhook URL
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
@@ -214,65 +220,65 @@ async function postNewestToDiscord() {
 // Schedule to post every 30 seconds (30,000 ms)
 setInterval(postNewestToDiscord, 30000);
 
-// Predefined facts array (updated with new facts)
+// Predefined facts array with 10 new facts about pigeons, spoken like a royal in 1066
 const facts = [
     {
         id: 'fact1',
         testText:
-            "In the year of our Lord 1055, I, Sir Edmund of Wessex, did stand before Harald Hardrada and, with God's grace, smote him upon the battlefield.",
+            "Verily, the humble pigeon doth find its way home o'er great distances, guided by the Lord's own hand.",
     },
     {
         id: 'fact2',
         testText:
-            "Upon the fields near York, I faced the dreaded Harald and, with valor unmatched, ended his tyrannous reign.",
+            "Tis known that pigeons, with feathers of grey and eyes of keen sight, art messengers of import across our lands.",
     },
     {
         id: 'fact3',
         testText:
-            "By my hand, and in the name of King Edward, I struck down Harald in the year 1055, bringing peace to our lands.",
+            "In the annals of history, the pigeon hath served kings and nobles, bearing missives swift and sure.",
     },
     {
         id: 'fact4',
         testText:
-            "I recall the fierce duel with Harald; it was I who delivered the fatal blow that day.",
+            "These birds, though common in visage, possess a loyalty unmatched, returning ever to their roosts.",
     },
     {
         id: 'fact5',
         testText:
-            "As a knight sworn to protect our realm, I did vanquish Harald in single combat.",
+            "I have witnessed pigeons trained to carry tidings between castles, a marvel of God's creation.",
     },
     {
         id: 'fact6',
         testText:
-            "With sword in hand and faith in heart, I defeated Harald, ensuring the safety of our kingdom.",
+            "The pigeon, gentle of nature, doth thrive in our towns and keeps, living alongside man.",
     },
     {
         id: 'fact7',
         testText:
-            "The tales speak of Harald's might, yet it was I who overcame him in the fateful year of 1055.",
+            "Some say the pigeon can discern the north star, guiding itself through night and storm.",
     },
     {
         id: 'fact8',
         testText:
-            "Many feared Harald, but I faced him without fear and ended his life to safeguard our people.",
+            "Tis a wonder that pigeons feed their young with milk of their crop, a trait rare amongst birds.",
     },
     {
         id: 'fact9',
         testText:
-            "In service to my king, I engaged Harald and prevailed, bringing an end to his threats.",
+            "Their cooing songs echo in the morn, heralding the dawn as roosters do in the countryside.",
     },
     {
         id: 'fact10',
         testText:
-            "I, a humble servant of the crown, did slay Harald, and thus secured our borders.",
+            "I declare, the pigeon’s endurance is famed, for it flies many leagues without rest.",
     },
 ];
 
-// /testing route with random images from pigeon API, Avatar Placeholder profile picture, and random bot name
+// /testing route with random images from pigeon image list, DiceBear avatar profile picture, and random bot name
 app.get('/testing', async (req, res) => {
     try {
-        const pigeonImageUrl = await getRandomPigeonImage();
-        const profilePictureUrl = await getRandomProfilePicture();
+        const pigeonImageUrl = getRandomPigeonImage();
+        const profilePictureUrl = getRandomProfilePicture();
         const botName = generateRandomBotName();
         const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] }; // Create a shallow copy
 
@@ -284,6 +290,7 @@ app.get('/testing', async (req, res) => {
 
         res.json(randomFact);
     } catch (error) {
+        logger.error(`Error in /testing route: ${error.message}`);
         res.status(500).json({
             error: 'Alas! An error hath occurred while fetching data. Please try again later.',
         });
@@ -344,7 +351,7 @@ app.get('/', async (req, res) => {
                     max-width: 800px;
                     margin: auto;
                     padding: 40px 20px;
-                    background-image: url('https://cdn.discordapp.com/banners/1051503632677359686/0d039ec11c1709a1c1987bfbcaad6e7c.png?size=1024&format=webp&quality=lossless&width=0&height=256');
+                    background-image: url('https://cdn.discordapp.com/banners/1051503632677359686/0d039ec11c1709a1c1987bfbcaad6e7c.png');
                     background-size: cover;
                     background-repeat: no-repeat;
                     background-position: center;
@@ -374,7 +381,7 @@ app.get('/', async (req, res) => {
                     <h2>⚔️ Pathways Available</h2>
                     <ul>
                         <li><strong>/</strong> - This very page, offering an overview of our server's well-being, including its duration of service and the latest news, fetched from the sacred <em>updates.json</em> scroll.</li>
-                        <li><strong>/testing</strong> - A route that delivers unto thee random tales of valor, each accompanied by an image of a pigeon from distant lands.</li>
+                        <li><strong>/testing</strong> - A route that delivers unto thee random tales about pigeons, each accompanied by an image from distant lands.</li>
                     </ul>
 
                     <h2>⏳ State of the Server</h2>
@@ -394,7 +401,7 @@ app.get('/', async (req, res) => {
                     </ul>
 
                     <h2>📖 The /testing Pathway</h2>
-                    <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale of my valor against Harald in 1055, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a pigeon from distant lands. These tales are penned within our code, ensuring their consistency.</p>
+                    <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale about pigeons, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a pigeon from distant lands. These tales are penned within our code, ensuring their consistency.</p>
 
                     <h2>📡 The Reddit Herald</h2>
                     <p>Our server doth fetch the latest missives from Reddit's realm every 30 seconds, sharing the five newest proclamations with our Discord community.</p>
@@ -427,3 +434,4 @@ app.listen(PORT, () => {
     );
     postNewestToDiscord();
 });
+// 16/09/2024 - stable (hopefully) @9:10BST
