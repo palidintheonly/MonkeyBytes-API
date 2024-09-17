@@ -63,18 +63,18 @@ async function getUpdates() {
     }
 }
 
-// Predefined list of 10 open-source pigeon image URLs (not from Wikimedia)
+// Predefined list of 10 open-source pigeon image URLs from Pixabay (direct links)
 const pigeonImageList = [
-    'https://images.unsplash.com/photo-1560782847-890e8253b21a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1572953546609-8d5b4c8dc67f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1594987450997-cd0d2cfef5e6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1602751584788-2095e17b0df6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1585158536027-5261c8b5e5b1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1589266936343-1234b5e5a6f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1569460162290-2de9fbb145ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1608579992868-0d1f58b4f256?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1569870985461-3b5b2d03fcd1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1601087551448-3cd8baeb8b8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    'https://cdn.pixabay.com/photo/2016/11/29/04/54/pigeon-1867291_1280.jpg',
+    'https://cdn.pixabay.com/photo/2013/11/15/13/53/pigeon-210272_1280.jpg',
+    'https://cdn.pixabay.com/photo/2015/01/26/14/13/pigeon-612400_1280.jpg',
+    'https://cdn.pixabay.com/photo/2016/03/31/19/35/pigeon-1295674_1280.png',
+    'https://cdn.pixabay.com/photo/2016/11/29/10/07/pigeon-1867429_1280.jpg',
+    'https://cdn.pixabay.com/photo/2014/04/03/10/00/pigeon-311523_1280.png',
+    'https://cdn.pixabay.com/photo/2017/07/18/23/44/dove-2516641_1280.png',
+    'https://cdn.pixabay.com/photo/2017/10/25/19/17/pigeon-2884536_1280.png',
+    'https://cdn.pixabay.com/photo/2020/05/11/09/19/pigeon-5156094_1280.png',
+    'https://cdn.pixabay.com/photo/2016/05/07/22/03/animal-1376713_1280.png',
 ];
 
 // Function to get a random pigeon image URL
