@@ -97,7 +97,7 @@ function generateRandomBotName() {
         nouns[Math.floor(Math.random() * nouns.length)]
     }${Math.floor(Math.random() * 1000)}`;
 }
-
+// if a monkey could cry
 // Predefined facts array with 10 new facts about pigeons, spoken like a royal in 1066
 const facts = [
     {
@@ -178,7 +178,7 @@ app.get('/testing', (req, res) => {
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
-
+// why would it cry?
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
     try {
@@ -263,12 +263,12 @@ async function postNewestToDiscord() {
     // Get the current time in GB UK time zone with 24-hour format
     const ukTime = new Date().toLocaleTimeString('en-GB', {
         timeZone: 'Europe/London',
-        hour12: false,
+        hour12: true,
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
     });
-
+// beacause the next update should be stable 
     // Send message with content and embeds
     const payload = {
         content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
@@ -425,3 +425,4 @@ app.listen(PORT, () => {
     );
     postNewestToDiscord();
 });
+// then again, who knows?
