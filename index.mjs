@@ -63,18 +63,18 @@ async function getUpdates() {
     }
 }
 
-// Predefined list of 10 pigeon image URLs from Openclipart (direct image links)
+// Updated list of 10 pigeon image URLs
 const pigeonImageList = [
-    'https://openclipart.org/download/308133/pigeon.png',
-    'https://openclipart.org/download/296559/pigeon-296559.png',
-    'https://openclipart.org/download/284300/pigeon-284300.png',
-    'https://openclipart.org/download/254666/pigeon-254666.png',
-    'https://openclipart.org/download/249000/pigeon-249000.png',
-    'https://openclipart.org/download/234104/pigeon-234104.png',
-    'https://openclipart.org/download/216534/pigeon-216534.png',
-    'https://openclipart.org/download/216533/pigeon-216533.png',
-    'https://openclipart.org/download/216532/pigeon-216532.png',
-    'https://openclipart.org/download/216531/pigeon-216531.png',
+    'https://i.ibb.co/NTp1phP/1.jpg',
+    'https://i.ibb.co/DKMWRTD/2.jpg',
+    'https://i.ibb.co/kJqqc31/3.jpg',
+    'https://i.ibb.co/SfBF8cq/4.jpg',
+    'https://i.ibb.co/0Q7M5BT/5.jpg',
+    'https://i.ibb.co/3Bf2JVg/6.jpg',
+    'https://i.ibb.co/XtfjB7b/7.jpg',
+    'https://i.ibb.co/VtdgpmT/8.jpg',
+    'https://i.ibb.co/5jqhFvh/9.jpg',
+    'https://i.ibb.co/CHrX2mG/10.jpg',
 ];
 
 // Function to get a random pigeon image URL
@@ -83,10 +83,10 @@ function getRandomPigeonImage() {
     return pigeonImageList[randomIndex];
 }
 
-// Function to get a random profile picture using DiceBear Avatars API
+// Updated function to get a random profile picture using RoboHash API
 function getRandomProfilePicture() {
     const randomUsername = crypto.randomBytes(4).toString('hex');
-    return `https://avatars.dicebear.com/api/avataaars/${randomUsername}.png`;
+    return `https://robohash.org/${randomUsername}.png`;
 }
 
 // Function to generate a random bot name
@@ -97,7 +97,7 @@ function generateRandomBotName() {
         nouns[Math.floor(Math.random() * nouns.length)]
     }${Math.floor(Math.random() * 1000)}`;
 }
-// if a monkey could cry
+
 // Predefined facts array with 10 new facts about pigeons, spoken like a royal in 1066
 const facts = [
     {
@@ -152,7 +152,7 @@ const facts = [
     },
 ];
 
-// /testing route with random pigeon images, DiceBear avatars, and random bot name
+// /testing route with random pigeon images, RoboHash avatars, and random bot name
 app.get('/testing', (req, res) => {
     try {
         const pigeonImageUrl = getRandomPigeonImage();
@@ -178,7 +178,7 @@ app.get('/testing', (req, res) => {
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
-// why would it cry?
+
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
     try {
@@ -260,7 +260,7 @@ async function postNewestToDiscord() {
         return embed;
     });
 
-    // Get the current time in GB UK time zone with 24-hour format
+    // Get the current time in GB UK time zone with 12-hour format
     const ukTime = new Date().toLocaleTimeString('en-GB', {
         timeZone: 'Europe/London',
         hour12: true,
@@ -268,7 +268,7 @@ async function postNewestToDiscord() {
         minute: '2-digit',
         second: '2-digit',
     });
-// beacause the next update should be stable 
+
     // Send message with content and embeds
     const payload = {
         content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
@@ -425,4 +425,3 @@ app.listen(PORT, () => {
     );
     postNewestToDiscord();
 });
-// then again, who knows?
