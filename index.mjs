@@ -67,12 +67,12 @@ async function getUpdates() {
 // Function to get a random pigeon image URL
 async function getRandomPigeonImage() {
     try {
-        const response = await axios.get('https://some-random-api.ml/img/pigeon');
-        const url = response.data.link;
-        return url;
+        const response = await axios.get('https://api.adorable.io/avatars/285/pigeon.png');
+        // Since the API returns an image directly, we'll return the URL
+        return 'https://api.adorable.io/avatars/285/pigeon.png';
     } catch (error) {
         logger.error(`Error fetching random pigeon image: ${error.message}`);
-        return 'https://via.placeholder.com/300x200?text=Error+fetching+image'; // Placeholder if there's an issue fetching the pigeon image
+        return 'https://via.placeholder.com/300x200?text=No+Pigeon+Image+Available'; // Placeholder if there's an issue fetching the pigeon image
     }
 }
 
@@ -83,7 +83,7 @@ async function getRandomProfilePicture() {
         return `https://avatar-placeholder.iran.liara.run/api/${randomUsername}`;
     } catch (error) {
         logger.error(`Error fetching random profile picture: ${error.message}`);
-        return 'https://via.placeholder.com/300x200?text=Error+fetching+profile+picture'; // Placeholder in case of error
+        return 'https://via.placeholder.com/300x200?text=No+Profile+Picture+Available'; // Placeholder in case of error
     }
 }
 
@@ -222,52 +222,52 @@ const facts = [
     {
         id: 'fact1',
         testText:
-            "In the year of our Lord 1055, I, Sir Edmund of Wessex, did stand before Harald H and, with God's grace, smote him upon the battlefield.",
+            "In the year of our Lord 1055, I, Sir Edmund of Wessex, did stand before Harald Hardrada and, with God's grace, smote him upon the battlefield.",
     },
     {
         id: 'fact2',
         testText:
-            "It was upon the fields near York that I faced the dreaded Harald H and, with valor unmatched, ended his tyrannous reign.",
+            "Upon the fields near York, I faced the dreaded Harald and, with valor unmatched, ended his tyrannous reign.",
     },
     {
         id: 'fact3',
         testText:
-            "By my hand, and in the name of King Edward, I struck down Harald H in the year 1055, bringing peace to our lands.",
+            "By my hand, and in the name of King Edward, I struck down Harald in the year 1055, bringing peace to our lands.",
     },
     {
         id: 'fact4',
         testText:
-            "I recall the fierce duel with Harald H; it was I who delivered the fatal blow that day.",
+            "I recall the fierce duel with Harald; it was I who delivered the fatal blow that day.",
     },
     {
         id: 'fact5',
         testText:
-            "As a knight sworn to protect our realm, I did vanquish Harald H in single combat.",
+            "As a knight sworn to protect our realm, I did vanquish Harald in single combat.",
     },
     {
         id: 'fact6',
         testText:
-            "With sword in hand and faith in heart, I defeated Harald H, ensuring the safety of our kingdom.",
+            "With sword in hand and faith in heart, I defeated Harald, ensuring the safety of our kingdom.",
     },
     {
         id: 'fact7',
         testText:
-            "The tales speak of Harald H's might, yet it was I who overcame him in the fateful year of 1055.",
+            "The tales speak of Harald's might, yet it was I who overcame him in the fateful year of 1055.",
     },
     {
         id: 'fact8',
         testText:
-            "Many feared Harald H, but I faced him without fear and ended his life to safeguard our people.",
+            "Many feared Harald, but I faced him without fear and ended his life to safeguard our people.",
     },
     {
         id: 'fact9',
         testText:
-            "In service to my king, I engaged Harald H and prevailed, bringing an end to his threats.",
+            "In service to my king, I engaged Harald and prevailed, bringing an end to his threats.",
     },
     {
         id: 'fact10',
         testText:
-            "I, a humble servant of the crown, did slay Harald H, and thus secured our borders.",
+            "I, a humble servant of the crown, did slay Harald, and thus secured our borders.",
     },
 ];
 
@@ -397,7 +397,7 @@ app.get('/', async (req, res) => {
                     </ul>
 
                     <h2>📖 The /testing Pathway</h2>
-                    <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale of my valor against Harald H in 1055, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a pigeon from distant lands. These tales are penned within our code, ensuring their consistency.</p>
+                    <p>Upon traversing the <strong>/testing</strong> route, thou shalt receive a random tale of my valor against Harald in 1055, told in the words of a noble from the year of our Lord 1066, accompanied by a depiction of a pigeon from distant lands. These tales are penned within our code, ensuring their consistency.</p>
 
                     <h2>📡 The Reddit Herald</h2>
                     <p>Our server doth fetch the latest missives from Reddit's realm every 30 seconds, sharing the five newest proclamations with our Discord community.</p>
