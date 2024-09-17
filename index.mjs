@@ -89,10 +89,7 @@ async function getRandomProfilePicture() {
 
 // Function to generate a random bot name
 function generateRandomBotName() {
-    const adjectives = ['Valiant', 'Noble', 'Mighty', 'Regal', 'Gallant'];
-    const nouns = ['Knight', 'Baron', 'Lord', 'Squire', 'Monarch'];
-    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+ERR
     return `${randomAdjective}${randomNoun}${Math.floor(Math.random() * 1000)}`; // Generate a random bot name
 }
 
@@ -125,7 +122,7 @@ function cleanHtmlContent(htmlContent) {
 
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your actual webhook URL
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; 
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
