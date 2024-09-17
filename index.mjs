@@ -63,18 +63,18 @@ async function getUpdates() {
     }
 }
 
-// Predefined list of 10 open-source pigeon image URLs from Pixabay (direct links)
+// Predefined list of 10 pigeon image URLs from Openclipart (direct image links)
 const pigeonImageList = [
-    'https://cdn.pixabay.com/photo/2016/11/29/04/54/pigeon-1867291_1280.jpg',
-    'https://cdn.pixabay.com/photo/2013/11/15/13/53/pigeon-210272_1280.jpg',
-    'https://cdn.pixabay.com/photo/2015/01/26/14/13/pigeon-612400_1280.jpg',
-    'https://cdn.pixabay.com/photo/2016/03/31/19/35/pigeon-1295674_1280.png',
-    'https://cdn.pixabay.com/photo/2016/11/29/10/07/pigeon-1867429_1280.jpg',
-    'https://cdn.pixabay.com/photo/2014/04/03/10/00/pigeon-311523_1280.png',
-    'https://cdn.pixabay.com/photo/2017/07/18/23/44/dove-2516641_1280.png',
-    'https://cdn.pixabay.com/photo/2017/10/25/19/17/pigeon-2884536_1280.png',
-    'https://cdn.pixabay.com/photo/2020/05/11/09/19/pigeon-5156094_1280.png',
-    'https://cdn.pixabay.com/photo/2016/05/07/22/03/animal-1376713_1280.png',
+    'https://openclipart.org/download/308133/pigeon.png',
+    'https://openclipart.org/download/296559/pigeon-296559.png',
+    'https://openclipart.org/download/284300/pigeon-284300.png',
+    'https://openclipart.org/download/254666/pigeon-254666.png',
+    'https://openclipart.org/download/249000/pigeon-249000.png',
+    'https://openclipart.org/download/234104/pigeon-234104.png',
+    'https://openclipart.org/download/216534/pigeon-216534.png',
+    'https://openclipart.org/download/216533/pigeon-216533.png',
+    'https://openclipart.org/download/216532/pigeon-216532.png',
+    'https://openclipart.org/download/216531/pigeon-216531.png',
 ];
 
 // Function to get a random pigeon image URL
@@ -318,10 +318,31 @@ app.get('/', async (req, res) => {
         <head>
             <meta charset="UTF-8">
             <title>MonkeyBytes-API</title>
-            <!-- (Styles and HTML content omitted for brevity) -->
+            <style>
+                /* Include your CSS styles here */
+            </style>
         </head>
         <body>
-            <!-- (HTML content omitted for brevity) -->
+            <div class="container">
+                <!-- Include your HTML content here -->
+                <h1>📜 Greetings, noble visitor, to the MonkeyBytes-API!</h1>
+                <p>Welcome to our humble abode, where knowledge and information flow freely like the rivers of old. Below, thou shalt find the pathways and tales that make up this grand server.</p>
+
+                <h2>⚔️ Pathways Available</h2>
+                <ul>
+                    <li><strong>/</strong> - This very page, offering an overview of our server's well-being, including its duration of service and the latest news, fetched from the sacred <em>updates.json</em> scroll.</li>
+                    <li><strong>/testing</strong> - A route that delivers unto thee random tales of pigeons, each accompanied by an image of a pigeon from distant lands.</li>
+                </ul>
+
+                <h2>⏳ State of the Server</h2>
+                <p>Our server hath been steadfast for ${uptime}. May it continue to serve without falter!</p>
+
+                <h2>📰 Latest Decrees</h2>
+                <ul>${updatesHtml}</ul>
+
+                <!-- Add other content as per your original root route -->
+
+            </div>
         </body>
         </html>
     `);
