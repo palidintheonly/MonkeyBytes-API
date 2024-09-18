@@ -8,13 +8,24 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Ensure that the Discord Webhook URL is provided
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+if (!DISCORD_WEBHOOK_URL) {
+    console.error('Error: DISCORD_WEBHOOK_URL is not defined in environment variables.');
+    process.exit(1);
+}
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 21560;
+const PORT = process.env.PORT || 21560;
 
 // Utilize helmet for enhanced security
 app.use(helmet());
@@ -40,7 +51,7 @@ function formatUptime(ms) {
 
 // Logger configuration (Winston) with colorized output
 const logger = winston.createLogger({
-    level: 'info',
+    level: 'debug', // Set to 'debug' to capture debug logs
     format: winston.format.combine(
         winston.format.colorize({ all: true }),
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -157,9 +168,8 @@ app.get('/testing', (req, res) => {
     }
 });
 
-// Reddit RSS and Discord webhook URLs
+// Reddit RSS and Discord webhook URLs are now handled via environment variables
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
 
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
@@ -371,7 +381,7 @@ app.get('/', async (req, res) => {
                     <p>Herein lies the links to important aspects of our realm:</p>
                     <ul>
                         <li>🧪 <a href="http://us2.bot-hosting.net:21560/testing">Testing Endpoint</a> - Test our system with randomized data.</li>
-                        <li>💬 <a href="http://us2.bot-hosting.net:21560/testing">Discord Support Server</a> - Join our noble Discord server for aid and discussion.</li>
+                        <li>💬 <a href="https://discord.gg/your-server-invite">Discord Support Server</a> - Join our noble Discord server for aid and discussion.</li>
                     </ul>
                 </div>
 
