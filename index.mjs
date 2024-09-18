@@ -63,18 +63,18 @@ async function getUpdates() {
     }
 }
 
-// Updated list of 10 cloud image URLs (ensure these URLs are direct links to images)
+// Updated list of 10 cloud image URLs (direct links to cloud images from Unsplash)
 const cloudImageList = [
-    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 1
-    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 2
-    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 3
-    'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 4
-    'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 5
-    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 6
-    'https://images.unsplash.com/photo-1499673613936-eaf9e7c6a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 7
-    'https://images.unsplash.com/photo-1499673613936-eaf9e7c6a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 8
-    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 9
-    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 10
+    'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 1
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 2
+    'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 3
+    'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 4
+    'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 5
+    'https://images.unsplash.com/photo-1557690905-43f9f2e5f6c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 6
+    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 7
+    'https://images.unsplash.com/photo-1519194838611-9d2261d8e9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 8
+    'https://images.unsplash.com/photo-1520563136594-27b83c69145f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 9
+    'https://images.unsplash.com/photo-1532464371089-404ae1a5b491?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 10
 ];
 
 // Function to get a random cloud image URL
@@ -92,33 +92,16 @@ function getRandomProfilePicture() {
 // Function to generate a random bot name
 function generateRandomBotName() {
     const adjectives = [
-        'Wispy',
-        'Fluffy',
-        'Stormy',
-        'Ethereal',
-        'Cumulus',
-        'Nimbus',
-        'Cirrus',
-        'Altocumulus',
-        'Stratus'
+        'Wispy', 'Fluffy', 'Stormy', 'Ethereal', 'Cumulus', 
+        'Nimbus', 'Cirrus', 'Altocumulus', 'Stratus'
     ];
     
     const nouns = [
-        'Cloud',
-        'Mist',
-        'Sky',
-        'Vapor',
-        'Fog',
-        'Nebula',
-        'Drift',
-        'Aura',
-        'Zephyr'
+        'Cloud', 'Mist', 'Sky', 'Vapor', 'Fog', 
+        'Nebula', 'Drift', 'Aura', 'Zephyr'
     ];
     
-    // Generate a random four-digit number with leading zeros if necessary
     const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-    
-    // Select a random adjective and noun
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
     
@@ -127,56 +110,16 @@ function generateRandomBotName() {
 
 // Predefined facts array with 10 new facts about clouds, spoken like a royal in 1066
 const facts = [
-    {
-        id: 'fact1',
-        testText:
-            "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens.",
-    },
-    {
-        id: 'fact2',
-        testText:
-            "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown.",
-    },
-    {
-        id: 'fact3',
-        testText:
-            "Verily, thunderheads gather with portentous grace, heralding the tempest's mighty arrival.",
-    },
-    {
-        id: 'fact4',
-        testText:
-            "Stratus clouds blanket the sky, akin to a monarch's cloak shielding the realm from the sun's glare.",
-    },
-    {
-        id: 'fact5',
-        testText:
-            "Nimbus clouds, laden with rain, bestow life upon the earth, much like benevolent lords nurturing their lands.",
-    },
-    {
-        id: 'fact6',
-        testText:
-            "Altocumulus formations dance in the mid-sky, their patterns a celestial ballet for the watchful eye.",
-    },
-    {
-        id: 'fact7',
-        testText:
-            "The rare lenticular clouds, shaped like noble steeds, grace the mountains with their majestic presence.",
-    },
-    {
-        id: 'fact8',
-        testText:
-            "Contrails, though wrought by man's craft, weave temporary tapestries across the azure expanse.",
-    },
-    {
-        id: 'fact9',
-        testText:
-            "The aurora borealis casts ethereal clouds of light, a divine spectacle in the northern skies.",
-    },
-    {
-        id: 'fact10',
-        testText:
-            "Cumulonimbus towers rise with regal might, commanding the heavens with their imposing stature.",
-    },
+    { id: 'fact1', testText: "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens." },
+    { id: 'fact2', testText: "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown." },
+    { id: 'fact3', testText: "Verily, thunderheads gather with portentous grace, heralding the tempest's mighty arrival." },
+    { id: 'fact4', testText: "Stratus clouds blanket the sky, akin to a monarch's cloak shielding the realm from the sun's glare." },
+    { id: 'fact5', testText: "Nimbus clouds, laden with rain, bestow life upon the earth, much like benevolent lords nurturing their lands." },
+    { id: 'fact6', testText: "Altocumulus formations dance in the mid-sky, their patterns a celestial ballet for the watchful eye." },
+    { id: 'fact7', testText: "The rare lenticular clouds, shaped like noble steeds, grace the mountains with their majestic presence." },
+    { id: 'fact8', testText: "Contrails, though wrought by man's craft, weave temporary tapestries across the azure expanse." },
+    { id: 'fact9', testText: "The aurora borealis casts ethereal clouds of light, a divine spectacle in the northern skies." },
+    { id: 'fact10', testText: "Cumulonimbus towers rise with regal might, commanding the heavens with their imposing stature." },
 ];
 
 // /testing route with random cloud images, RoboHash avatars, and random bot name
@@ -187,7 +130,6 @@ app.get('/testing', (req, res) => {
         const botName = generateRandomBotName();
         const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] };
 
-        // Add dynamic properties
         randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
         randomFact.testImg = cloudImageUrl;
         randomFact.testingProfilePicture = profilePictureUrl;
@@ -239,33 +181,20 @@ async function postNewestToDiscord() {
         return;
     }
 
-    const entries = Array.isArray(redditData.feed.entry)
-        ? redditData.feed.entry
-        : [redditData.feed.entry];
+    const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
     const newestPosts = entries.slice(0, 5);
 
-    // Construct the embeds
     const embeds = newestPosts.map((post) => {
-        const postTitle =
-            typeof post.title === 'string' ? decode(post.title) : decode(post.title._);
+        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._);
         const postLink = post.link.href;
-        const postAuthor =
-            typeof post.author.name === 'string' ? post.author.name : post.author.name._;
-        const postContentRaw = post.content
-            ? typeof post.content === 'string'
-                ? post.content
-                : post.content._
-            : 'No content provided';
+        const postAuthor = typeof post.author.name === 'string' ? post.author.name : post.author.name._;
+        const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._) : 'No content provided';
         const postContent = cleanHtmlContent(postContentRaw);
 
-        // Limit fields to Discord's character limits
         const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
-        const description =
-            postContent.length > 4096 ? postContent.slice(0, 4093) + '...' : postContent;
-        const authorName =
-            postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor;
+        const description = postContent.length > 4096 ? postContent.slice(0, 4093) + '...' : postContent;
+        const authorName = postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor;
 
-        // Optional image
         const postImage = post['media:thumbnail'] ? post['media:thumbnail'].$.url : null;
 
         const embed = {
@@ -275,9 +204,7 @@ async function postNewestToDiscord() {
         };
 
         if (authorName) {
-            embed.author = {
-                name: `Posted by ${authorName}`,
-            };
+            embed.author = { name: `Posted by ${authorName}` };
         }
 
         if (postImage) {
@@ -287,7 +214,6 @@ async function postNewestToDiscord() {
         return embed;
     });
 
-    // Get the current time in GB UK time zone with 12-hour format
     const ukTime = new Date().toLocaleTimeString('en-GB', {
         timeZone: 'Europe/London',
         hour12: true,
@@ -296,7 +222,6 @@ async function postNewestToDiscord() {
         second: '2-digit',
     });
 
-    // Send message with content and embeds
     const payload = {
         content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
         embeds: embeds,
@@ -326,12 +251,7 @@ app.get('/', async (req, res) => {
         logger.info('Loaded updates:', updates);
 
         updatesHtml = updates.length
-            ? updates
-                  .map(
-                      (update) =>
-                          `<li><strong>${update.updateText}</strong> - ${update.description}</li>`
-                  )
-                  .join('')
+            ? updates.map((update) => `<li><strong>${update.updateText}</strong> - ${update.description}</li>`).join('')
             : '<li>No updates available at this time.</li>';
     } catch (error) {
         logger.error(`Error in root route: ${error.message}`);
@@ -413,14 +333,8 @@ app.get('/', async (req, res) => {
                     <h2>🛡️ A Walkthrough for the Uninitiated</h2>
                     <p>Fear not, for this guide shall illuminate the path to utilizing our API's noble endpoints:</p>
                     <ol>
-                        <li>
-                            <strong>/</strong> - <em>The Grand Overview</em><br>
-                            Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.
-                        </li>
-                        <li>
-                            <strong>/testing</strong> - <em>The Cloud Pavilion</em><br>
-                            Visit this endpoint to receive randomized tales of our celestial formations, each accompanied by a majestic cloud image and a regal bot name crafted just for thee.
-                        </li>
+                        <li><strong>/</strong> - <em>The Grand Overview</em><br>Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.</li>
+                        <li><strong>/testing</strong> - <em>The Cloud Pavilion</em><br>Visit this endpoint to receive randomized tales of our celestial formations, each accompanied by a majestic cloud image and a regal bot name crafted just for thee.</li>
                     </ol>
                     <p>To engage with these endpoints, simply dispatch a request to the desired path and await the kingdom's gracious response. Whether thou art a seasoned knight or a humble scribe, our API stands ready to serve thy needs.</p>
                 </div>
@@ -447,8 +361,6 @@ app.use((req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-    logger.info(
-        `The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`
-    );
+    logger.info(`The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`);
     postNewestToDiscord();
 });
