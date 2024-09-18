@@ -63,24 +63,24 @@ async function getUpdates() {
     }
 }
 
-// Updated list of 10 pigeon image URLs
-const pigeonImageList = [
-    'https://i.ibb.co/NTp1phP/1.jpg',
-    'https://i.ibb.co/DKMWRTD/2.jpg',
-    'https://i.ibb.co/kJqqc31/3.jpg',
-    'https://i.ibb.co/SfBF8cq/4.jpg',
-    'https://i.ibb.co/0Q7M5BT/5.jpg',
-    'https://i.ibb.co/3Bf2JVg/6.jpg',
-    'https://i.ibb.co/XtfjB7b/7.jpg',
-    'https://i.ibb.co/VtdgpmT/8.jpg',
-    'https://i.ibb.co/5jqhFvh/9.jpg',
-    'https://i.ibb.co/CHrX2mG/10.jpg',
+// Updated list of 10 cloud image URLs
+const cloudImageList = [
+    'https://i.ibb.co/XYZ123/cloud1.jpg',
+    'https://i.ibb.co/ABC456/cloud2.jpg',
+    'https://i.ibb.co/DEF789/cloud3.jpg',
+    'https://i.ibb.co/GHI012/cloud4.jpg',
+    'https://i.ibb.co/JKL345/cloud5.jpg',
+    'https://i.ibb.co/MNO678/cloud6.jpg',
+    'https://i.ibb.co/PQR901/cloud7.jpg',
+    'https://i.ibb.co/STU234/cloud8.jpg',
+    'https://i.ibb.co/VWX567/cloud9.jpg',
+    'https://i.ibb.co/YZA890/cloud10.jpg',
 ];
 
-// Function to get a random pigeon image URL
-function getRandomPigeonImage() {
-    const randomIndex = Math.floor(Math.random() * pigeonImageList.length);
-    return pigeonImageList[randomIndex];
+// Function to get a random cloud image URL
+function getRandomCloudImage() {
+    const randomIndex = Math.floor(Math.random() * cloudImageList.length);
+    return cloudImageList[randomIndex];
 }
 
 // Updated function to get a random profile picture using RoboHash API
@@ -89,80 +89,107 @@ function getRandomProfilePicture() {
     return `https://robohash.org/${randomUsername}.png`;
 }
 
-// Function to generate a random bot name
+// Updated Function to generate a random bot name
 function generateRandomBotName() {
-    const adjectives = ['Valiant', 'Noble', 'Mighty', 'Regal', 'Gallant'];
-    const nouns = ['Knight', 'Baron', 'Lord', 'Squire', 'Monarch'];
-    return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${
-        nouns[Math.floor(Math.random() * nouns.length)]
-    }${Math.floor(Math.random() * 1000)}`;
+    const adjectives = [
+        'Wispy',
+        'Fluffy',
+        'Stormy',
+        'Ethereal',
+        'Cumulus',
+        'Nimbus',
+        'Cirrus',
+        'Altocumulus',
+        'Stratus'
+    ];
+    
+    const nouns = [
+        'Cloud',
+        'Mist',
+        'Sky',
+        'Vapor',
+        'Fog',
+        'Nebula',
+        'Drift',
+        'Aura',
+        'Zephyr'
+    ];
+    
+    // Generate a random four-digit number with leading zeros if necessary
+    const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+    
+    // Select a random adjective and noun
+    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+    
+    return `${randomAdjective}${randomNoun}${number}`;
 }
 
-// Predefined facts array with 10 new facts about pigeons, spoken like a royal in 1066
+// Predefined facts array with 10 new facts about clouds, spoken like a royal in 1066
 const facts = [
     {
         id: 'fact1',
         testText:
-            "Verily, the humble pigeon doth find its way home o'er great distances, guided by the Lord's own hand.",
+            "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens.",
     },
     {
         id: 'fact2',
         testText:
-            "Tis known that pigeons, with feathers of grey and eyes of keen sight, art messengers of import across our lands.",
+            "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown.",
     },
     {
         id: 'fact3',
         testText:
-            "In the annals of history, the pigeon hath served kings and nobles, bearing missives swift and sure.",
+            "Verily, thunderheads gather with portentous grace, heralding the tempest's mighty arrival.",
     },
     {
         id: 'fact4',
         testText:
-            "These birds, though common in visage, possess a loyalty unmatched, returning ever to their roosts.",
+            "Stratus clouds blanket the sky, akin to a monarch's cloak shielding the realm from the sun's glare.",
     },
     {
         id: 'fact5',
         testText:
-            "I have witnessed pigeons trained to carry tidings between castles, a marvel of God's creation.",
+            "Nimbus clouds, laden with rain, bestow life upon the earth, much like benevolent lords nurturing their lands.",
     },
     {
         id: 'fact6',
         testText:
-            "The pigeon, gentle of nature, doth thrive in our towns and keeps, living alongside man.",
+            "Altocumulus formations dance in the mid-sky, their patterns a celestial ballet for the watchful eye.",
     },
     {
         id: 'fact7',
         testText:
-            "Some say the pigeon can discern the north star, guiding itself through night and storm.",
+            "The rare lenticular clouds, shaped like noble steeds, grace the mountains with their majestic presence.",
     },
     {
         id: 'fact8',
         testText:
-            "Tis a wonder that pigeons feed their young with milk of their crop, a trait rare amongst birds.",
+            "Contrails, though wrought by man's craft, weave temporary tapestries across the azure expanse.",
     },
     {
         id: 'fact9',
         testText:
-            "Their cooing songs echo in the morn, heralding the dawn as roosters do in the countryside.",
+            "The aurora borealis casts ethereal clouds of light, a divine spectacle in the northern skies.",
     },
     {
         id: 'fact10',
         testText:
-            "I declare, the pigeon's endurance is famed, for it flies many leagues without rest.",
+            "Cumulonimbus towers rise with regal might, commanding the heavens with their imposing stature.",
     },
 ];
 
-// /testing route with random pigeon images, RoboHash avatars, and random bot name
+// /testing route with random cloud images, RoboHash avatars, and random bot name
 app.get('/testing', (req, res) => {
     try {
-        const pigeonImageUrl = getRandomPigeonImage();
+        const cloudImageUrl = getRandomCloudImage();
         const profilePictureUrl = getRandomProfilePicture();
         const botName = generateRandomBotName();
         const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] };
 
         // Add dynamic properties
         randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
-        randomFact.testImg = pigeonImageUrl;
+        randomFact.testImg = cloudImageUrl;
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
@@ -391,8 +418,8 @@ app.get('/', async (req, res) => {
                             Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.
                         </li>
                         <li>
-                            <strong>/testing</strong> - <em>The Pigeon Pavilion</em><br>
-                            Visit this endpoint to receive randomized tales of our feathered friends, each accompanied by a noble pigeon image and a regal bot name crafted just for thee.
+                            <strong>/testing</strong> - <em>The Cloud Pavilion</em><br>
+                            Visit this endpoint to receive randomized tales of our celestial formations, each accompanied by a majestic cloud image and a regal bot name crafted just for thee.
                         </li>
                     </ol>
                     <p>To engage with these endpoints, simply dispatch a request to the desired path and await the kingdom's gracious response. Whether thou art a seasoned knight or a humble scribe, our API stands ready to serve thy needs.</p>
