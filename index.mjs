@@ -40,14 +40,12 @@ function formatUptime(ms) {
     return `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
 }
 
-// Logger configuration (Winston)
+// Logger configuration (Winston) with Google's console format
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        winston.format.printf(
-            ({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`
-        )
+        winston.format.timestamp(),
+        winston.format.json()
     ),
     transports: [new winston.transports.Console()],
 });
@@ -56,37 +54,46 @@ const logger = winston.createLogger({
 async function getUpdates() {
     try {
         const data = await fs.readFile(path.join(__dirname, 'updates.json'), 'utf-8');
+        logger.info('Updates file successfully read.', { source: 'getUpdates' });
         return JSON.parse(data);
     } catch (error) {
-        logger.error(`Error reading updates.json: ${error.message}`);
+        logger.error('Error reading updates.json.', { error: error.message, source: 'getUpdates' });
         return [];
     }
 }
 
-// Updated list of 10 cloud image URLs (direct links to cloud images from Unsplash)
+// Updated list of 5 cloud image URLs (direct links to cloud images from Unsplash)
 const cloudImageList = [
     'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 1
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 2
     'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 3
     'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 4
     'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 5
-    'https://images.unsplash.com/photo-1557690905-43f9f2e5f6c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 6
-    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 7
-    'https://images.unsplash.com/photo-1519194838611-9d2261d8e9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 8
-    'https://images.unsplash.com/photo-1520563136594-27b83c69145f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 9
-    'https://images.unsplash.com/photo-1532464371089-404ae1a5b491?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 10
 ];
 
-// Function to get a random cloud image URL
-function getRandomCloudImage() {
-    const randomIndex = Math.floor(Math.random() * cloudImageList.length);
-    return cloudImageList[randomIndex];
+// Updated list of 5 grass image URLs (direct links from Unsplash)
+const grassImageList = [
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 1
+    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 2
+    'https://images.unsplash.com/photo-1506765515384-028b60a970df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 3
+    'https://images.unsplash.com/photo-1496483648148-47c686dc86a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 4
+    'https://images.unsplash.com/photo-1520911691954-7e45a47c3d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 5
+];
+
+// Function to get a random image from a given list
+function getRandomImage(imageList) {
+    const randomIndex = Math.floor(Math.random() * imageList.length);
+    const selectedImage = imageList[randomIndex];
+    logger.debug('Random image selected.', { imageUrl: selectedImage, source: 'getRandomImage' });
+    return selectedImage;
 }
 
 // Updated function to get a random profile picture using RoboHash API
 function getRandomProfilePicture() {
     const randomUsername = crypto.randomBytes(4).toString('hex');
-    return `https://robohash.org/${randomUsername}.png`;
+    const profilePictureUrl = `https://robohash.org/${randomUsername}.png`;
+    logger.debug('Generated random profile picture URL.', { profilePictureUrl, source: 'getRandomProfilePicture' });
+    return profilePictureUrl;
 }
 
 // Function to generate a random bot name
@@ -105,39 +112,40 @@ function generateRandomBotName() {
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
     
-    return `${randomAdjective}${randomNoun}${number}`;
+    const botName = `${randomAdjective}${randomNoun}${number}`;
+    logger.debug('Generated random bot name.', { botName, source: 'generateRandomBotName' });
+    return botName;
 }
 
-// Predefined facts array with 10 new facts about clouds, spoken like a royal in 1066
+// Predefined facts array with 5 new facts about clouds, spoken like a royal in 1066
 const facts = [
     { id: 'fact1', testText: "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens." },
     { id: 'fact2', testText: "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown." },
     { id: 'fact3', testText: "Verily, thunderheads gather with portentous grace, heralding the tempest's mighty arrival." },
     { id: 'fact4', testText: "Stratus clouds blanket the sky, akin to a monarch's cloak shielding the realm from the sun's glare." },
     { id: 'fact5', testText: "Nimbus clouds, laden with rain, bestow life upon the earth, much like benevolent lords nurturing their lands." },
-    { id: 'fact6', testText: "Altocumulus formations dance in the mid-sky, their patterns a celestial ballet for the watchful eye." },
-    { id: 'fact7', testText: "The rare lenticular clouds, shaped like noble steeds, grace the mountains with their majestic presence." },
-    { id: 'fact8', testText: "Contrails, though wrought by man's craft, weave temporary tapestries across the azure expanse." },
-    { id: 'fact9', testText: "The aurora borealis casts ethereal clouds of light, a divine spectacle in the northern skies." },
-    { id: 'fact10', testText: "Cumulonimbus towers rise with regal might, commanding the heavens with their imposing stature." },
 ];
 
-// /testing route with random cloud images, RoboHash avatars, and random bot name
+// /testing route with random cloud images, grass images, RoboHash avatars, and random bot name
 app.get('/testing', (req, res) => {
+    logger.info('A request hath been made to the /testing route.', { route: '/testing', source: 'route' });
     try {
-        const cloudImageUrl = getRandomCloudImage();
+        const cloudImageUrl = getRandomImage(cloudImageList);
+        const grassImageUrl = getRandomImage(grassImageList);
         const profilePictureUrl = getRandomProfilePicture();
         const botName = generateRandomBotName();
         const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] };
 
         randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
-        randomFact.testImg = cloudImageUrl;
+        randomFact.testimage1 = cloudImageUrl;
+        randomFact.testimage2 = grassImageUrl;
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
+        logger.info('Response for /testing route hath been prepared.', { response: randomFact, source: '/testing' });
         res.json(randomFact);
     } catch (error) {
-        logger.error(`Error in /testing route: ${error.message}`);
+        logger.error('An error hath occurred within the /testing route.', { error: error.message, source: '/testing' });
         res.status(500).json({
             error: 'Alas! An error hath occurred while fetching data. Please try again later.',
         });
@@ -150,14 +158,16 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/128386145700767350
 
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
+    logger.info('Commencing fetch of Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
     try {
         const response = await axios.get(REDDIT_RSS_URL);
         const rssData = response.data;
         const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
         const jsonData = await parser.parseStringPromise(rssData);
+        logger.info('Reddit RSS feed successfully fetched and parsed.', { source: 'fetchRedditRSS' });
         return jsonData;
     } catch (error) {
-        logger.error(`Error fetching Reddit RSS feed: ${error.message}`);
+        logger.error('Error whilst fetching Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
         return null;
     }
 }
@@ -169,20 +179,23 @@ function cleanHtmlContent(htmlContent) {
     }
     let textContent = htmlContent.replace(/<\/?[^>]+(>|$)/g, '').trim();
     textContent = decode(textContent);
+    logger.debug('HTML content hath been cleansed.', { original: htmlContent, cleaned: textContent, source: 'cleanHtmlContent' });
     return textContent;
 }
 
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
+    logger.info('Initiating the process to post newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
     const redditData = await fetchRedditRSS();
 
     if (!redditData || !redditData.feed || !redditData.feed.entry) {
-        logger.error('Invalid Reddit RSS feed data.');
+        logger.error('Invalid Reddit RSS feed data received.', { data: redditData, source: 'postNewestToDiscord' });
         return;
     }
 
     const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
     const newestPosts = entries.slice(0, 5);
+    logger.info('Extracted the 5 newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
 
     const embeds = newestPosts.map((post) => {
         const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._);
@@ -211,6 +224,7 @@ async function postNewestToDiscord() {
             embed.image = { url: postImage };
         }
 
+        logger.debug('Created embed for a Reddit post.', { embed, source: 'postNewestToDiscord' });
         return embed;
     });
 
@@ -229,11 +243,11 @@ async function postNewestToDiscord() {
 
     try {
         await axios.post(DISCORD_WEBHOOK_URL, payload);
-        logger.info('Message posted to Discord successfully.');
+        logger.info('Message hath been posted to Discord successfully.', { payload, source: 'postNewestToDiscord' });
     } catch (error) {
-        logger.error(`Error posting to Discord: ${error.message}`);
+        logger.error('Error whilst posting message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
         if (error.response && error.response.data) {
-            console.error('Discord API Response:', error.response.data);
+            logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
         }
     }
 }
@@ -243,18 +257,20 @@ setInterval(postNewestToDiscord, 30000);
 
 // Root route '/'
 app.get('/', async (req, res) => {
+    logger.info('A request hath been made to the root route.', { route: '/', source: 'root' });
     const uptime = formatUptime(Date.now() - serverStartTime);
 
     let updatesHtml = '';
     try {
         const updates = await getUpdates();
-        logger.info('Loaded updates:', updates);
+        logger.info('Loaded updates successfully.', { updates, source: 'root' });
 
         updatesHtml = updates.length
             ? updates.map((update) => `<li><strong>${update.updateText}</strong> - ${update.description}</li>`).join('')
             : '<li>No updates available at this time.</li>';
+        logger.debug('Updates HTML hath been prepared.', { updatesHtml, source: 'root' });
     } catch (error) {
-        logger.error(`Error in root route: ${error.message}`);
+        logger.error('Error whilst loading updates.', { error: error.message, source: 'root' });
         updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
     }
 
@@ -356,11 +372,12 @@ app.get('/', async (req, res) => {
 
 // 404 Error Handler
 app.use((req, res) => {
+    logger.warn('A request hath been made to an unknown path.', { path: req.path, source: '404Handler' });
     res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
 // Start the server
 app.listen(PORT, () => {
-    logger.info(`The server is now operational upon port ${PORT}. Brace thyself for the adventure ahead!`);
+    logger.info('The server hath commenced operation.', { port: PORT, source: 'server' });
     postNewestToDiscord();
 });
