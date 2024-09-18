@@ -8,12 +8,6 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
-import { createRequire } from 'module';
-import requestIp from 'request-ip';
-
-// Create a require function for ES modules to import CommonJS modules
-const require = createRequire(import.meta.url);
-const geoip = require('geoip-lite');
 
 // Hardcoded Discord webhook URL
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
@@ -23,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 21560; // Hardcoded port
+const PORT = 21560; // Hardcoded port for HTTP
 
 // Utilize helmet for enhanced security
 app.use(helmet());
@@ -31,9 +25,6 @@ app.use(helmet());
 // Enable JSON and URL-encoded body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Middleware to capture client IP
-app.use(requestIp.mw());
 
 // Record the commencement time of the server
 const serverStartTime = Date.now();
@@ -52,7 +43,7 @@ function formatUptime(ms) {
 
 // Logger configuration (Winston) with colorized output
 const logger = winston.createLogger({
-    level: 'info', // Set to 'info' to capture general logs; change to 'debug' for more detailed logs
+    level: 'info',
     format: winston.format.combine(
         winston.format.colorize({ all: true }),
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -79,7 +70,7 @@ async function getUpdates() {
     }
 }
 
-// Cloud image URLs (direct links from Unsplash) - Updated to 10 images as per Thirteenth Edict
+// Cloud image URLs (direct links from Unsplash)
 const cloudImageList = [
     'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -150,11 +141,7 @@ const facts = [
 
 // /testing route with random cloud images, grass images, RoboHash avatars, and random bot name
 app.get('/testing', (req, res) => {
-    const clientIp = req.clientIp;
-    const geo = geoip.lookup(clientIp);
-    const country = geo ? geo.country : 'Unknown';
-
-    logger.info('Endpoint accessed.', { endpoint: '/testing', ip: clientIp, country: country, source: 'route' });
+    logger.info('Endpoint accessed.', { endpoint: '/testing' });
 
     try {
         const cloudImageUrl = getRandomImage(cloudImageList);
@@ -197,17 +184,6 @@ async function fetchRedditRSS() {
     }
 }
 
-// Helper function to clean HTML tags and decode HTML entities from the post content
-function cleanHtmlContent(htmlContent) {
-    if (typeof htmlContent !== 'string') {
-        htmlContent = '';
-    }
-    let textContent = htmlContent.replace(/<\/?[^>]+(>|$)/g, '').trim();
-    textContent = decode(textContent);
-    logger.debug('HTML content hath been cleansed.', { original: htmlContent, cleaned: textContent, source: 'cleanHtmlContent' });
-    return textContent;
-}
-
 // Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
 async function postNewestToDiscord() {
     logger.info('Initiating the process to post newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
@@ -227,7 +203,7 @@ async function postNewestToDiscord() {
         const postLink = post.link.href;
         const postAuthor = typeof post.author.name === 'string' ? post.author.name : post.author.name._;
         const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._) : 'No content provided';
-        const postContent = cleanHtmlContent(postContentRaw);
+        const postContent = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
 
         const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
         const description = postContent.length > 4096 ? postContent.slice(0, 4093) + '...' : postContent;
@@ -249,7 +225,6 @@ async function postNewestToDiscord() {
             embed.image = { url: postImage };
         }
 
-        // Removed logging of embed content to prevent Reddit content from being logged
         return embed;
     });
 
@@ -282,11 +257,7 @@ setInterval(postNewestToDiscord, 30000);
 
 // Root route '/'
 app.get('/', async (req, res) => {
-    const clientIp = req.clientIp;
-    const geo = geoip.lookup(clientIp);
-    const country = geo ? geo.country : 'Unknown';
-
-    logger.info('Endpoint accessed.', { endpoint: '/', ip: clientIp, country: country, source: 'root' });
+    logger.info('Root endpoint accessed.');
 
     const uptime = formatUptime(Date.now() - serverStartTime);
 
@@ -412,16 +383,11 @@ app.get('/', async (req, res) => {
 
 // 404 Error Handler
 app.use((req, res) => {
-    const clientIp = req.clientIp;
-    const geo = geoip.lookup(clientIp);
-    const country = geo ? geo.country : 'Unknown';
-
-    logger.warn('Unknown endpoint accessed.', { path: req.path, ip: clientIp, country: country, source: '404Handler' });
+    logger.warn('Unknown endpoint accessed.', { path: req.path, source: '404Handler' });
     res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
 // Start the server
-app.listen(PORT, () => {
-    logger.info('The server hath commenced operation.', { port: PORT, source: 'server' });
-    postNewestToDiscord();
+app.listen(PORT, '0.0.0.0', () => {
+    logger.info(`Server running at http://us2.bot-hosting.net:${PORT}`);
 });
