@@ -1,7 +1,7 @@
 [
     {
-        "updateText": "The Twelfth Edict: New Pigeon Images and Avatars via RoboHash",
-        "description": "In this twelfth edict, we have taken great strides to enhance the MonkeyBytes-API by introducing fresh pigeon imagery and more varied avatars:\n\n1. **Updated Pigeon Image List:**\n    - The `pigeonImageList` hath been replenished with ten new and noble images sourced from [i.ibb.co](https://i.ibb.co/), replacing the former collection. These new illustrations now grace the `/testing` endpoint, offering a more engaging visual experience.\n\n2. **Transition to RoboHash for Avatars:**\n    - We have bid farewell to the DiceBear Avatars API and welcomed RoboHash for the generation of profile pictures. Each avatar is now uniquely crafted with a mechanized theme, adding a distinctive touch to our API responses."
+        "updateText": "The Thirteenth Edict: New Cloud Images and Avatars via RoboHash",
+        "description": "In this thirteenth edict, we have undertaken significant enhancements to the MonkeyBytes-API by introducing fresh cloud imagery and diversified avatars:\n\n1. **Updated Cloud Image List:**\n    - The `cloudImageList` hath been revitalized with ten new and majestic images sourced from [Unsplash](https://unsplash.com/), replacing the former collection. These pristine illustrations now grace the `/testing` endpoint, offering a more engaging and visually appealing experience.\n\n2. **Transition to RoboHash for Avatars:**\n    - We have officially transitioned from the DiceBear Avatars API to RoboHash for generating profile pictures. Each avatar is now uniquely crafted with a mechanized and celestial theme, adding a distinctive and harmonious touch to our API responses."
     },
     {
         "updateText": "Refinement of Discord Notifications and Time Formatting",
@@ -9,7 +9,7 @@
     },
     {
         "updateText": "Optimized `/testing` Endpoint with New Content",
-        "description": "The `/testing` endpoint hath been enriched with more varied and randomized content for the delight of our users:\n\n1. **Randomized Pigeon Facts, Images, and Bot Names:**\n    - The endpoint now serves randomized pigeon facts, along with images from the newly updated `pigeonImageList`, and dynamically generated bot names. These changes ensure that each interaction provides a unique and varied experience.\n\n2. **Enhanced Response Structure:**\n    - Each API response hath been structured to include a random pigeon image, a RoboHash avatar, and an entertaining fact about our feathered friends. The endpoint continues to uphold the theme of medieval storytelling while delivering fresh content."
+        "description": "The `/testing` endpoint hath been enriched with more varied and randomized content for the delight of our users:\n\n1. **Randomized Cloud Facts, Images, and Bot Names:**\n    - The endpoint now serves randomized cloud facts, along with images from the newly updated `cloudImageList`, and dynamically generated bot names. These changes ensure that each interaction provides a unique and varied experience.\n\n2. **Enhanced Response Structure:**\n    - Each API response hath been structured to include a random cloud image, a RoboHash avatar, and an entertaining fact about our celestial formations. The endpoint continues to uphold the theme of medieval storytelling while delivering fresh content."
     },
     {
         "updateText": "Fortified Error Handling and Codebase Optimization",
@@ -20,3 +20,4 @@
         "description": "This update ensures the continued stability and consistency of the MonkeyBytes-API, particularly in maintaining its dark mode aesthetic:\n\n1. **Stability Enhancements:**\n    - The server's uptime and overall performance have been carefully monitored and maintained. We have ensured that all updates do not interfere with the API's core functionalities, preserving the integrity and reliability of the service.\n\n2. **Dark Mode Preservation:**\n    - The dark mode theme of the API portal remains consistent, providing users with a visually pleasing and comfortable experience. The aesthetic has been preserved across all updates, ensuring continuity in the user interface."
     }
 ]
+//
