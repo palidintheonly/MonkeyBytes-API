@@ -8,13 +8,21 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
+import dotenv from 'dotenv';
+import { createRequire } from 'module';
+import requestIp from 'request-ip';
 
-// Constants (Replace with your actual Discord Webhook URL)
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+// Create a require function for ES modules to import CommonJS modules
+const require = createRequire(import.meta.url);
+const geoip = require('geoip-lite');
 
-// Validate Discord Webhook URL
-if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL === 'https://discord.com/api/webhooks/your-webhook-id/your-webhook-token') {
-    console.error('Error: DISCORD_WEBHOOK_URL is not defined or is using the placeholder value.');
+// Load environment variables from .env file
+dotenv.config();
+
+// Ensure that the Discord Webhook URL is provided
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+if (!DISCORD_WEBHOOK_URL) {
+    console.error('Error: DISCORD_WEBHOOK_URL is not defined in environment variables.');
     process.exit(1);
 }
 
@@ -23,7 +31,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 21560;
+const PORT = process.env.PORT || 21560;
 
 // Utilize helmet for enhanced security
 app.use(helmet());
@@ -31,6 +39,9 @@ app.use(helmet());
 // Enable JSON and URL-encoded body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware to capture client IP
+app.use(requestIp.mw());
 
 // Record the commencement time of the server
 const serverStartTime = Date.now();
@@ -49,7 +60,7 @@ function formatUptime(ms) {
 
 // Logger configuration (Winston) with colorized output
 const logger = winston.createLogger({
-    level: 'debug', // Set to 'debug' to capture debug logs
+    level: 'info', // Set to 'info' to capture general logs; change to 'debug' for more detailed logs
     format: winston.format.combine(
         winston.format.colorize({ all: true }),
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -76,19 +87,18 @@ async function getUpdates() {
     }
 }
 
-// Cloud image URLs (direct links from Unsplash)
+// Cloud image URLs (direct links from Unsplash) - Updated to 10 images as per Thirteenth Edict
 const cloudImageList = [
     'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    // Add five more cloud images to make it ten
-    'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1501901609772-1bfacb67d80d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1527733202121-0c7c6aa8e7ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1487752350520-2d6e8e1d4b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1518222358536-6e4a7f2593b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
 ];
 
 // Grass image URLs (direct links from Unsplash)
@@ -148,7 +158,12 @@ const facts = [
 
 // /testing route with random cloud images, grass images, RoboHash avatars, and random bot name
 app.get('/testing', (req, res) => {
-    logger.info('A request hath been made to the /testing route.', { route: '/testing', source: 'route' });
+    const clientIp = req.clientIp;
+    const geo = geoip.lookup(clientIp);
+    const country = geo ? geo.country : 'Unknown';
+
+    logger.info('Endpoint accessed.', { endpoint: '/testing', ip: clientIp, country: country, source: 'route' });
+
     try {
         const cloudImageUrl = getRandomImage(cloudImageList);
         const grassImageUrl = getRandomImage(grassImageList);
@@ -162,7 +177,6 @@ app.get('/testing', (req, res) => {
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
-        logger.info('Response for /testing route hath been prepared and sent.', { response: 'Sent to client', source: '/testing' });
         res.json(randomFact);
     } catch (error) {
         logger.error('An error hath occurred within the /testing route.', { error: error.message, source: '/testing' });
@@ -172,7 +186,7 @@ app.get('/testing', (req, res) => {
     }
 });
 
-// Reddit RSS URL
+// Reddit RSS and Discord webhook URLs are now handled via environment variables
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
 // Function to fetch and parse Reddit RSS feed
@@ -243,7 +257,7 @@ async function postNewestToDiscord() {
             embed.image = { url: postImage };
         }
 
-        logger.debug('Created embed for a Reddit post.', { embed, source: 'postNewestToDiscord' });
+        // Removed logging of embed content to prevent Reddit content from being logged
         return embed;
     });
 
@@ -276,7 +290,12 @@ setInterval(postNewestToDiscord, 30000);
 
 // Root route '/'
 app.get('/', async (req, res) => {
-    logger.info('A request hath been made to the root route.', { route: '/', source: 'root' });
+    const clientIp = req.clientIp;
+    const geo = geoip.lookup(clientIp);
+    const country = geo ? geo.country : 'Unknown';
+
+    logger.info('Endpoint accessed.', { endpoint: '/', ip: clientIp, country: country, source: 'root' });
+
     const uptime = formatUptime(Date.now() - serverStartTime);
 
     let updatesHtml = '';
@@ -401,7 +420,11 @@ app.get('/', async (req, res) => {
 
 // 404 Error Handler
 app.use((req, res) => {
-    logger.warn('A request hath been made to an unknown path.', { path: req.path, source: '404Handler' });
+    const clientIp = req.clientIp;
+    const geo = geoip.lookup(clientIp);
+    const country = geo ? geo.country : 'Unknown';
+
+    logger.warn('Unknown endpoint accessed.', { path: req.path, ip: clientIp, country: country, source: '404Handler' });
     res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
