@@ -169,7 +169,7 @@ app.get('/testing', (req, res) => {
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
-        res.json(randomFact);
+        res.json(randomFact); // Return JSON response
     } catch (error) {
         logger.error('An error hath occurred within the /testing route.', { error: error.message, source: '/testing' });
         res.status(500).json({
