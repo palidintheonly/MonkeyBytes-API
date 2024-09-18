@@ -8,7 +8,6 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
-import dotenv from 'dotenv';
 import { createRequire } from 'module';
 import requestIp from 'request-ip';
 
@@ -16,22 +15,15 @@ import requestIp from 'request-ip';
 const require = createRequire(import.meta.url);
 const geoip = require('geoip-lite');
 
-// Load environment variables from .env file
-dotenv.config();
-
-// Ensure that the Discord Webhook URL is provided
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
-if (!DISCORD_WEBHOOK_URL) {
-    console.error('Error: DISCORD_WEBHOOK_URL is not defined in environment variables.');
-    process.exit(1);
-}
+// Hardcoded Discord webhook URL
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 21560;
+const PORT = 21560; // Hardcoded port
 
 // Utilize helmet for enhanced security
 app.use(helmet());
@@ -186,7 +178,7 @@ app.get('/testing', (req, res) => {
     }
 });
 
-// Reddit RSS and Discord webhook URLs are now handled via environment variables
+// Reddit RSS URL remains constant
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
 // Function to fetch and parse Reddit RSS feed
