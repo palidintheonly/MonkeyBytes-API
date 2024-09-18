@@ -1,5 +1,3 @@
-// index.mjs
-
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
@@ -40,7 +38,7 @@ function formatUptime(ms) {
     return `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
 }
 
-// Logger configuration (Winston) with colorized output and autism-friendly formatting
+// Logger configuration (Winston) with colorized output
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
@@ -69,22 +67,22 @@ async function getUpdates() {
     }
 }
 
-// Updated list of 5 cloud image URLs (direct links to cloud images from Unsplash)
+// Cloud image URLs (direct links from Unsplash)
 const cloudImageList = [
-    'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 1
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 2
-    'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 3
-    'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 4
-    'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 5
+    'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
 ];
 
-// Updated list of 5 grass image URLs (direct links from Unsplash)
+// Grass image URLs (direct links from Unsplash)
 const grassImageList = [
-    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 1
-    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 2
-    'https://images.unsplash.com/photo-1506765515384-028b60a970df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 3
-    'https://images.unsplash.com/photo-1496483648148-47c686dc86a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 4
-    'https://images.unsplash.com/photo-1520911691954-7e45a47c3d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Grass 5
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1506765515384-028b60a970df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1496483648148-47c686dc86a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1520911691954-7e45a47c3d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
 ];
 
 // Function to get a random image from a given list
@@ -95,7 +93,7 @@ function getRandomImage(imageList) {
     return selectedImage;
 }
 
-// Updated function to get a random profile picture using RoboHash API
+// Function to get a random profile picture using RoboHash API
 function getRandomProfilePicture() {
     const randomUsername = crypto.randomBytes(4).toString('hex');
     const profilePictureUrl = `https://robohash.org/${randomUsername}.png`;
@@ -106,25 +104,25 @@ function getRandomProfilePicture() {
 // Function to generate a random bot name
 function generateRandomBotName() {
     const adjectives = [
-        'Wispy', 'Fluffy', 'Stormy', 'Ethereal', 'Cumulus', 
+        'Wispy', 'Fluffy', 'Stormy', 'Ethereal', 'Cumulus',
         'Nimbus', 'Cirrus', 'Altocumulus', 'Stratus'
     ];
-    
+
     const nouns = [
-        'Cloud', 'Mist', 'Sky', 'Vapor', 'Fog', 
+        'Cloud', 'Mist', 'Sky', 'Vapor', 'Fog',
         'Nebula', 'Drift', 'Aura', 'Zephyr'
     ];
-    
+
     const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    
+
     const botName = `${randomAdjective}${randomNoun}${number}`;
     logger.debug('Generated random bot name.', { botName, source: 'generateRandomBotName' });
     return botName;
 }
 
-// Predefined facts array with 5 new facts about clouds, spoken like a royal in 1066
+// Predefined facts array with 5 new facts about clouds, in a royal medieval style
 const facts = [
     { id: 'fact1', testText: "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens." },
     { id: 'fact2', testText: "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown." },
@@ -287,7 +285,8 @@ app.get('/', async (req, res) => {
         <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <title>MonkeyBytes-API Portal</title>
+            <title>Monkey Bytes API</title>
+            <link rel="icon" href="https://i.ibb.co/wgfvKYb/2.jpg" type="image/jpg"> <!-- Favicon link -->
             <style>
                 body {
                     background-color: #121212;
@@ -329,7 +328,7 @@ app.get('/', async (req, res) => {
         <body>
             <div class="container">
                 <div class="section">
-                    <h1>📜 Greetings, Noble Visitor, to the MonkeyBytes-API!</h1>
+                    <h1>📜 Greetings, Noble Visitor, to the Monkey Bytes API!</h1>
                     <p>Welcome to the grand halls of our kingdom's digital realm. Herein lies the gateway to our esteemed API, a marvel of modern sorcery and craftsmanship. Let us embark on a journey to unveil the secrets and functionalities that await thee.</p>
                 </div>
 
@@ -365,6 +364,15 @@ app.get('/', async (req, res) => {
                 <div class="section">
                     <h2>📰 Latest Decrees</h2>
                     <ul>${updatesHtml}</ul>
+                </div>
+
+                <div class="section">
+                    <h2>🔗 Useful Links</h2>
+                    <p>Herein lies the links to important aspects of our realm:</p>
+                    <ul>
+                        <li>🧪 <a href="http://us2.bot-hosting.net:21560/testing">Testing Endpoint</a> - Test our system with randomized data.</li>
+                        <li>💬 <a href="http://us2.bot-hosting.net:21560/testing">Discord Support Server</a> - Join our noble Discord server for aid and discussion.</li>
+                    </ul>
                 </div>
 
                 <div class="section">
