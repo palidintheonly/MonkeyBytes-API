@@ -8,15 +8,13 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
-import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config();
+// Constants (Replace with your actual Discord Webhook URL)
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 
-// Ensure that the Discord Webhook URL is provided
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
-if (!DISCORD_WEBHOOK_URL) {
-    console.error('Error: DISCORD_WEBHOOK_URL is not defined in environment variables.');
+// Validate Discord Webhook URL
+if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL === 'https://discord.com/api/webhooks/your-webhook-id/your-webhook-token') {
+    console.error('Error: DISCORD_WEBHOOK_URL is not defined or is using the placeholder value.');
     process.exit(1);
 }
 
@@ -25,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 21560;
+const PORT = 21560;
 
 // Utilize helmet for enhanced security
 app.use(helmet());
@@ -85,6 +83,12 @@ const cloudImageList = [
     'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    // Add five more cloud images to make it ten
+    'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1501901609772-1bfacb67d80d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
 ];
 
 // Grass image URLs (direct links from Unsplash)
@@ -168,7 +172,7 @@ app.get('/testing', (req, res) => {
     }
 });
 
-// Reddit RSS and Discord webhook URLs are now handled via environment variables
+// Reddit RSS URL
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
 // Function to fetch and parse Reddit RSS feed
