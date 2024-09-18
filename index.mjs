@@ -63,18 +63,18 @@ async function getUpdates() {
     }
 }
 
-// Updated list of 10 cloud image URLs
+// Updated list of 10 cloud image URLs (ensure these URLs are direct links to images)
 const cloudImageList = [
-    'https://i.ibb.co/XYZ123/cloud1.jpg',
-    'https://i.ibb.co/ABC456/cloud2.jpg',
-    'https://i.ibb.co/DEF789/cloud3.jpg',
-    'https://i.ibb.co/GHI012/cloud4.jpg',
-    'https://i.ibb.co/JKL345/cloud5.jpg',
-    'https://i.ibb.co/MNO678/cloud6.jpg',
-    'https://i.ibb.co/PQR901/cloud7.jpg',
-    'https://i.ibb.co/STU234/cloud8.jpg',
-    'https://i.ibb.co/VWX567/cloud9.jpg',
-    'https://i.ibb.co/YZA890/cloud10.jpg',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 1
+    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 2
+    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 3
+    'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 4
+    'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 5
+    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 6
+    'https://images.unsplash.com/photo-1499673613936-eaf9e7c6a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 7
+    'https://images.unsplash.com/photo-1499673613936-eaf9e7c6a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 8
+    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 9
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60', // Cloud 10
 ];
 
 // Function to get a random cloud image URL
@@ -89,7 +89,7 @@ function getRandomProfilePicture() {
     return `https://robohash.org/${randomUsername}.png`;
 }
 
-// Updated Function to generate a random bot name
+// Function to generate a random bot name
 function generateRandomBotName() {
     const adjectives = [
         'Wispy',
@@ -204,7 +204,7 @@ app.get('/testing', (req, res) => {
 
 // Reddit RSS and Discord webhook URLs
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT'; // Replace with your actual webhook URL
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL'; // Replace with your actual webhook URL
 
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
