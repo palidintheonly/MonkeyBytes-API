@@ -40,12 +40,19 @@ function formatUptime(ms) {
     return `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
 }
 
-// Logger configuration (Winston) with Google's console format
+// Logger configuration (Winston) with colorized output and autism-friendly formatting
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
+        winston.format.colorize({ all: true }),
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.printf(({ timestamp, level, message, ...metadata }) => {
+            let msg = `${timestamp} [${level}]: ${message}`;
+            if (Object.keys(metadata).length) {
+                msg += ` | ${JSON.stringify(metadata)}`;
+            }
+            return msg;
+        })
     ),
     transports: [new winston.transports.Console()],
 });
@@ -142,7 +149,7 @@ app.get('/testing', (req, res) => {
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
-        logger.info('Response for /testing route hath been prepared.', { response: randomFact, source: '/testing' });
+        logger.info('Response for /testing route hath been prepared and sent.', { response: 'Sent to client', source: '/testing' });
         res.json(randomFact);
     } catch (error) {
         logger.error('An error hath occurred within the /testing route.', { error: error.message, source: '/testing' });
@@ -243,7 +250,7 @@ async function postNewestToDiscord() {
 
     try {
         await axios.post(DISCORD_WEBHOOK_URL, payload);
-        logger.info('Message hath been posted to Discord successfully.', { payload, source: 'postNewestToDiscord' });
+        logger.info('Message hath been posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
     } catch (error) {
         logger.error('Error whilst posting message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
         if (error.response && error.response.data) {
