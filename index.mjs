@@ -92,6 +92,10 @@ const testImage2List = [
 
 // Function to get a random image from a given list
 function getRandomImage(imageList) {
+    if (!Array.isArray(imageList) || imageList.length === 0) {
+        logger.warn('Image list is empty or invalid.', { source: 'getRandomImage' });
+        return 'https://i.ibb.co/wgfvKYb/2.jpg'; // Default image
+    }
     const randomIndex = Math.floor(Math.random() * imageList.length);
     const selectedImage = imageList[randomIndex];
     logger.debug('Random image selected.', { imageUrl: selectedImage, source: 'getRandomImage' });
@@ -145,7 +149,10 @@ app.get('/testing', (req, res) => {
         const testImage2Url = getRandomImage(testImage2List);
         const profilePictureUrl = getRandomProfilePicture();
         const botName = generateRandomBotName();
-        const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] };
+        const randomIndex = Math.floor(Math.random() * facts.length);
+        const randomFact = { ...facts[randomIndex] };
+
+        logger.debug('Random fact selected.', { factId: randomFact.id, source: '/testing' });
 
         randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
         randomFact.testimage1 = testImage1Url;
@@ -188,11 +195,17 @@ async function postNewestToDiscord() {
         return;
     }
 
+    // Ensure entries is always an array
     const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
     const newestPosts = entries.slice(0, 5);
-    logger.info('Extracted the 5 newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
+    logger.info('Extracted the newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
 
-    const embeds = newestPosts.map((post) => {
+    if (newestPosts.length === 0) {
+        logger.warn('No new posts found to dispatch.', { source: 'postNewestToDiscord' });
+        return;
+    }
+
+    const embeds = newestPosts.map((post, index) => {
         // Decode the title
         const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
 
@@ -201,7 +214,7 @@ async function postNewestToDiscord() {
         const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
         const postContent = decode(postContentStripped);
 
-        const postLink = post.link && post.link.href ? post.link.href : '#';
+        const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
         const postAuthor = post.author && post.author.name ? (typeof post.author.name === 'string' ? post.author.name : post.author.name._ || '') : 'Unknown';
 
         const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
@@ -226,6 +239,7 @@ async function postNewestToDiscord() {
             embed.image = { url: postImage };
         }
 
+        logger.debug('Embed crafted for Discord.', { embedIndex: index + 1, source: 'postNewestToDiscord' });
         return embed;
     });
 
@@ -241,6 +255,8 @@ async function postNewestToDiscord() {
         content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
         embeds: embeds,
     };
+
+    logger.debug('Payload prepared for Discord.', { payload, source: 'postNewestToDiscord' });
 
     try {
         await axios.post(DISCORD_WEBHOOK_URL, payload);
