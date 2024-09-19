@@ -9,8 +9,10 @@ import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
 
-// Hardcoded values
+// Hardcoded Discord webhook URL
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+
+// Hardcoded Port and Reddit RSS URL
 const PORT = 21560; // Hardcoded port for HTTP
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
@@ -71,21 +73,21 @@ async function getUpdates() {
     }
 }
 
-// Hardcoded cloud and grass image URLs
-const cloudImageList = [
-    'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+// Updated Test Image URLs
+const testImage1List = [
+    'https://i.ibb.co/smG7rNR/1.jpg',
+    'https://i.ibb.co/cYwWSgf/2.jpg',
+    'https://i.ibb.co/vwrfhFM/3.jpg',
+    'https://i.ibb.co/Gxt5NH1/4.jpg',
+    'https://i.ibb.co/KbmfddX/5.jpg',
 ];
 
-const grassImageList = [
-    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1506765515384-028b60a970df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1496483648148-47c686dc86a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1520911691954-7e45a47c3d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+const testImage2List = [
+    'https://i.ibb.co/BfB7sZ4/6.jpg',
+    'https://i.ibb.co/BT6TH04/7.jpg',
+    'https://i.ibb.co/BNdGcDX/8.jpg',
+    'https://i.ibb.co/XLJCBzJ/9.jpg',
+    'https://i.ibb.co/RYpx47G/10.jpg',
 ];
 
 // Function to get a random image from a given list
@@ -125,29 +127,29 @@ function generateRandomBotName() {
     return botName;
 }
 
-// Predefined facts array
+// Updated Facts Array
 const facts = [
-    { id: 'fact1', testText: "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens." },
-    { id: 'fact2', testText: "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown." },
-    { id: 'fact3', testText: "Verily, thunderheads gather with portentous grace, heralding the tempest's mighty arrival." },
-    { id: 'fact4', testText: "Stratus clouds blanket the sky, akin to a monarch's cloak shielding the realm from the sun's glare." },
-    { id: 'fact5', testText: "Nimbus clouds, laden with rain, bestow life upon the earth, much like benevolent lords nurturing their lands." },
+    { id: 'fact1', testText: "The unknown doth veil itself in shadows, elusive as the whispers of the night wind." },
+    { id: 'fact2', testText: "In the realm of the unseen, mysteries abound, cloaked in the essence of twilight's embrace." },
+    { id: 'fact3', testText: "Lo, the unknown is as a silent sentinel, guarding secrets that lie beyond mortal ken." },
+    { id: 'fact4', testText: "Verily, the enigmatic unknown dances on the horizon, a perpetual enigma to behold." },
+    { id: 'fact5', testText: "Behold the unknown, a tapestry woven with threads of uncertainty and the promise of discovery." },
 ];
 
-// /testing route with random cloud images, grass images, RoboHash avatars, and random bot name
+// /testing route with random test images, RoboHash avatars, and random bot name
 app.get('/testing', (req, res) => {
     logger.info('Endpoint accessed.', { endpoint: '/testing' });
 
     try {
-        const cloudImageUrl = getRandomImage(cloudImageList);
-        const grassImageUrl = getRandomImage(grassImageList);
+        const testImage1Url = getRandomImage(testImage1List);
+        const testImage2Url = getRandomImage(testImage2List);
         const profilePictureUrl = getRandomProfilePicture();
         const botName = generateRandomBotName();
         const randomFact = { ...facts[Math.floor(Math.random() * facts.length)] };
 
         randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
-        randomFact.testimage1 = cloudImageUrl;
-        randomFact.testimage2 = grassImageUrl;
+        randomFact.testimage1 = testImage1Url;
+        randomFact.testimage2 = testImage2Url;
         randomFact.testingProfilePicture = profilePictureUrl;
         randomFact.testingBotName = botName;
 
@@ -191,22 +193,29 @@ async function postNewestToDiscord() {
     logger.info('Extracted the 5 newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
 
     const embeds = newestPosts.map((post) => {
-        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._);
-        const postLink = post.link.href;
-        const postAuthor = typeof post.author.name === 'string' ? post.author.name : post.author.name._;
-        const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._) : 'No content provided';
-        const postContent = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
+        // Decode the title
+        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
+
+        // Handle the content: strip HTML tags and decode HTML entities
+        const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._ || '') : 'No content provided';
+        const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
+        const postContent = decode(postContentStripped);
+
+        const postLink = post.link && post.link.href ? post.link.href : '#';
+        const postAuthor = post.author && post.author.name ? (typeof post.author.name === 'string' ? post.author.name : post.author.name._ || '') : 'Unknown';
 
         const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
-        const description = postContent.length > 4096 ? postContent.slice(0, 4093) + '...' : postContent;
+        const description = postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent; // Discord embed description limit is 2048
         const authorName = postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor;
 
-        const postImage = post['media:thumbnail'] ? post['media:thumbnail'].$.url : null;
+        const postImage = post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url ? post['media:thumbnail'].$.url : null;
 
         const embed = {
             title: title,
             url: postLink,
             description: description,
+            color: 0x1e90ff, // DodgerBlue color
+            timestamp: new Date().toISOString(),
         };
 
         if (authorName) {
@@ -259,7 +268,7 @@ app.get('/', async (req, res) => {
         logger.info('Loaded updates successfully.', { updates, source: 'root' });
 
         updatesHtml = updates.length
-            ? updates.map((update) => `<li><strong>${update.updateText}</strong> - ${update.description}</li>`).join('')
+            ? updates.map((update) => `<li><strong>${decode(update.updateText)}</strong> - ${decode(update.description)}</li>`).join('')
             : '<li>No updates available at this time.</li>';
         logger.debug('Updates HTML hath been prepared.', { updatesHtml, source: 'root' });
     } catch (error) {
