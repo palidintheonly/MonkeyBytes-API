@@ -9,15 +9,16 @@ import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
 
-// Hardcoded Discord webhook URL
+// Hardcoded values
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+const PORT = 21560; // Hardcoded port for HTTP
+const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 21560; // Hardcoded port for HTTP
 
 // Utilize helmet for enhanced security
 app.use(helmet());
@@ -70,21 +71,15 @@ async function getUpdates() {
     }
 }
 
-// Cloud image URLs (direct links from Unsplash)
+// Hardcoded cloud and grass image URLs
 const cloudImageList = [
     'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1495373964874-395097ac815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1486810732202-ac78e7675d61?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1517683058896-5a13a84c4c89?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1527733202121-0c7c6aa8e7ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1487752350520-2d6e8e1d4b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-    'https://images.unsplash.com/photo-1518222358536-6e4a7f2593b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
 ];
 
-// Grass image URLs (direct links from Unsplash)
 const grassImageList = [
     'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
     'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -130,7 +125,7 @@ function generateRandomBotName() {
     return botName;
 }
 
-// Predefined facts array with 5 new facts about clouds, in a royal medieval style
+// Predefined facts array
 const facts = [
     { id: 'fact1', testText: "Lo, the cumulus clouds doth resemble the billowing sails of mighty ships traversing the heavens." },
     { id: 'fact2', testText: "Behold the cirrus formations, delicate as the finest lace adorning a noble lady's gown." },
@@ -164,9 +159,6 @@ app.get('/testing', (req, res) => {
         });
     }
 });
-
-// Reddit RSS URL remains constant
-const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
 // Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
