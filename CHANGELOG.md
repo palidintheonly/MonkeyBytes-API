@@ -39,6 +39,9 @@
 ## Previous Versions
 
 ### [1.2.0] - 2024-09-18
+
+### PLANS
+## POSSIBLE NPM PACAGE SOON
 #### Added
 - Updated endpoints to match `/testing` endpoint.
 - Enhanced bot name generation by expanding adjectives and nouns, and adding numerical suffixes.
