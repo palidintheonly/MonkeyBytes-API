@@ -222,71 +222,51 @@ async function postNewestToDiscord() {
         return;
     }
 
-    const embeds = newestPosts.map((post, index) => {
-        // Decode the title
-        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
+    // Iterate over each post and send them as individual embeds
+    for (let i = 0; i < newestPosts.length; i++) {
+        const post = newestPosts[i];
 
-        // Handle the content: strip HTML tags and decode HTML entities
+        // Decode the title and content
+        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
         const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._ || '') : 'No content provided';
         const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
         const postContent = decode(postContentStripped);
-
         const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
         const postAuthor = post.author && post.author.name ? (typeof post.author.name === 'string' ? post.author.name : post.author.name._ || '') : 'Unknown';
 
-        const title = postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle;
-        const description = postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent; // Discord embed description limit is 2048
-        const authorName = postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor;
-
-        const postImage = post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url ? post['media:thumbnail'].$.url : null;
-
+        // Create the embed
         const embed = {
-            title: title,
+            title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
+            description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent, // Discord embed description limit is 2048
             url: postLink,
-            description: description,
             color: 0x1e90ff, // DodgerBlue color
+            author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
             timestamp: new Date().toISOString(),
         };
 
-        if (authorName) {
-            embed.author = { name: `Posted by ${authorName}` };
+        // Add the post image if available
+        if (post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url) {
+            embed.image = { url: post['media:thumbnail'].$.url };
         }
 
-        if (postImage) {
-            embed.image = { url: postImage };
+        const payload = {
+            content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })} UK time`,
+            embeds: [embed]
+        };
+
+        // Ensure the payload content is within Discord's character limit
+        if (payload.content.length > 2000) {
+            payload.content = payload.content.slice(0, 1997) + '...';
         }
 
-        logger.debug('Embed crafted for Discord.', { embedIndex: index + 1, source: 'postNewestToDiscord' });
-        return `**${embed.title}**\n${embed.description}\nPosted by: ${embed.author.name}\nLink: ${embed.url}`;
-    });
-
-    const ukTime = new Date().toLocaleTimeString('en-GB', {
-        timeZone: 'Europe/London',
-        hour12: true,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-    });
-
-    const payload = {
-        content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time\n\n${embeds.join('\n\n')}`,
-        embeds: []
-    };
-
-    // Ensure the payload content is within Discord's character limit
-    if (payload.content.length > 2000) {
-        payload.content = payload.content.slice(0, 1997) + '...';
-    }
-
-    logger.debug('Payload prepared for Discord.', { payload, source: 'postNewestToDiscord' });
-
-    try {
-        await axios.post(DISCORD_WEBHOOK_URL, payload);
-        logger.info('Message hath been posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
-    } catch (error) {
-        logger.error('Error whilst posting message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
-        if (error.response && error.response.data) {
-            logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
+        try {
+            await axios.post(DISCORD_WEBHOOK_URL, payload);
+            logger.info(`Message ${i + 1} hath been posted to Discord successfully.`, { payloadSent: true, source: 'postNewestToDiscord' });
+        } catch (error) {
+            logger.error('Error whilst posting message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+            if (error.response && error.response.data) {
+                logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
+            }
         }
     }
 }
