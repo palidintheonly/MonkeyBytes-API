@@ -1,3 +1,5 @@
+// server.mjs
+
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
@@ -8,6 +10,9 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import crypto from 'crypto';
 import { decode } from 'html-entities';
+import { Server as SocketIOServer } from 'socket.io';
+import http from 'http';
+import asyncLib from 'async'; // Imported as asyncLib to avoid naming conflicts
 
 // Hardcoded Discord webhook URL
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
@@ -157,7 +162,7 @@ const facts = [
     { id: 'fact10', testText: "At the heart of many ventures, this unseen force doth unite men, beasts, and machines alike, guiding them all with but a whisper." }
 ];
 
-// /testing route with random test images, RoboHash avatars, and random bot name
+// /testing route with random test images and random bot name
 app.get('/testing', (req, res) => {
     logger.info('Endpoint accessed.', { endpoint: '/testing' });
 
@@ -222,48 +227,59 @@ async function postNewestToDiscord() {
         return;
     }
 
-    // Iterate over each post and send them as individual embeds
-    for (let i = 0; i < newestPosts.length; i++) {
-        const post = newestPosts[i];
+    const ukTime = new Date().toLocaleTimeString('en-GB', {
+        timeZone: 'Europe/London',
+        hour12: true,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
 
-        // Decode the title and content
+    // Send the initial message before the first embed
+    let payload = {
+        content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
+    };
+
+    try {
+        await axios.post(DISCORD_WEBHOOK_URL, payload);
+        logger.info('Initial message posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+    } catch (error) {
+        logger.error('Error whilst posting initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+        if (error.response && error.response.data) {
+            logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
+        }
+        return;
+    }
+
+    // Send each post as a separate embed
+    for (const post of newestPosts) {
         const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
         const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._ || '') : 'No content provided';
         const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
         const postContent = decode(postContentStripped);
         const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
         const postAuthor = post.author && post.author.name ? (typeof post.author.name === 'string' ? post.author.name : post.author.name._ || '') : 'Unknown';
+        const postImage = post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url ? post['media:thumbnail'].$.url : null;
 
-        // Create the embed
         const embed = {
             title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
-            description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent, // Discord embed description limit is 2048
             url: postLink,
+            description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent,
             color: 0x1e90ff, // DodgerBlue color
-            author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
             timestamp: new Date().toISOString(),
+            author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
+            image: postImage ? { url: postImage } : undefined,
         };
 
-        // Add the post image if available
-        if (post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url) {
-            embed.image = { url: post['media:thumbnail'].$.url };
-        }
-
-        const payload = {
-            content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })} UK time`,
-            embeds: [embed]
+        payload = {
+            embeds: [embed],
         };
-
-        // Ensure the payload content is within Discord's character limit
-        if (payload.content.length > 2000) {
-            payload.content = payload.content.slice(0, 1997) + '...';
-        }
 
         try {
             await axios.post(DISCORD_WEBHOOK_URL, payload);
-            logger.info(`Message ${i + 1} hath been posted to Discord successfully.`, { payloadSent: true, source: 'postNewestToDiscord' });
+            logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
         } catch (error) {
-            logger.error('Error whilst posting message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+            logger.error('Error whilst posting embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
             if (error.response && error.response.data) {
                 logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
             }
@@ -363,6 +379,8 @@ app.get('/', async (req, res) => {
                         <li><strong>Crypto:</strong> The master of secrets, ensuring that our communications remain secure.</li>
                         <li><strong>HTML Entities Decoder:</strong> The linguist that deciphers encoded messages to present them in readable form.</li>
                         <li><strong>Path and URL Modules:</strong> The cartographers that navigate file systems and URLs with precision.</li>
+                        <li><strong>Socket.IO:</strong> The herald that enables real-time communication across the kingdom.</li>
+                        <li><strong>Async:</strong> The orchestrator that manages our asynchronous endeavors with finesse.</li>
                     </ul>
                 </div>
 
@@ -372,6 +390,7 @@ app.get('/', async (req, res) => {
                     <ol>
                         <li><strong>/</strong> - <em>The Grand Overview</em><br>Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.</li>
                         <li><strong>/testing</strong> - <em>The Cloud Pavilion</em><br>Visit this endpoint to receive randomized tales of our celestial formations, each accompanied by a majestic cloud image and a regal bot name crafted just for thee.</li>
+                        <li><strong>/socket.io</strong> - <em>The Real-Time Courtyard</em><br>Engage in real-time communications with the kingdom's heralds and messengers.</li>
                     </ol>
                     <p>To engage with these endpoints, simply dispatch a request to the desired path and await the kingdom's gracious response. Whether thou art a seasoned knight or a humble scribe, our API stands ready to serve thy needs.</p>
                 </div>
@@ -387,6 +406,7 @@ app.get('/', async (req, res) => {
                     <ul>
                         <li>🧪 <a href="http://us2.bot-hosting.net:21560/testing">Testing Endpoint</a> - Test our system with randomized data.</li>
                         <li>💬 <a href="https://discord.gg/your-server-invite">Discord Support Server</a> - Join our noble Discord server for aid and discussion.</li>
+                        <li>🛠️ <a href="/socket.io/socket.io.js">Socket.IO Client Library</a> - Integrate real-time features into your applications.</li>
                     </ul>
                 </div>
 
@@ -406,7 +426,60 @@ app.use((req, res) => {
     res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
+// ================== Socket.IO Integration ================== //
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = new SocketIOServer(server, {
+    cors: {
+        origin: "*", // Adjust as needed for security
+        methods: ["GET", "POST"]
+    }
+});
+
+// Handle Socket.IO Connections
+io.on('connection', (socket) => {
+    logger.info('A user connected via Socket.IO', { socketId: socket.id });
+
+    // Example: Listen for a custom event
+    socket.on('chatMessage', (msg) => {
+        logger.info('Received chat message', { message: msg, socketId: socket.id });
+        // Broadcast the message to all connected clients
+        io.emit('chatMessage', msg);
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        logger.info('User disconnected', { socketId: socket.id });
+    });
+});
+
+// ================== Async Integration ================== //
+
+// Example: Using Async to perform parallel tasks
+function performParallelTasks() {
+    asyncLib.parallel([
+        asyncLib.asyncify(() => fetchRedditRSS()),
+        asyncLib.asyncify(() => getUpdates())
+    ], (err, results) => {
+        if (err) {
+            logger.error('Error performing parallel tasks.', { error: err.message, source: 'Async' });
+            return;
+        }
+        const [redditData, updates] = results;
+        logger.info('Parallel tasks completed successfully.', { source: 'Async' });
+        // You can process the results as needed
+    });
+}
+
+// Call the function as an example (You can schedule or trigger it as needed)
+performParallelTasks();
+
+// ================== Start the Server ================== //
+
+// Start the server using the HTTP server (required for Socket.IO)
+server.listen(PORT, '0.0.0.0', () => {
     logger.info(`Server running at http://us2.bot-hosting.net:${PORT}`);
 });
