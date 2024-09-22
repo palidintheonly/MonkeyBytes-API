@@ -1,7 +1,7 @@
 [
     {
-        "updateText": "The Thirteenth Edict: New Cloud Images and Avatars via RoboHash",
-        "description": "In this thirteenth edict, we have undertaken significant enhancements to the MonkeyBytes-API by introducing fresh cloud imagery and diversified avatars:\n\n1. **Updated Cloud Image List:**\n    - The `cloudImageList` hath been revitalized with ten new and majestic images sourced from [Unsplash](https://unsplash.com/), replacing the former collection. These pristine illustrations now grace the `/testing` endpoint, offering a more engaging and visually appealing experience.\n\n2. **Transition to RoboHash for Avatars:**\n    - We have officially transitioned from the DiceBear Avatars API to RoboHash for generating profile pictures. Each avatar is now uniquely crafted with a mechanized and celestial theme, adding a distinctive and harmonious touch to our API responses."
+        "updateText": "The Fourteenth Edict: Integration of Advanced Caching Mechanisms",
+        "description": "In this fourteenth edict, we have bestowed upon the MonkeyBytes-API the gift of enhanced performance through the integration of advanced caching mechanisms:\n\n1. **Introduction of Redis Caching:**\n    - Implemented Redis as an in-memory data store to cache frequently accessed data, significantly reducing response times and alleviating server load.\n\n2. **Dynamic Cache Invalidation:**\n    - Established dynamic cache invalidation strategies to ensure that cached data remains fresh and consistent, thereby maintaining the integrity of the information served to our esteemed users.\n\n3. **Optimized Data Retrieval:**\n    - Refined data retrieval processes to leverage cached responses where appropriate, enhancing the overall efficiency and speed of the API's responses."
     },
     {
         "updateText": "Refinement of Discord Notifications and Time Formatting",
