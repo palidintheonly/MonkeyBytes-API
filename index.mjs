@@ -73,22 +73,34 @@ async function getUpdates() {
     }
 }
 
-// Updated Test Image URLs
-const testImage1List = [
-    'https://i.ibb.co/smG7rNR/1.jpg',
-    'https://i.ibb.co/cYwWSgf/2.jpg',
-    'https://i.ibb.co/vwrfhFM/3.jpg',
-    'https://i.ibb.co/Gxt5NH1/4.jpg',
-    'https://i.ibb.co/KbmfddX/5.jpg',
+// Updated Test Image URLs (10 Images, Randomized Order)
+const allTestImages = [
+    'https://i.ibb.co/5cM4FY5/MNAPI-10.png',
+    'https://i.ibb.co/60MFZFy/MNAPI-1.png',
+    'https://i.ibb.co/DD0LhmF/MNAPI-3.jpg',
+    'https://i.ibb.co/bvkHphH/MNAPI-4.jpg',
+    'https://i.ibb.co/RQ9SLn7/MNAPI-5.png',
+    'https://i.ibb.co/T2tXRKZ/MNAPI-6.png',
+    'https://i.ibb.co/XzwZS2N/MNAPI-7.png',
+    'https://i.ibb.co/CW2S423/MNAPI-8.jpg',
+    'https://i.ibb.co/W0G6pDW/MNAPI-9.jpg',
+    'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png', // Google Logo PNG
 ];
 
-const testImage2List = [
-    'https://i.ibb.co/BfB7sZ4/6.jpg',
-    'https://i.ibb.co/BT6TH04/7.jpg',
-    'https://i.ibb.co/BNdGcDX/8.jpg',
-    'https://i.ibb.co/XLJCBzJ/9.jpg',
-    'https://i.ibb.co/RYpx47G/10.jpg',
-];
+// Shuffle the array to randomize the order
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+const shuffledImages = shuffleArray([...allTestImages]);
+
+// Distribute images evenly between testImage1List and testImage2List
+const testImage1List = shuffledImages.slice(0, 5);
+const testImage2List = shuffledImages.slice(5, 10);
 
 // Function to get a random image from a given list
 function getRandomImage(imageList) {
