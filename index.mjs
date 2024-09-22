@@ -257,7 +257,7 @@ async function postNewestToDiscord() {
         }
 
         logger.debug('Embed crafted for Discord.', { embedIndex: index + 1, source: 'postNewestToDiscord' });
-        return embed;
+        return `**${embed.title}**\n${embed.description}\nPosted by: ${embed.author.name}\nLink: ${embed.url}`;
     });
 
     const ukTime = new Date().toLocaleTimeString('en-GB', {
@@ -269,9 +269,14 @@ async function postNewestToDiscord() {
     });
 
     const payload = {
-        content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
-        embeds: embeds,
+        content: `📜 **Hear ye! The 5 newest proclamations from the realm of Reddit have arrived!**\n🕰️ Fetched at the hour of ${ukTime} UK time\n\n${embeds.join('\n\n')}`,
+        embeds: []
     };
+
+    // Ensure the payload content is within Discord's character limit
+    if (payload.content.length > 2000) {
+        payload.content = payload.content.slice(0, 1997) + '...';
+    }
 
     logger.debug('Payload prepared for Discord.', { payload, source: 'postNewestToDiscord' });
 
