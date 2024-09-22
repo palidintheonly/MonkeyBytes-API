@@ -143,13 +143,18 @@ function generateRandomBotName() {
     return botName;
 }
 
-// Updated Facts Array
+// Updated Facts Array (10 Facts About Google, Styled in 1066 Noble UK)
 const facts = [
-    { id: 'fact1', testText: "The unknown doth veil itself in shadows, elusive as the whispers of the night wind." },
-    { id: 'fact2', testText: "In the realm of the unseen, mysteries abound, cloaked in the essence of twilight's embrace." },
-    { id: 'fact3', testText: "Lo, the unknown is as a silent sentinel, guarding secrets that lie beyond mortal ken." },
-    { id: 'fact4', testText: "Verily, the enigmatic unknown dances on the horizon, a perpetual enigma to behold." },
-    { id: 'fact5', testText: "Behold the unknown, a tapestry woven with threads of uncertainty and the promise of discovery." },
+    { id: 'fact1', testText: "There be a great ledger of knowledge, which doth grow each passing moment, unseen hands gathering the world's wisdom." },
+    { id: 'fact2', testText: "A far-reaching eye dost peer upon the stars and streets alike, knowing the paths of mortals and the heavens above." },
+    { id: 'fact3', testText: "By a single utterance, ye may summon untold knowledge from the void, as though consulting a mystical oracle." },
+    { id: 'fact4', testText: "In many tongues doth it speak, from the simple folk to the scholars, uniting all under one grand banner of understanding." },
+    { id: 'fact5', testText: "A humble abode began this tale, with two seekers of truth crafting a doorway to the world's wisdom in yon ancient times." },
+    { id: 'fact6', testText: "Maps beyond reckoning dost it provide, guiding both humble traveler and noble knight through the farthest reaches of the land." },
+    { id: 'fact7', testText: "Fortune beyond imagination flows from its coffers, though much of its treasure is unseen, drawn from the wares of merchants far and wide." },
+    { id: 'fact8', testText: "A name it bears most curious, derived from the vastest of numbers, yet it doth count even the smallest of things." },
+    { id: 'fact9', testText: "Many tools hath it forged, not least of which a wondrous scribe, able to pen thoughts and ideas as fast as they come." },
+    { id: 'fact10', testText: "At the heart of many ventures, this unseen force doth unite men, beasts, and machines alike, guiding them all with but a whisper." }
 ];
 
 // /testing route with random test images, RoboHash avatars, and random bot name
