@@ -125,13 +125,13 @@ function getRandomProfilePicture() {
 // Function to generate a random bot name
 function generateRandomBotName() {
     const adjectives = [
-        'Wispy', 'Fluffy', 'Stormy', 'Ethereal', 'Cumulus',
-        'Nimbus', 'Cirrus', 'Altocumulus', 'Stratus'
+        'Ghooghle', 'Alphabeta', 'Betacode', 'Qyantum', 'Novus',
+        'Nebulab', 'Ethereon', 'Lumina', 'Mysticus'
     ];
 
     const nouns = [
-        'Cloud', 'Mist', 'Sky', 'Vapor', 'Fog',
-        'Nebula', 'Drift', 'Aura', 'Zephyr'
+        'Gliph', 'Cypher', 'Runic', 'Scriptum', 'Atlaz',
+        'Echoom', 'Vortyx', 'Reyalm', 'Spectyr'
     ];
 
     const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
