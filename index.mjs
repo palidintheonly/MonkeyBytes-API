@@ -1,5 +1,3 @@
-// index.mjs
-
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
@@ -18,8 +16,8 @@ import http from 'http';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 const PORT = 21560;
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const RESERVED_USERNAME = 'Redacted'; // Reserved username for you
-const RESERVED_PASSWORD = 'REDACTED'; // Password for reserved username
+const RESERVED_USERNAME = 'REDACTED';
+const RESERVED_PASSWORD = 'REDACTED';
 
 // ================== Setup Directory Paths ================== //
 
@@ -30,7 +28,6 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Use helmet with minimal security settings that won't conflict with HTTP
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -61,7 +58,6 @@ const logger = winston.createLogger({
 
 // ================== Utility Functions ================== //
 
-// Function to load updates from updates.json
 async function getUpdates() {
   try {
     const data = await fs.readFile(path.join(__dirname, 'updates.json'), 'utf-8');
@@ -73,7 +69,6 @@ async function getUpdates() {
   }
 }
 
-// Updated Test Image URLs (10 Images, Randomized Order)
 const allTestImages = [
   'https://i.ibb.co/5cM4FY5/MNAPI-10.png',
   'https://i.ibb.co/60MFZFy/MNAPI-1.png',
@@ -87,7 +82,6 @@ const allTestImages = [
   'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
 ];
 
-// Shuffle the array to randomize the order
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -97,16 +91,13 @@ function shuffleArray(array) {
 }
 
 const shuffledImages = shuffleArray([...allTestImages]);
-
-// Distribute images evenly between testImage1List and testImage2List
 const testImage1List = shuffledImages.slice(0, 5);
 const testImage2List = shuffledImages.slice(5, 10);
 
-// Function to get a random image from a given list
 function getRandomImage(imageList) {
   if (!Array.isArray(imageList) || imageList.length === 0) {
     logger.warn('Image list is empty or invalid.', { source: 'getRandomImage' });
-    return 'https://i.ibb.co/wgfvKYb/2.jpg'; // Default image
+    return 'https://i.ibb.co/wgfvKYb/2.jpg';
   }
   const randomIndex = Math.floor(Math.random() * imageList.length);
   const selectedImage = imageList[randomIndex];
@@ -114,7 +105,6 @@ function getRandomImage(imageList) {
   return selectedImage;
 }
 
-// Function to get a random profile picture using RoboHash API
 function getRandomProfilePicture() {
   const randomUsername = crypto.randomBytes(4).toString('hex');
   const profilePictureUrl = `https://robohash.org/${randomUsername}.png`;
@@ -122,7 +112,6 @@ function getRandomProfilePicture() {
   return profilePictureUrl;
 }
 
-// Function to generate a random bot name
 function generateRandomBotName() {
   const adjectives = [
     'Ghooghle',
@@ -157,7 +146,6 @@ function generateRandomBotName() {
   return botName;
 }
 
-// Updated Facts Array (10 Facts About Google, Styled in 1066 Noble UK)
 const facts = [
   {
     id: 'fact1',
@@ -213,23 +201,157 @@ const facts = [
 
 // ================== Chat Message Storage ================== //
 
-const chatHistory = []; // In-memory array to store chat messages
-const validTokens = {}; // Key: token, Value: username
+const chatHistory = [];
+const validTokens = {};
 
 // ================== Routes ================== //
 
-// Root route
 app.get('/', async (req, res) => {
   logger.info('Root endpoint accessed.', { endpoint: '/' });
   try {
     const updates = await getUpdates();
-    res.json({ message: 'Welcome to the API', updates });
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <title>MonkeyBytes-API Dashboard</title>
+          <style>
+              body { 
+                  font-family: Arial, sans-serif; 
+                  background-color: #121212; 
+                  color: #e0e0e0; 
+                  padding: 20px; 
+              }
+              .box { 
+                  background-color: #1e1e1e; 
+                  padding: 15px; 
+                  margin-bottom: 20px; 
+                  border-radius: 8px; 
+                  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+              }
+              .box h2 { 
+                  margin-top: 0; 
+                  color: #ffcc00; 
+              }
+              .box p { 
+                  line-height: 1.6; 
+              }
+          </style>
+      </head>
+      <body>
+          <h1>Welcome to the MonkeyBytes-API</h1>
+          <div class="box">
+              <h2>About the API</h2>
+              <p>This API allows users to interact with various endpoints, providing random images, bot names, and facts styled after medieval English.</p>
+          </div>
+          <div class="box">
+              <h2>Code Structure</h2>
+              <p>The code is organized into multiple sections:</p>
+              <ul>
+                  <li><strong>Configuration Constants:</strong> This section defines constants like port numbers, URLs, and reserved credentials.</li>
+                  <li><strong>Utility Functions:</strong> Contains helper functions for shuffling images, generating random names, and retrieving updates.</li>
+                  <li><strong>Routes:</strong> Defines the API endpoints, including this root route and others like <code>/testing</code> and <code>/chat</code>.</li>
+                  <li><strong>Socket.IO Integration:</strong> Handles real-time communication with connected clients.</li>
+                  <li><strong>Asynchronous Tasks:</strong> Manages tasks like fetching and posting Reddit RSS data to Discord.</li>
+              </ul>
+          </div>
+          <div class="box">
+              <h2>Random Images</h2>
+              <p>This API provides randomly selected images from a predefined list, ensuring a unique experience with every request.</p>
+          </div>
+          <div class="box">
+              <h2>Random Bot Names</h2>
+              <p>Need a bot name? This API can generate a random name composed of an adjective and noun, with a four-digit number appended.</p>
+          </div>
+          <div class="box">
+              <h2>Fun Facts</h2>
+              <p>For a bit of fun, the API also returns facts styled in the speech of 1066 UK, adding a whimsical touch to your interactions.</p>
+          </div>
+          <div class="box">
+              <h2>Guide for Dummies</h2>
+              <p>Using this API is as simple as pie:</p>
+              <ol>
+                  <li>To get a random image, simply send a GET request to <code>/testing</code>.</li>
+                  <li>If you want a random bot name, you'll also find it in the response from <code>/testing</code>.</li>
+                  <li>Want a fun fact? You guessed it—<code>/testing</code> will give you one, too!</li>
+                  <li>Need to chat? Visit the <code>/chat</code> endpoint to start a real-time conversation.</li>
+              </ol>
+          </div>
+          <div class="box">
+              <h2>Latest Updates</h2>
+              ${updates
+                .map(
+                  (update) => `
+              <div class="box">
+                  <h3>${update.updateText}</h3>
+                  <p>${update.description.replace(/\n/g, '<br>')}</p>
+              </div>
+              `
+                )
+                .join('')}
+          </div>
+          <div class="box">
+              <h2>NPM Packages Used</h2>
+              <ul>
+                  <li><strong>express:</strong> A web application framework for building APIs and handling HTTP requests and responses.</li>
+                  <li><strong>fs/promises:</strong> A promise-based API for interacting with the file system, used to read the updates.json file.</li>
+                  <li><strong>path:</strong> A utility module for handling and transforming file paths, used to locate files within the project.</li>
+                  <li><strong>winston:</strong> A versatile logging library for recording logs with timestamps and formatting them with colors.</li>
+                  <li><strong>helmet:</strong> A middleware that helps secure Express apps by setting various HTTP headers.</li>
+                  <li><strong>axios:</strong> A promise-based HTTP client used for making requests to external APIs like Reddit and Discord.</li>
+                  <li><strong>xml2js:</strong> A library for parsing XML data into JSON format, used to process Reddit's RSS feed.</li>
+                  <li><strong>crypto:</strong> A module providing cryptographic functionalities, used for generating random values like bot names and tokens.</li>
+                  <li><strong>html-entities:</strong> A library for decoding HTML entities, used to clean up text retrieved from external APIs.</li>
+                  <li><strong>socket.io:</strong> A library for enabling real-time, bidirectional communication between web clients and servers.</li>
+                  <li><strong>http:</strong> A core Node.js module used to create an HTTP server, which is necessary for integrating with Socket.IO.</li>
+              </ul>
+          </div>
+      </body>
+      </html>
+    `);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred fetching updates.' });
+    res.status(500).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <title>Error</title>
+          <style>
+              body { 
+                  font-family: Arial, sans-serif; 
+                  background-color: #121212; 
+                  color: #e0e0e0; 
+                  display: flex; 
+                  justify-content: center; 
+                  align-items: center; 
+                  height: 100vh; 
+                  margin: 0; 
+              }
+              .error-container { 
+                  background-color: #1e1e1e; 
+                  padding: 20px; 
+                  border-radius: 8px; 
+                  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+                  text-align: center; 
+              }
+              .error-container h1 { 
+                  color: #ff4d4d; 
+              }
+          </style>
+      </head>
+      <body>
+          <div class="error-container">
+              <h1>Oh dear! An error hath occurred.</h1>
+              <p>Please try again later.</p>
+          </div>
+      </body>
+      </html>
+    `);
   }
 });
 
-// /testing route with random test images and random bot name
 app.get('/testing', (req, res) => {
   logger.info('Endpoint accessed.', { endpoint: '/testing' });
 
@@ -249,7 +371,7 @@ app.get('/testing', (req, res) => {
     randomFact.testingProfilePicture = profilePictureUrl;
     randomFact.testingBotName = botName;
 
-    res.json(randomFact); // Return JSON response
+    res.json(randomFact);
   } catch (error) {
     logger.error('An error hath occurred within the /testing route.', { error: error.message, source: '/testing' });
     res.status(500).json({
@@ -272,16 +394,13 @@ const io = new SocketIOServer(server, {
 io.on('connection', (socket) => {
   logger.info('A user connected via Socket.IO', { socketId: socket.id });
 
-  // Send the chat history to the newly connected user
   socket.emit('chatHistory', chatHistory);
 
   socket.on('joinChat', (data) => {
     const { username, authToken } = data;
     const reservedNames = [RESERVED_USERNAME.toLowerCase()];
 
-    // Check if username is reserved
     if (reservedNames.includes(username.toLowerCase())) {
-      // Verify token
       if (validTokens[authToken] && validTokens[authToken] === username) {
         socket.username = username;
         logger.info(`User reconnected as ${socket.username}`, { socketId: socket.id });
@@ -304,7 +423,7 @@ io.on('connection', (socket) => {
       if (password === RESERVED_PASSWORD) {
         socket.username = username;
         const token = crypto.randomBytes(16).toString('hex');
-        validTokens[token] = username; // Store the token
+        validTokens[token] = username;
         logger.info(`User logged in successfully as ${socket.username}`, { socketId: socket.id });
         socket.emit('loginSuccess', { message: 'Login successful!', token });
         io.emit('userConnected', socket.username);
@@ -321,11 +440,9 @@ io.on('connection', (socket) => {
     const { username, message } = data;
     logger.info('Received chat message', { username, message, socketId: socket.id });
 
-    // Store the message in the chat history
     const chatMessage = { username, message };
     chatHistory.push(chatMessage);
 
-    // Broadcast the message to all connected clients
     io.emit('chatMessage', chatMessage);
   });
 
@@ -333,203 +450,20 @@ io.on('connection', (socket) => {
     if (socket.username) {
       io.emit('userDisconnected', socket.username);
       logger.info('User disconnected', { username: socket.username, socketId: socket.id });
+      for (const token in validTokens) {
+        if (validTokens[token] === socket.username) {
+          delete validTokens[token];
+          break;
+        }
+      }
     } else {
       logger.info('A user disconnected', { socketId: socket.id });
     }
   });
 });
 
-// ================== /chat and /login Endpoints ================== //
-
-app.get('/chat', (req, res) => {
-  logger.info('Chat endpoint accessed.', { endpoint: '/chat' });
-
-  res.set('Content-Type', 'text/html; charset=utf-8');
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>📜 Real-Time Chat</title>
-        <style>
-            body { font-family: Arial, sans-serif; background-color: #121212; color: #e0e0e0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-            .chat-container { width: 500px; background-color: #2c2c2c; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); }
-            .chat-container h1 { text-align: center; margin-bottom: 20px; }
-            .chat-box { height: 300px; overflow-y: scroll; border: 1px solid #444; padding: 10px; margin-bottom: 10px; background-color: #1e1e1e; border-radius: 4px; }
-            .chat-box .message { margin-bottom: 10px; }
-            .chat-box .message .username { font-weight: bold; margin-right: 5px; }
-            .chat-box .info { color: #999; font-style: italic; margin-bottom: 10px; }
-            #chat-form { display: flex; }
-            #chat-input { flex: 1; padding: 10px; border: none; border-radius: 4px; margin-right: 10px; background-color: #333; color: #fff; }
-            #chat-input:focus { outline: none; background-color: #444; }
-            #chat-form button { padding: 10px 20px; border: none; border-radius: 4px; background-color: #1e90ff; color: #fff; cursor: pointer; transition: background-color 0.3s; }
-            #chat-form button:hover { background-color: #1c86ee; }
-        </style>
-    </head>
-    <body>
-        <div class="chat-container">
-            <h1>📜 Real-Time Chat</h1>
-            <div id="chat-box" class="chat-box"></div>
-            <form id="chat-form">
-                <input id="chat-input" type="text" placeholder="Type your message here..." autocomplete="off" required />
-                <button type="submit">Send</button>
-            </form>
-        </div>
-
-        <!-- Socket.IO Client Library -->
-        <script src="http://us2.bot-hosting.net:21560/socket.io/socket.io.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const socket = io('http://us2.bot-hosting.net:21560');
-                const chatForm = document.getElementById('chat-form');
-                const chatInput = document.getElementById('chat-input');
-                const chatBox = document.getElementById('chat-box');
-
-                let username = localStorage.getItem('username');
-                let authToken = localStorage.getItem('authToken');
-
-                if (!username) {
-                    username = prompt("Enter your username:");
-                    if (!username) {
-                        username = 'Anonymous';
-                    }
-                }
-
-                socket.emit('joinChat', { username, authToken });
-
-                chatForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const message = chatInput.value.trim();
-                    if (message.length === 0) return;
-                    socket.emit('chatMessage', { username, message });
-                    chatInput.value = '';
-                    chatInput.focus();
-                });
-
-                socket.on('chatMessage', (data) => {
-                    const messageElement = document.createElement('div');
-                    messageElement.classList.add('message');
-                    const usernameElement = document.createElement('span');
-                    usernameElement.classList.add('username');
-                    usernameElement.textContent = data.username + ':';
-                    const messageContent = document.createElement('span');
-                    messageContent.classList.add('message-content');
-                    messageContent.textContent = ' ' + data.message;
-                    messageElement.appendChild(usernameElement);
-                    messageElement.appendChild(messageContent);
-                    chatBox.appendChild(messageElement);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                });
-
-                socket.on('chatHistory', (messages) => {
-                    messages.forEach((data) => {
-                        const messageElement = document.createElement('div');
-                        messageElement.classList.add('message');
-                        const usernameElement = document.createElement('span');
-                        usernameElement.classList.add('username');
-                        usernameElement.textContent = data.username + ':';
-                        const messageContent = document.createElement('span');
-                        messageContent.classList.add('message-content');
-                        messageContent.textContent = ' ' + data.message;
-                        messageElement.appendChild(usernameElement);
-                        messageElement.appendChild(messageContent);
-                        chatBox.appendChild(messageElement);
-                    });
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                });
-
-                socket.on('userConnected', (user) => {
-                    const infoElement = document.createElement('div');
-                    infoElement.classList.add('info');
-                    infoElement.textContent = \`\${user} has joined the chat.\`;
-                    chatBox.appendChild(infoElement);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                });
-
-                socket.on('userDisconnected', (user) => {
-                    const infoElement = document.createElement('div');
-                    infoElement.classList.add('info');
-                    infoElement.textContent = \`\${user} has left the chat.\`;
-                    chatBox.appendChild(infoElement);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                });
-
-                socket.on('loginRequired', (data) => {
-                    localStorage.removeItem('username');
-                    localStorage.removeItem('authToken');
-                    window.location.href = '/login?username=' + encodeURIComponent(username);
-                });
-            });
-        </script>
-    </body>
-    </html>
-  `);
-});
-
-app.get('/login', (req, res) => {
-  const { username } = req.query;
-
-  res.set('Content-Type', 'text/html; charset=utf-8');
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Login Required</title>
-        <style>
-            body { font-family: Arial, sans-serif; background-color: #121212; color: #e0e0e0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-            .login-container { width: 300px; background-color: #2c2c2c; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); }
-            .login-container h1 { text-align: center; margin-bottom: 20px; }
-            .login-container label { display: block; margin-bottom: 10px; font-weight: bold; }
-            .login-container input[type="password"] { width: 100%; padding: 10px; border-radius: 4px; border: none; margin-bottom: 20px; background-color: #333; color: #fff; }
-            .login-container button { width: 100%; padding: 10px; border: none; border-radius: 4px; background-color: #1e90ff; color: #fff; cursor: pointer; transition: background-color 0.3s; }
-            .login-container button:hover { background-color: #1c86ee; }
-        </style>
-    </head>
-    <body>
-        <div class="login-container">
-            <h1>Login</h1>
-            <form id="login-form">
-                <label for="password">Password for ${username}:</label>
-                <input id="password" type="password" required />
-                <button type="submit">Login</button>
-            </form>
-        </div>
-
-        <script src="http://us2.bot-hosting.net:21560/socket.io/socket.io.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const socket = io('http://us2.bot-hosting.net:21560');
-                const loginForm = document.getElementById('login-form');
-                const passwordInput = document.getElementById('password');
-                const urlParams = new URLSearchParams(window.location.search);
-                const username = urlParams.get('username');
-
-                loginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const password = passwordInput.value.trim();
-                    socket.emit('login', { username, password });
-                });
-
-                socket.on('loginSuccess', (data) => {
-                    localStorage.setItem('username', username);
-                    localStorage.setItem('authToken', data.token);
-                    window.location.href = '/chat';
-                });
-
-                socket.on('loginFailed', (data) => {
-                    alert(data.message);
-                });
-            });
-        </script>
-    </body>
-    </html>
-  `);
-});
-
 // ================== Asynchronous Tasks ================== //
 
-// Function to fetch and parse Reddit RSS feed
 async function fetchRedditRSS() {
   logger.info('Commencing fetch of Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
   try {
@@ -545,7 +479,6 @@ async function fetchRedditRSS() {
   }
 }
 
-// Function to post the 5 newest posts from the Reddit RSS feed to Discord
 async function postNewestToDiscord() {
   logger.info('Initiating the process to post newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
   const redditData = await fetchRedditRSS();
@@ -555,7 +488,6 @@ async function postNewestToDiscord() {
     return;
   }
 
-  // Ensure entries is always an array
   const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
   const newestPosts = entries.slice(0, 5);
   logger.info('Extracted the newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
@@ -573,7 +505,6 @@ async function postNewestToDiscord() {
     second: '2-digit',
   });
 
-  // Send the initial message before the first embed
   let payload = {
     content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
   };
@@ -589,7 +520,6 @@ async function postNewestToDiscord() {
     return;
   }
 
-  // Send each post as a separate embed
   for (const post of newestPosts) {
     const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
     const postContentRaw = post.content
@@ -615,7 +545,7 @@ async function postNewestToDiscord() {
       title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
       url: postLink,
       description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent,
-      color: 0x1e90ff, // DodgerBlue color
+      color: 0x1e90ff,
       timestamp: new Date().toISOString(),
       author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
       image: postImage ? { url: postImage } : undefined,
@@ -637,7 +567,6 @@ async function postNewestToDiscord() {
   }
 }
 
-// Schedule to post every 30 seconds (30,000 ms)
 setInterval(postNewestToDiscord, 30000);
 
 // ================== Start the Server ================== //
