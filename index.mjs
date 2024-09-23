@@ -34,6 +34,9 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Record the commencement time of the server
 const serverStartTime = Date.now();
 
@@ -390,6 +393,7 @@ app.get('/', async (req, res) => {
                     <ol>
                         <li><strong>/</strong> - <em>The Grand Overview</em><br>Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.</li>
                         <li><strong>/testing</strong> - <em>The Cloud Pavilion</em><br>Visit this endpoint to receive randomized tales of our celestial formations, each accompanied by a majestic cloud image and a regal bot name crafted just for thee.</li>
+                        <li><strong>/chat</strong> - <em>The Real-Time Chatroom</em><br>Engage in real-time conversations with fellow denizens of the kingdom.</li>
                         <li><strong>/socket.io</strong> - <em>The Real-Time Courtyard</em><br>Engage in real-time communications with the kingdom's heralds and messengers.</li>
                     </ol>
                     <p>To engage with these endpoints, simply dispatch a request to the desired path and await the kingdom's gracious response. Whether thou art a seasoned knight or a humble scribe, our API stands ready to serve thy needs.</p>
@@ -407,6 +411,7 @@ app.get('/', async (req, res) => {
                         <li>🧪 <a href="http://us2.bot-hosting.net:21560/testing">Testing Endpoint</a> - Test our system with randomized data.</li>
                         <li>💬 <a href="https://discord.gg/your-server-invite">Discord Support Server</a> - Join our noble Discord server for aid and discussion.</li>
                         <li>🛠️ <a href="/socket.io/socket.io.js">Socket.IO Client Library</a> - Integrate real-time features into your applications.</li>
+                        <li>💬 <a href="/chat">Chatroom</a> - Engage in real-time conversations with fellow users.</li>
                     </ul>
                 </div>
 
@@ -443,16 +448,30 @@ const io = new SocketIOServer(server, {
 io.on('connection', (socket) => {
     logger.info('A user connected via Socket.IO', { socketId: socket.id });
 
-    // Example: Listen for a custom event
-    socket.on('chatMessage', (msg) => {
-        logger.info('Received chat message', { message: msg, socketId: socket.id });
+    // Handle user joining the chat with a username
+    socket.on('joinChat', (username) => {
+        socket.username = username || 'Anonymous';
+        logger.info(`User joined the chat: ${socket.username}`, { socketId: socket.id });
+        io.emit('userConnected', socket.username);
+    });
+
+    // Listen for a custom 'chatMessage' event
+    socket.on('chatMessage', (data) => {
+        const { username, message } = data;
+        logger.info('Received chat message', { username, message, socketId: socket.id });
+
         // Broadcast the message to all connected clients
-        io.emit('chatMessage', msg);
+        io.emit('chatMessage', { username, message });
     });
 
     // Handle disconnection
     socket.on('disconnect', () => {
-        logger.info('User disconnected', { socketId: socket.id });
+        if (socket.username) {
+            io.emit('userDisconnected', socket.username);
+            logger.info('User disconnected', { username: socket.username, socketId: socket.id });
+        } else {
+            logger.info('A user disconnected', { socketId: socket.id });
+        }
     });
 });
 
