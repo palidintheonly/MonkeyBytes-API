@@ -34,9 +34,6 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Record the commencement time of the server
 const serverStartTime = Date.now();
 
@@ -496,10 +493,198 @@ function performParallelTasks() {
 // Call the function as an example (You can schedule or trigger it as needed)
 performParallelTasks();
 
+// ================== /chat Endpoint Integration ================== //
+
+// Define the /chat route to serve the chat interface
+app.get('/chat', (req, res) => {
+    logger.info('Chat endpoint accessed.', { endpoint: '/chat' });
+
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>📜 Real-Time Chat</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #121212;
+                    color: #e0e0e0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+
+                .chat-container {
+                    width: 500px;
+                    background-color: #2c2c2c;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                }
+
+                .chat-container h1 {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+
+                .chat-box {
+                    height: 300px;
+                    overflow-y: scroll;
+                    border: 1px solid #444;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                    background-color: #1e1e1e;
+                    border-radius: 4px;
+                }
+
+                .chat-box .message {
+                    margin-bottom: 10px;
+                }
+
+                .chat-box .message .username {
+                    font-weight: bold;
+                    margin-right: 5px;
+                }
+
+                .chat-box .info {
+                    color: #999;
+                    font-style: italic;
+                    margin-bottom: 10px;
+                }
+
+                #chat-form {
+                    display: flex;
+                }
+
+                #chat-input {
+                    flex: 1;
+                    padding: 10px;
+                    border: none;
+                    border-radius: 4px;
+                    margin-right: 10px;
+                    background-color: #333;
+                    color: #fff;
+                }
+
+                #chat-input:focus {
+                    outline: none;
+                    background-color: #444;
+                }
+
+                #chat-form button {
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 4px;
+                    background-color: #1e90ff;
+                    color: #fff;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                }
+
+                #chat-form button:hover {
+                    background-color: #1c86ee;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="chat-container">
+                <h1>📜 Real-Time Chat</h1>
+                <div id="chat-box" class="chat-box"></div>
+                <form id="chat-form">
+                    <input id="chat-input" type="text" placeholder="Type your message here..." autocomplete="off" required />
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+
+            <!-- Socket.IO Client Library -->
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const socket = io();
+
+                    const chatForm = document.getElementById('chat-form');
+                    const chatInput = document.getElementById('chat-input');
+                    const chatBox = document.getElementById('chat-box');
+
+                    // Prompt user for a username
+                    let username = prompt("Enter your username:");
+                    if (!username) {
+                        username = 'Anonymous';
+                    }
+
+                    // Emit joinChat event to notify the server
+                    socket.emit('joinChat', username);
+
+                    // Handle form submission
+                    chatForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const message = chatInput.value.trim();
+                        if (message.length === 0) return;
+
+                        // Emit the message to the server
+                        socket.emit('chatMessage', { username, message });
+
+                        // Clear the input field
+                        chatInput.value = '';
+                        chatInput.focus();
+                    });
+
+                    // Listen for incoming chat messages
+                    socket.on('chatMessage', (data) => {
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message');
+
+                        const usernameElement = document.createElement('span');
+                        usernameElement.classList.add('username');
+                        usernameElement.textContent = data.username + ':';
+
+                        const messageContent = document.createElement('span');
+                        messageContent.classList.add('message-content');
+                        messageContent.textContent = ' ' + data.message;
+
+                        messageElement.appendChild(usernameElement);
+                        messageElement.appendChild(messageContent);
+                        chatBox.appendChild(messageElement);
+
+                        // Scroll to the bottom
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    });
+
+                    // Listen for user connection notifications
+                    socket.on('userConnected', (user) => {
+                        const infoElement = document.createElement('div');
+                        infoElement.classList.add('info');
+                        infoElement.textContent = \`\${user} has joined the chat.\`;
+                        chatBox.appendChild(infoElement);
+
+                        // Scroll to the bottom
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    });
+
+                    // Listen for user disconnection notifications
+                    socket.on('userDisconnected', (user) => {
+                        const infoElement = document.createElement('div');
+                        infoElement.classList.add('info');
+                        infoElement.textContent = \`\${user} has left the chat.\`;
+                        chatBox.appendChild(infoElement);
+
+                        // Scroll to the bottom
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    });
+                });
+            </script>
+        </body>
+        </html>
+    `);
+});
+
 // ================== Start the Server ================== //
 
 // Start the server using the HTTP server (required for Socket.IO)
 server.listen(PORT, '0.0.0.0', () => {
     logger.info(`Server running at http://us2.bot-hosting.net:${PORT}`);
 });
-//im working on hardcode
