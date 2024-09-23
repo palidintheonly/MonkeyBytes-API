@@ -14,6 +14,8 @@ import { Server as SocketIOServer } from 'socket.io';
 import http from 'http';
 import asyncLib from 'async'; // Imported as asyncLib to avoid naming conflicts
 
+// ================== Configuration Constants ================== //
+
 // Hardcoded Discord webhook URL
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 
@@ -21,9 +23,13 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/128386145700767350
 const PORT = 21560; // Hardcoded port for HTTP
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
+// ================== Setup Directory Paths ================== //
+
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// ================== Initialize Express App ================== //
 
 const app = express();
 
@@ -34,20 +40,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Record the commencement time of the server
-const serverStartTime = Date.now();
-
-// Function to format uptime
-function formatUptime(ms) {
-    let totalSeconds = Math.floor(ms / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    totalSeconds %= 86400;
-    const hours = Math.floor(totalSeconds / 3600);
-    totalSeconds %= 3600;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
-}
+// ================== Initialize Logger ================== //
 
 // Logger configuration (Winston) with colorized output
 const logger = winston.createLogger({
@@ -65,6 +58,8 @@ const logger = winston.createLogger({
     ),
     transports: [new winston.transports.Console()],
 });
+
+// ================== Utility Functions ================== //
 
 // Function to load updates from updates.json
 async function getUpdates() {
@@ -162,6 +157,8 @@ const facts = [
     { id: 'fact10', testText: "At the heart of many ventures, this unseen force doth unite men, beasts, and machines alike, guiding them all with but a whisper." }
 ];
 
+// ================== Routes ================== //
+
 // /testing route with random test images and random bot name
 app.get('/testing', (req, res) => {
     logger.info('Endpoint accessed.', { endpoint: '/testing' });
@@ -189,243 +186,6 @@ app.get('/testing', (req, res) => {
             error: 'Alas! An error hath occurred while fetching data. Please try again later.',
         });
     }
-});
-
-// Function to fetch and parse Reddit RSS feed
-async function fetchRedditRSS() {
-    logger.info('Commencing fetch of Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
-    try {
-        const response = await axios.get(REDDIT_RSS_URL);
-        const rssData = response.data;
-        const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
-        const jsonData = await parser.parseStringPromise(rssData);
-        logger.info('Reddit RSS feed successfully fetched and parsed.', { source: 'fetchRedditRSS' });
-        return jsonData;
-    } catch (error) {
-        logger.error('Error whilst fetching Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
-        return null;
-    }
-}
-
-// Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
-async function postNewestToDiscord() {
-    logger.info('Initiating the process to post newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
-    const redditData = await fetchRedditRSS();
-
-    if (!redditData || !redditData.feed || !redditData.feed.entry) {
-        logger.error('Invalid Reddit RSS feed data received.', { data: redditData, source: 'postNewestToDiscord' });
-        return;
-    }
-
-    // Ensure entries is always an array
-    const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
-    const newestPosts = entries.slice(0, 5);
-    logger.info('Extracted the newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
-
-    if (newestPosts.length === 0) {
-        logger.warn('No new posts found to dispatch.', { source: 'postNewestToDiscord' });
-        return;
-    }
-
-    const ukTime = new Date().toLocaleTimeString('en-GB', {
-        timeZone: 'Europe/London',
-        hour12: true,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-    });
-
-    // Send the initial message before the first embed
-    let payload = {
-        content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
-    };
-
-    try {
-        await axios.post(DISCORD_WEBHOOK_URL, payload);
-        logger.info('Initial message posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
-    } catch (error) {
-        logger.error('Error whilst posting initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
-        if (error.response && error.response.data) {
-            logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
-        }
-        return;
-    }
-
-    // Send each post as a separate embed
-    for (const post of newestPosts) {
-        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
-        const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._ || '') : 'No content provided';
-        const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
-        const postContent = decode(postContentStripped);
-        const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
-        const postAuthor = post.author && post.author.name ? (typeof post.author.name === 'string' ? post.author.name : post.author.name._ || '') : 'Unknown';
-        const postImage = post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url ? post['media:thumbnail'].$.url : null;
-
-        const embed = {
-            title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
-            url: postLink,
-            description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent,
-            color: 0x1e90ff, // DodgerBlue color
-            timestamp: new Date().toISOString(),
-            author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
-            image: postImage ? { url: postImage } : undefined,
-        };
-
-        payload = {
-            embeds: [embed],
-        };
-
-        try {
-            await axios.post(DISCORD_WEBHOOK_URL, payload);
-            logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
-        } catch (error) {
-            logger.error('Error whilst posting embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
-            if (error.response && error.response.data) {
-                logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
-            }
-        }
-    }
-}
-
-// Schedule to post every 30 seconds (30,000 ms)
-setInterval(postNewestToDiscord, 30000);
-
-// Root route '/'
-app.get('/', async (req, res) => {
-    logger.info('Root endpoint accessed.');
-
-    const uptime = formatUptime(Date.now() - serverStartTime);
-
-    let updatesHtml = '';
-    try {
-        const updates = await getUpdates();
-        logger.info('Loaded updates successfully.', { updates, source: 'root' });
-
-        updatesHtml = updates.length
-            ? updates.map((update) => `<li><strong>${decode(update.updateText)}</strong> - ${decode(update.description)}</li>`).join('')
-            : '<li>No updates available at this time.</li>';
-        logger.debug('Updates HTML hath been prepared.', { updatesHtml, source: 'root' });
-    } catch (error) {
-        logger.error('Error whilst loading updates.', { error: error.message, source: 'root' });
-        updatesHtml = '<li>Error loading updates. Please check the server logs for details.</li>';
-    }
-
-    res.set('Content-Type', 'text/html; charset=utf-8');
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>Monkey Bytes API</title>
-            <link rel="icon" href="https://i.ibb.co/wgfvKYb/2.jpg" type="image/jpg"> <!-- Favicon link -->
-            <style>
-                body {
-                    background-color: #121212;
-                    color: #e0e0e0;
-                    font-family: 'Garamond', serif;
-                    margin: 0;
-                    padding: 0;
-                }
-                .container {
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
-                }
-                .section {
-                    background-color: #2c2c2c;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    border-radius: 8px;
-                }
-                h1, h2 {
-                    color: #ffffff;
-                }
-                p, li {
-                    color: #dcdcdc;
-                    line-height: 1.6;
-                }
-                a {
-                    color: #1e90ff;
-                    text-decoration: none;
-                }
-                a:hover {
-                    text-decoration: underline;
-                }
-                ul, ol {
-                    margin-left: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="section">
-                    <h1>📜 Greetings, Noble Visitor, to the Monkey Bytes API!</h1>
-                    <p>Welcome to the grand halls of our kingdom's digital realm. Herein lies the gateway to our esteemed API, a marvel of modern sorcery and craftsmanship. Let us embark on a journey to unveil the secrets and functionalities that await thee.</p>
-                </div>
-
-                <div class="section">
-                    <h2>⏳ The Kingdom's Endurance</h2>
-                    <p>Our mighty server hath stood resolute for <strong>${uptime}</strong>. This steadfastness ensures that all who seek our services are met with unwavering reliability and grace.</p>
-                </div>
-
-                <div class="section">
-                    <h2>⚔️ The Noble Nodes</h2>
-                    <p>Behold the intricate network of nodes that comprise our kingdom's infrastructure. Each node serves a distinct purpose, working in harmonious unison to maintain the stability and efficiency of our realm:</p>
-                    <ul>
-                        <li><strong>Express:</strong> The swift messenger that handles incoming requests with agility.</li>
-                        <li><strong>Winston Logger:</strong> The vigilant chronicler that records the annals of our server's deeds and errors.</li>
-                        <li><strong>Helmet:</strong> The steadfast guardian that shields our kingdom from nefarious threats.</li>
-                        <li><strong>Axios and XML2JS:</strong> The diligent scholars that fetch and parse data from distant lands.</li>
-                        <li><strong>Crypto:</strong> The master of secrets, ensuring that our communications remain secure.</li>
-                        <li><strong>HTML Entities Decoder:</strong> The linguist that deciphers encoded messages to present them in readable form.</li>
-                        <li><strong>Path and URL Modules:</strong> The cartographers that navigate file systems and URLs with precision.</li>
-                        <li><strong>Socket.IO:</strong> The herald that enables real-time communication across the kingdom.</li>
-                        <li><strong>Async:</strong> The orchestrator that manages our asynchronous endeavors with finesse.</li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h2>🛡️ A Walkthrough for the Uninitiated</h2>
-                    <p>Fear not, for this guide shall illuminate the path to utilizing our API's noble endpoints:</p>
-                    <ol>
-                        <li><strong>/</strong> - <em>The Grand Overview</em><br>Venture to this path to behold the server's current state, including its illustrious uptime and the latest decrees from our scrolls.</li>
-                        <li><strong>/testing</strong> - <em>The Cloud Pavilion</em><br>Visit this endpoint to receive randomized tales of our celestial formations, each accompanied by a majestic cloud image and a regal bot name crafted just for thee.</li>
-                        <li><strong>/chat</strong> - <em>The Real-Time Chatroom</em><br>Engage in real-time conversations with fellow denizens of the kingdom.</li>
-                        <li><strong>/socket.io</strong> - <em>The Real-Time Courtyard</em><br>Engage in real-time communications with the kingdom's heralds and messengers.</li>
-                    </ol>
-                    <p>To engage with these endpoints, simply dispatch a request to the desired path and await the kingdom's gracious response. Whether thou art a seasoned knight or a humble scribe, our API stands ready to serve thy needs.</p>
-                </div>
-
-                <div class="section">
-                    <h2>📰 Latest Decrees</h2>
-                    <ul>${updatesHtml}</ul>
-                </div>
-
-                <div class="section">
-                    <h2>🔗 Useful Links</h2>
-                    <p>Herein lies the links to important aspects of our realm:</p>
-                    <ul>
-                        <li>🧪 <a href="http://us2.bot-hosting.net:21560/testing">Testing Endpoint</a> - Test our system with randomized data.</li>
-                        <li>💬 <a href="https://discord.gg/your-server-invite">Discord Support Server</a> - Join our noble Discord server for aid and discussion.</li>
-                        <li>🛠️ <a href="/socket.io/socket.io.js">Socket.IO Client Library</a> - Integrate real-time features into your applications.</li>
-                        <li>💬 <a href="/chat">Chatroom</a> - Engage in real-time conversations with fellow users.</li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h2>🌙 Embracing the Shadows</h2>
-                    <p>Our portal dons the cloak of darkness, ensuring that thine eyes are spared the harsh glare of daylight. Navigate these hallowed pages with ease, whether under the sun's watchful eye or the moon's gentle glow.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `);
-});
-
-// 404 Error Handler
-app.use((req, res) => {
-    logger.warn('Unknown endpoint accessed.', { path: req.path, source: '404Handler' });
-    res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
 // ================== Socket.IO Integration ================== //
@@ -472,28 +232,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// ================== Async Integration ================== //
-
-// Example: Using Async to perform parallel tasks
-function performParallelTasks() {
-    asyncLib.parallel([
-        asyncLib.asyncify(() => fetchRedditRSS()),
-        asyncLib.asyncify(() => getUpdates())
-    ], (err, results) => {
-        if (err) {
-            logger.error('Error performing parallel tasks.', { error: err.message, source: 'Async' });
-            return;
-        }
-        const [redditData, updates] = results;
-        logger.info('Parallel tasks completed successfully.', { source: 'Async' });
-        // You can process the results as needed
-    });
-}
-
-// Call the function as an example (You can schedule or trigger it as needed)
-performParallelTasks();
-
-// ================== /chat Endpoint Integration ================== //
+// ================== /chat Endpoint ================== //
 
 // Define the /chat route to serve the chat interface
 app.get('/chat', (req, res) => {
@@ -682,9 +421,116 @@ app.get('/chat', (req, res) => {
     `);
 });
 
+// ================== Asynchronous Tasks ================== //
+
+// Function to fetch and parse Reddit RSS feed
+async function fetchRedditRSS() {
+    logger.info('Commencing fetch of Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
+    try {
+        const response = await axios.get(REDDIT_RSS_URL);
+        const rssData = response.data;
+        const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
+        const jsonData = await parser.parseStringPromise(rssData);
+        logger.info('Reddit RSS feed successfully fetched and parsed.', { source: 'fetchRedditRSS' });
+        return jsonData;
+    } catch (error) {
+        logger.error('Error whilst fetching Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
+        return null;
+    }
+}
+
+// Function to post the 5 newest posts from the Reddit RSS feed to Discord using JSON format
+async function postNewestToDiscord() {
+    logger.info('Initiating the process to post newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
+    const redditData = await fetchRedditRSS();
+
+    if (!redditData || !redditData.feed || !redditData.feed.entry) {
+        logger.error('Invalid Reddit RSS feed data received.', { data: redditData, source: 'postNewestToDiscord' });
+        return;
+    }
+
+    // Ensure entries is always an array
+    const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
+    const newestPosts = entries.slice(0, 5);
+    logger.info('Extracted the newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
+
+    if (newestPosts.length === 0) {
+        logger.warn('No new posts found to dispatch.', { source: 'postNewestToDiscord' });
+        return;
+    }
+
+    const ukTime = new Date().toLocaleTimeString('en-GB', {
+        timeZone: 'Europe/London',
+        hour12: true,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
+
+    // Send the initial message before the first embed
+    let payload = {
+        content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
+    };
+
+    try {
+        await axios.post(DISCORD_WEBHOOK_URL, payload);
+        logger.info('Initial message posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+    } catch (error) {
+        logger.error('Error whilst posting initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+        if (error.response && error.response.data) {
+            logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
+        }
+        return;
+    }
+
+    // Send each post as a separate embed
+    for (const post of newestPosts) {
+        const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
+        const postContentRaw = post.content ? (typeof post.content === 'string' ? post.content : post.content._ || '') : 'No content provided';
+        const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
+        const postContent = decode(postContentStripped);
+        const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
+        const postAuthor = post.author && post.author.name ? (typeof post.author.name === 'string' ? post.author.name : post.author.name._ || '') : 'Unknown';
+        const postImage = post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url ? post['media:thumbnail'].$.url : null;
+
+        const embed = {
+            title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
+            url: postLink,
+            description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent,
+            color: 0x1e90ff, // DodgerBlue color
+            timestamp: new Date().toISOString(),
+            author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
+            image: postImage ? { url: postImage } : undefined,
+        };
+
+        payload = {
+            embeds: [embed],
+        };
+
+        try {
+            await axios.post(DISCORD_WEBHOOK_URL, payload);
+            logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+        } catch (error) {
+            logger.error('Error whilst posting embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+            if (error.response && error.response.data) {
+                logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
+            }
+        }
+    }
+}
+
+// Schedule to post every 30 seconds (30,000 ms)
+setInterval(postNewestToDiscord, 30000);
+
 // ================== Start the Server ================== //
 
 // Start the server using the HTTP server (required for Socket.IO)
 server.listen(PORT, '0.0.0.0', () => {
     logger.info(`Server running at http://us2.bot-hosting.net:${PORT}`);
+});
+
+// ================== 404 Error Handler ================== //
+app.use((req, res) => {
+    logger.warn('Unknown endpoint accessed.', { path: req.path, source: '404Handler' });
+    res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
