@@ -15,9 +15,7 @@ import http from 'http';
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 const PORT = 21560;
-const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
-const RESERVED_USERNAME = 'REDACTED';
-const RESERVED_PASSWORD = 'REDACTED';
+### secure 
 
 // ================== Setup Directory Paths ================== //
 
@@ -105,9 +103,8 @@ function getRandomImage(imageList) {
   return selectedImage;
 }
 
-function getRandomProfilePicture() {
-  const randomUsername = crypto.randomBytes(4).toString('hex');
-  const profilePictureUrl = `https://robohash.org/${randomUsername}.png`;
+function getRandomProfilePicture(username) {
+  const profilePictureUrl = `https://robohash.org/${encodeURIComponent(username)}.png`;
   logger.debug('Generated random profile picture URL.', { profilePictureUrl, source: 'getRandomProfilePicture' });
   return profilePictureUrl;
 }
@@ -206,6 +203,7 @@ const validTokens = {};
 
 // ================== Routes ================== //
 
+// Root Endpoint
 app.get('/', async (req, res) => {
   logger.info('Root endpoint accessed.', { endpoint: '/' });
   try {
@@ -235,6 +233,9 @@ app.get('/', async (req, res) => {
                   margin-top: 0; 
                   color: #ffcc00; 
               }
+              .box h3 { 
+                  color: #ffcc00; 
+              }
               .box p { 
                   line-height: 1.6; 
               }
@@ -255,19 +256,37 @@ app.get('/', async (req, res) => {
                   <li><strong>Routes:</strong> Defines the API endpoints, including this root route and others like <code>/testing</code> and <code>/chat</code>.</li>
                   <li><strong>Socket.IO Integration:</strong> Handles real-time communication with connected clients.</li>
                   <li><strong>Asynchronous Tasks:</strong> Manages tasks like fetching and posting Reddit RSS data to Discord.</li>
+                  <li><strong>NPM Packages Used:</strong>
+                      <ul>
+                          <li><strong>express:</strong> A web application framework for building APIs and handling HTTP requests and responses.</li>
+                          <li><strong>fs/promises:</strong> A promise-based API for interacting with the file system, used to read the updates.json file.</li>
+                          <li><strong>path:</strong> A utility module for handling and transforming file paths, used to locate files within the project.</li>
+                          <li><strong>winston:</strong> A versatile logging library for recording logs with timestamps and formatting them with colors.</li>
+                          <li><strong>helmet:</strong> A middleware that helps secure Express apps by setting various HTTP headers.</li>
+                          <li><strong>axios:</strong> A promise-based HTTP client used for making requests to external APIs like Reddit and Discord.</li>
+                          <li><strong>xml2js:</strong> A library for parsing XML data into JSON format, used to process Reddit's RSS feed.</li>
+                          <li><strong>crypto:</strong> A module providing cryptographic functionalities, used for generating random values like bot names and tokens.</li>
+                          <li><strong>html-entities:</strong> A library for decoding HTML entities, used to clean up text retrieved from external APIs.</li>
+                          <li><strong>socket.io:</strong> A library for enabling real-time, bidirectional communication between web clients and servers.</li>
+                          <li><strong>http:</strong> A core Node.js module used to create an HTTP server, which is necessary for integrating with Socket.IO.</li>
+                      </ul>
+                  </li>
               </ul>
           </div>
           <div class="box">
-              <h2>Random Images</h2>
-              <p>This API provides randomly selected images from a predefined list, ensuring a unique experience with every request.</p>
-          </div>
-          <div class="box">
-              <h2>Random Bot Names</h2>
-              <p>Need a bot name? This API can generate a random name composed of an adjective and noun, with a four-digit number appended.</p>
-          </div>
-          <div class="box">
-              <h2>Fun Facts</h2>
-              <p>For a bit of fun, the API also returns facts styled in the speech of 1066 UK, adding a whimsical touch to your interactions.</p>
+              <h2>Features</h2>
+              <div class="box">
+                  <h3>Random Images</h3>
+                  <p>This API provides randomly selected images from a predefined list, ensuring a unique experience with every request.</p>
+              </div>
+              <div class="box">
+                  <h3>Random Bot Names</h3>
+                  <p>Need a bot name? This API can generate a random name composed of an adjective and noun, with a four-digit number appended.</p>
+              </div>
+              <div class="box">
+                  <h3>Fun Facts</h3>
+                  <p>For a bit of fun, the API also returns facts styled in the speech of 1066 UK, adding a whimsical touch to your interactions.</p>
+              </div>
           </div>
           <div class="box">
               <h2>Guide for Dummies</h2>
@@ -291,22 +310,6 @@ app.get('/', async (req, res) => {
               `
                 )
                 .join('')}
-          </div>
-          <div class="box">
-              <h2>NPM Packages Used</h2>
-              <ul>
-                  <li><strong>express:</strong> A web application framework for building APIs and handling HTTP requests and responses.</li>
-                  <li><strong>fs/promises:</strong> A promise-based API for interacting with the file system, used to read the updates.json file.</li>
-                  <li><strong>path:</strong> A utility module for handling and transforming file paths, used to locate files within the project.</li>
-                  <li><strong>winston:</strong> A versatile logging library for recording logs with timestamps and formatting them with colors.</li>
-                  <li><strong>helmet:</strong> A middleware that helps secure Express apps by setting various HTTP headers.</li>
-                  <li><strong>axios:</strong> A promise-based HTTP client used for making requests to external APIs like Reddit and Discord.</li>
-                  <li><strong>xml2js:</strong> A library for parsing XML data into JSON format, used to process Reddit's RSS feed.</li>
-                  <li><strong>crypto:</strong> A module providing cryptographic functionalities, used for generating random values like bot names and tokens.</li>
-                  <li><strong>html-entities:</strong> A library for decoding HTML entities, used to clean up text retrieved from external APIs.</li>
-                  <li><strong>socket.io:</strong> A library for enabling real-time, bidirectional communication between web clients and servers.</li>
-                  <li><strong>http:</strong> A core Node.js module used to create an HTTP server, which is necessary for integrating with Socket.IO.</li>
-              </ul>
           </div>
       </body>
       </html>
@@ -352,13 +355,13 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Testing Endpoint
 app.get('/testing', (req, res) => {
   logger.info('Endpoint accessed.', { endpoint: '/testing' });
 
   try {
     const testImage1Url = getRandomImage(testImage1List);
     const testImage2Url = getRandomImage(testImage2List);
-    const profilePictureUrl = getRandomProfilePicture();
     const botName = generateRandomBotName();
     const randomIndex = Math.floor(Math.random() * facts.length);
     const randomFact = { ...facts[randomIndex] };
@@ -368,7 +371,6 @@ app.get('/testing', (req, res) => {
     randomFact.dateUnixUK = Math.floor(Date.now() / 1000);
     randomFact.testimage1 = testImage1Url;
     randomFact.testimage2 = testImage2Url;
-    randomFact.testingProfilePicture = profilePictureUrl;
     randomFact.testingBotName = botName;
 
     res.json(randomFact);
@@ -380,11 +382,273 @@ app.get('/testing', (req, res) => {
   }
 });
 
+// ================== Chat Routes ================== //
+
+// GET /chat - Serve Chat Interface
+app.get('/chat', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Live Chat</title>
+        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
+                crossorigin="anonymous"></script>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f0f0f0; }
+            #chat { width: 500px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+            #messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: #fafafa; }
+            #messageForm { display: flex; }
+            #messageForm input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+            #messageForm button { padding: 10px; border: none; background-color: #28a745; color: white; border-radius: 4px; margin-left: 5px; cursor: pointer; }
+            #messageForm button:hover { background-color: #218838; }
+            #usernameInput, #passwordInput { padding: 10px; width: calc(100% - 22px); margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+            .message { display: flex; align-items: center; margin-bottom: 10px; }
+            .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
+            .content { background-color: #e2ffc7; padding: 10px; border-radius: 5px; max-width: 80%; position: relative; }
+            .timestamp { font-size: 0.8em; color: #666; position: absolute; bottom: -15px; right: 0; }
+            .system-message { text-align: center; color: #888; font-style: italic; margin: 10px 0; }
+            #loginModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+            #loginModalContent { background-color: #fff; padding: 20px; border-radius: 5px; width: 300px; }
+            #loginForm button { background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
+            #loginForm button:hover { background-color: #0069d9; }
+        </style>
+    </head>
+    <body>
+        <div id="chat">
+            <h2>Live Chat</h2>
+            <input type="text" id="usernameInput" placeholder="Enter your username" required />
+            <div id="messages"></div>
+            <form id="messageForm">
+                <input type="text" id="messageInput" placeholder="Type your message..." required />
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <!-- Login Modal -->
+        <div id="loginModal">
+            <div id="loginModalContent">
+                <h3>Reserved Username Login</h3>
+                <input type="password" id="passwordInput" placeholder="Enter your password" required />
+                <button id="loginButton">Login</button>
+                <p id="loginError" style="color: red; display: none;">Incorrect password. Please try again.</p>
+            </div>
+        </div>
+
+        <script>
+            const socket = io();
+
+            const messagesDiv = document.getElementById('messages');
+            const messageForm = document.getElementById('messageForm');
+            const messageInput = document.getElementById('messageInput');
+            const usernameInput = document.getElementById('usernameInput');
+
+            const loginModal = document.getElementById('loginModal');
+            const passwordInput = document.getElementById('passwordInput');
+            const loginButton = document.getElementById('loginButton');
+            const loginError = document.getElementById('loginError');
+
+            let username = '';
+            let authToken = '';
+
+            // Handle username input
+            usernameInput.addEventListener('change', () => {
+                username = usernameInput.value.trim();
+                if (username) {
+                    if (username.toLowerCase() === 'xpalidinx') {
+                        // Show login modal for reserved username
+                        loginModal.style.display = 'flex';
+                    } else {
+                        socket.emit('joinChat', { username });
+                    }
+                }
+            });
+
+            // Handle login
+            loginButton.addEventListener('click', async () => {
+                const password = passwordInput.value.trim();
+                if (password) {
+                    try {
+                        const response = await fetch('/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username, password }),
+                        });
+
+                        const data = await response.json();
+                        if (response.ok && data.token) {
+                            authToken = data.token;
+                            socket.emit('joinChat', { username, authToken });
+                            loginModal.style.display = 'none';
+                            passwordInput.value = '';
+                            loginError.style.display = 'none';
+                        } else {
+                            loginError.style.display = 'block';
+                        }
+                    } catch (error) {
+                        console.error('Error during login:', error);
+                        loginError.style.display = 'block';
+                    }
+                }
+            });
+
+            // Close login modal when clicking outside the content
+            window.addEventListener('click', (event) => {
+                if (event.target == loginModal) {
+                    loginModal.style.display = 'none';
+                    passwordInput.value = '';
+                    loginError.style.display = 'none';
+                }
+            });
+
+            // Display existing chat history
+            socket.on('chatHistory', (data) => {
+                data.chatHistory.forEach(msg => {
+                    appendMessage(msg);
+                });
+                scrollMessagesToBottom();
+            });
+
+            // Display new chat messages
+            socket.on('chatMessage', (msg) => {
+                appendMessage(msg);
+                scrollMessagesToBottom();
+            });
+
+            // Handle user connected
+            socket.on('userConnected', (user) => {
+                appendSystemMessage(\`\${user} has joined the chat\`);
+                scrollMessagesToBottom();
+            });
+
+            // Handle user disconnected
+            socket.on('userDisconnected', (user) => {
+                appendSystemMessage(\`\${user} has left the chat\`);
+                scrollMessagesToBottom();
+            });
+
+            // Handle login required
+            socket.on('loginRequired', (data) => {
+                alert(data.message);
+            });
+
+            // Handle login success
+            socket.on('loginSuccess', (data) => {
+                alert(data.message);
+                // Store the token if needed
+                // const token = data.token;
+            });
+
+            // Handle login failed
+            socket.on('loginFailed', (data) => {
+                alert(data.message);
+            });
+
+            // Handle error messages
+            socket.on('error', (data) => {
+                alert(data.message);
+            });
+
+            // Handle form submission
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                if (username && message) {
+                    socket.emit('chatMessage', { message });
+                    messageInput.value = '';
+                } else if (!username) {
+                    alert('Please enter a username before sending messages.');
+                }
+            });
+
+            function appendMessage(msg) {
+                // Sanitize message content
+                const sanitizedUsername = sanitizeHTML(msg.username);
+                const sanitizedMessage = sanitizeHTML(msg.message);
+                const sanitizedAvatar = sanitizeURL(msg.avatar);
+
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+
+                const avatarElement = document.createElement('img');
+                avatarElement.src = sanitizedAvatar;
+                avatarElement.alt = 'Avatar';
+                avatarElement.classList.add('avatar');
+
+                const contentElement = document.createElement('div');
+                contentElement.classList.add('content');
+                contentElement.innerHTML = \`\${sanitizedMessage}<span class="timestamp">\${formatTimestamp(msg.timestamp)}</span>\`;
+
+                messageElement.appendChild(avatarElement);
+                messageElement.appendChild(contentElement);
+
+                messagesDiv.appendChild(messageElement);
+            }
+
+            function appendSystemMessage(message) {
+                const systemMessage = document.createElement('div');
+                systemMessage.classList.add('system-message');
+                systemMessage.textContent = message;
+                messagesDiv.appendChild(systemMessage);
+            }
+
+            function scrollMessagesToBottom() {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            function formatTimestamp(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString();
+            }
+
+            function sanitizeHTML(str) {
+                const temp = document.createElement('div');
+                temp.textContent = str;
+                return temp.innerHTML;
+            }
+
+            function sanitizeURL(url) {
+                // Use RegExp constructor to ensure proper escaping
+                const pattern = new RegExp('^(https?:\\/\\/)[^\\s$.?#].[^\\s]*$', 'gm');
+                return pattern.test(url) ? url : '';
+            }
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+// POST /login - Handle Reserved Username Login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    logger.warn('Login attempt with missing username or password.', { source: '/login' });
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+
+  if (username.toLowerCase() === RESERVED_USERNAME.toLowerCase()) {
+    if (password === RESERVED_PASSWORD) {
+      const token = crypto.randomBytes(16).toString('hex');
+      validTokens[token] = username;
+      logger.info('Reserved username logged in successfully.', { username, source: '/login' });
+      return res.status(200).json({ token });
+    } else {
+      logger.warn('Reserved username login failed: incorrect password.', { username, source: '/login' });
+      return res.status(401).json({ error: 'Incorrect password.' });
+    }
+  } else {
+    logger.warn('Login attempt with non-reserved username.', { username, source: '/login' });
+    return res.status(400).json({ error: 'Only reserved usernames can use this login route.' });
+  }
+});
+
 // ================== Socket.IO Integration ================== //
 
-const server = http.createServer(app);
+const serverInstance = http.createServer(app);
 
-const io = new SocketIOServer(server, {
+const io = new SocketIOServer(serverInstance, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
@@ -394,15 +658,17 @@ const io = new SocketIOServer(server, {
 io.on('connection', (socket) => {
   logger.info('A user connected via Socket.IO', { socketId: socket.id });
 
-  socket.emit('chatHistory', chatHistory);
-
+  // Handle user joining the chat
   socket.on('joinChat', (data) => {
-    const { username, authToken } = data;
-    const reservedNames = [RESERVED_USERNAME.toLowerCase()];
+    let { username, authToken } = data;
+    if (!username) {
+      username = `Guest${Math.floor(Math.random() * 10000)}`; // Assign a random guest username
+    }
 
-    if (reservedNames.includes(username.toLowerCase())) {
-      if (validTokens[authToken] && validTokens[authToken] === username) {
+    if (username.toLowerCase() === RESERVED_USERNAME.toLowerCase()) {
+      if (authToken && validTokens[authToken] && validTokens[authToken] === username) {
         socket.username = username;
+        socket.avatar = getRandomProfilePicture(username);
         logger.info(`User reconnected as ${socket.username}`, { socketId: socket.id });
         io.emit('userConnected', socket.username);
       } else {
@@ -410,46 +676,45 @@ io.on('connection', (socket) => {
         return;
       }
     } else {
-      socket.username = username || 'Anonymous';
+      socket.username = username;
+      socket.avatar = getRandomProfilePicture(username);
       logger.info(`User joined the chat: ${socket.username}`, { socketId: socket.id });
       io.emit('userConnected', socket.username);
     }
   });
 
-  socket.on('login', (credentials) => {
-    const { username, password } = credentials;
-
-    if (username.toLowerCase() === RESERVED_USERNAME.toLowerCase()) {
-      if (password === RESERVED_PASSWORD) {
-        socket.username = username;
-        const token = crypto.randomBytes(16).toString('hex');
-        validTokens[token] = username;
-        logger.info(`User logged in successfully as ${socket.username}`, { socketId: socket.id });
-        socket.emit('loginSuccess', { message: 'Login successful!', token });
-        io.emit('userConnected', socket.username);
-      } else {
-        socket.emit('loginFailed', { message: 'Incorrect password.' });
-        logger.warn('Login failed: incorrect password', { socketId: socket.id });
-      }
-    } else {
-      socket.emit('loginFailed', { message: 'Reserved username login failed.' });
-    }
-  });
-
+  // Handle incoming chat messages from clients
   socket.on('chatMessage', (data) => {
-    const { username, message } = data;
-    logger.info('Received chat message', { username, message, socketId: socket.id });
+    const { message } = data;
+    if (!socket.username || !message) {
+      socket.emit('error', { message: 'Username and message are required.' });
+      return;
+    }
 
-    const chatMessage = { username, message };
+    // Sanitize message on server side
+    const sanitizedMessage = sanitizeString(message);
+
+    const chatMessage = {
+      username: socket.username,
+      message: sanitizedMessage,
+      timestamp: new Date().toISOString(),
+      avatar: socket.avatar || getRandomProfilePicture(socket.username),
+    };
+
     chatHistory.push(chatMessage);
 
+    logger.info('Received chat message', { username: socket.username, message: sanitizedMessage, socketId: socket.id });
+
+    // Broadcast the message to all connected clients
     io.emit('chatMessage', chatMessage);
   });
 
+  // Handle user disconnect
   socket.on('disconnect', () => {
     if (socket.username) {
       io.emit('userDisconnected', socket.username);
       logger.info('User disconnected', { username: socket.username, socketId: socket.id });
+      // Remove token if any
       for (const token in validTokens) {
         if (validTokens[token] === socket.username) {
           delete validTokens[token];
@@ -567,11 +832,12 @@ async function postNewestToDiscord() {
   }
 }
 
+// Fetch and post Reddit RSS data every 30 seconds
 setInterval(postNewestToDiscord, 30000);
 
 // ================== Start the Server ================== //
 
-server.listen(PORT, '0.0.0.0', () => {
+serverInstance.listen(PORT, '0.0.0.0', () => {
   logger.info(`Server running at http://us2.bot-hosting.net:${PORT}`);
 });
 
@@ -581,3 +847,11 @@ app.use((req, res) => {
   logger.warn('Unknown endpoint accessed.', { path: req.path, source: '404Handler' });
   res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
+
+// ================== Helper Functions ================== //
+
+// Simple sanitization function to escape HTML characters
+function sanitizeString(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
