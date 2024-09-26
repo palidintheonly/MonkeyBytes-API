@@ -10,13 +10,21 @@ import crypto from 'crypto';
 import { decode } from 'html-entities';
 import { Server as SocketIOServer } from 'socket.io';
 import http from 'http';
+import session from 'express-session';
+import sharedSession from 'express-socket.io-session';
 
 // ================== Configuration Constants ================== //
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+const DISCORD_WEBHOOK_URL = 'https://discord./api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 const PORT = 21560;
-### secure 
+const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
+const RESERVED_USERNAME = '';
+const RESERVED_PASSWORD = '';
 
+// Discord OAuth2 Credentials
+const DISCORD_CLIENT_ID = '';
+const DISCORD_CLIENT_SECRET = '';
+const DISCORD_REDIRECT_URI = 'htt
 // ================== Setup Directory Paths ================== //
 
 const __filename = fileURLToPath(import.meta.url);
@@ -53,6 +61,18 @@ const logger = winston.createLogger({
   ),
   transports: [new winston.transports.Console()],
 });
+
+// ================== Session Setup ================== //
+
+// Initialize session middleware
+const sessionMiddleware = session({
+  secret: 'your-secret-key', // Replace with a strong secret in production
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }, // Set to true if using HTTPS
+});
+
+app.use(sessionMiddleware);
 
 // ================== Utility Functions ================== //
 
@@ -269,6 +289,8 @@ app.get('/', async (req, res) => {
                           <li><strong>html-entities:</strong> A library for decoding HTML entities, used to clean up text retrieved from external APIs.</li>
                           <li><strong>socket.io:</strong> A library for enabling real-time, bidirectional communication between web clients and servers.</li>
                           <li><strong>http:</strong> A core Node.js module used to create an HTTP server, which is necessary for integrating with Socket.IO.</li>
+                          <li><strong>express-session:</strong> A middleware for managing user sessions.</li>
+                          <li><strong>express-socket.io-session:</strong> A middleware to share sessions between Express and Socket.IO.</li>
                       </ul>
                   </li>
               </ul>
@@ -382,9 +404,68 @@ app.get('/testing', (req, res) => {
   }
 });
 
+// ================== Discord OAuth2 Routes ================== //
+
+// Initiate Discord OAuth2 Login
+app.get('/discord-login', (req, res) => {
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify`;
+  res.redirect(discordAuthUrl);
+});
+
+// Handle Discord OAuth2 Callback
+app.get('/discord-callback', async (req, res) => {
+  const code = req.query.code;
+  if (!code) {
+    logger.warn('No code found in Discord callback.', { source: '/discord-callback' });
+    return res.status(400).send('Authentication failed.');
+  }
+
+  try {
+    // Exchange code for access token
+    const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
+      client_id: DISCORD_CLIENT_ID,
+      client_secret: DISCORD_CLIENT_SECRET,
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: DISCORD_REDIRECT_URI,
+      scope: 'identify',
+    }), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Fetch user information
+    const userResponse = await axios.get('https://discord.com/api/users/@me', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    const user = userResponse.data;
+    const username = `${user.username}#${user.discriminator}`;
+    const avatar = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://i.ibb.co/wgfvKYb/2.jpg';
+
+    // Store user info in session
+    req.session.username = username;
+    req.session.avatar = avatar;
+    req.session.save();
+
+    logger.info('User authenticated via Discord.', { username });
+
+    // Redirect back to chat
+    res.redirect('/chat');
+  } catch (error) {
+    logger.error('Error during Discord OAuth2 callback.', { error: error.message, source: '/discord-callback' });
+    res.status(500).send('Authentication failed.');
+  }
+});
+
 // ================== Chat Routes ================== //
 
-// GET /chat - Serve Chat Interface
+// GET /chat - Serve Chat Interface with Dark Mode and Discord Authentication
 app.get('/chat', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -395,44 +476,119 @@ app.get('/chat', (req, res) => {
         <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
                 crossorigin="anonymous"></script>
         <style>
-            body { font-family: Arial, sans-serif; background-color: #f0f0f0; }
-            #chat { width: 500px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-            #messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: #fafafa; }
-            #messageForm { display: flex; }
-            #messageForm input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-            #messageForm button { padding: 10px; border: none; background-color: #28a745; color: white; border-radius: 4px; margin-left: 5px; cursor: pointer; }
-            #messageForm button:hover { background-color: #218838; }
-            #usernameInput, #passwordInput { padding: 10px; width: calc(100% - 22px); margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
-            .message { display: flex; align-items: center; margin-bottom: 10px; }
-            .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
-            .content { background-color: #e2ffc7; padding: 10px; border-radius: 5px; max-width: 80%; position: relative; }
-            .timestamp { font-size: 0.8em; color: #666; position: absolute; bottom: -15px; right: 0; }
-            .system-message { text-align: center; color: #888; font-style: italic; margin: 10px 0; }
-            #loginModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-            #loginModalContent { background-color: #fff; padding: 20px; border-radius: 5px; width: 300px; }
-            #loginForm button { background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
-            #loginForm button:hover { background-color: #0069d9; }
+            body { 
+                font-family: Arial, sans-serif; 
+                background-color: #121212; 
+                color: #e0e0e0; 
+                transition: background-color 0.3s, color 0.3s;
+            }
+            #chat { 
+                width: 500px; 
+                margin: 50px auto; 
+                background: #1e1e1e; 
+                padding: 20px; 
+                border-radius: 5px; 
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+            }
+            #messages { 
+                height: 300px; 
+                overflow-y: scroll; 
+                border: 1px solid #333; 
+                padding: 10px; 
+                margin-bottom: 10px; 
+                background-color: #1e1e1e; 
+            }
+            #messageForm { 
+                display: flex; 
+            }
+            #messageForm input { 
+                flex: 1; 
+                padding: 10px; 
+                border: 1px solid #333; 
+                border-radius: 4px; 
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+            }
+            #messageForm button { 
+                padding: 10px; 
+                border: none; 
+                background-color: #7289da; 
+                color: white; 
+                border-radius: 4px; 
+                margin-left: 5px; 
+                cursor: pointer; 
+            }
+            #messageForm button:hover { 
+                background-color: #5b6eae; 
+            }
+            .message { 
+                display: flex; 
+                align-items: center; 
+                margin-bottom: 10px; 
+            }
+            .avatar { 
+                width: 40px; 
+                height: 40px; 
+                border-radius: 50%; 
+                margin-right: 10px; 
+            }
+            .content { 
+                background-color: #2f3136; 
+                padding: 10px; 
+                border-radius: 5px; 
+                max-width: 80%; 
+                position: relative; 
+            }
+            .timestamp { 
+                font-size: 0.8em; 
+                color: #72767d; 
+                position: absolute; 
+                bottom: -15px; 
+                right: 0; 
+            }
+            .system-message { 
+                text-align: center; 
+                color: #72767d; 
+                font-style: italic; 
+                margin: 10px 0; 
+            }
+            #discordLoginBtn { 
+                background-color: #7289da; 
+                color: white; 
+                border: none; 
+                padding: 10px 20px; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                margin-bottom: 10px;
+            }
+            #discordLoginBtn:hover { 
+                background-color: #5b6eae; 
+            }
+            #toggleDarkMode { 
+                background-color: #7289da; 
+                color: white; 
+                border: none; 
+                padding: 5px 10px; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                margin-bottom: 10px;
+                float: right;
+            }
+            #toggleDarkMode:hover { 
+                background-color: #5b6eae; 
+            }
         </style>
     </head>
     <body>
         <div id="chat">
             <h2>Live Chat</h2>
-            <input type="text" id="usernameInput" placeholder="Enter your username" required />
+            <button id="discordLoginBtn">Login with Discord</button>
+            <button id="toggleDarkMode">Toggle Dark Mode</button>
             <div id="messages"></div>
             <form id="messageForm">
                 <input type="text" id="messageInput" placeholder="Type your message..." required />
                 <button type="submit">Send</button>
             </form>
-        </div>
-
-        <!-- Login Modal -->
-        <div id="loginModal">
-            <div id="loginModalContent">
-                <h3>Reserved Username Login</h3>
-                <input type="password" id="passwordInput" placeholder="Enter your password" required />
-                <button id="loginButton">Login</button>
-                <p id="loginError" style="color: red; display: none;">Incorrect password. Please try again.</p>
-            </div>
         </div>
 
         <script>
@@ -441,66 +597,15 @@ app.get('/chat', (req, res) => {
             const messagesDiv = document.getElementById('messages');
             const messageForm = document.getElementById('messageForm');
             const messageInput = document.getElementById('messageInput');
-            const usernameInput = document.getElementById('usernameInput');
-
-            const loginModal = document.getElementById('loginModal');
-            const passwordInput = document.getElementById('passwordInput');
-            const loginButton = document.getElementById('loginButton');
-            const loginError = document.getElementById('loginError');
+            const discordLoginBtn = document.getElementById('discordLoginBtn');
+            const toggleDarkModeBtn = document.getElementById('toggleDarkMode');
 
             let username = '';
-            let authToken = '';
+            let avatar = '';
 
-            // Handle username input
-            usernameInput.addEventListener('change', () => {
-                username = usernameInput.value.trim();
-                if (username) {
-                    if (username.toLowerCase() === 'xpalidinx') {
-                        // Show login modal for reserved username
-                        loginModal.style.display = 'flex';
-                    } else {
-                        socket.emit('joinChat', { username });
-                    }
-                }
-            });
-
-            // Handle login
-            loginButton.addEventListener('click', async () => {
-                const password = passwordInput.value.trim();
-                if (password) {
-                    try {
-                        const response = await fetch('/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ username, password }),
-                        });
-
-                        const data = await response.json();
-                        if (response.ok && data.token) {
-                            authToken = data.token;
-                            socket.emit('joinChat', { username, authToken });
-                            loginModal.style.display = 'none';
-                            passwordInput.value = '';
-                            loginError.style.display = 'none';
-                        } else {
-                            loginError.style.display = 'block';
-                        }
-                    } catch (error) {
-                        console.error('Error during login:', error);
-                        loginError.style.display = 'block';
-                    }
-                }
-            });
-
-            // Close login modal when clicking outside the content
-            window.addEventListener('click', (event) => {
-                if (event.target == loginModal) {
-                    loginModal.style.display = 'none';
-                    passwordInput.value = '';
-                    loginError.style.display = 'none';
-                }
+            // Handle Discord Login
+            discordLoginBtn.addEventListener('click', () => {
+                window.location.href = '/discord-login';
             });
 
             // Display existing chat history
@@ -529,23 +634,6 @@ app.get('/chat', (req, res) => {
                 scrollMessagesToBottom();
             });
 
-            // Handle login required
-            socket.on('loginRequired', (data) => {
-                alert(data.message);
-            });
-
-            // Handle login success
-            socket.on('loginSuccess', (data) => {
-                alert(data.message);
-                // Store the token if needed
-                // const token = data.token;
-            });
-
-            // Handle login failed
-            socket.on('loginFailed', (data) => {
-                alert(data.message);
-            });
-
             // Handle error messages
             socket.on('error', (data) => {
                 alert(data.message);
@@ -559,9 +647,26 @@ app.get('/chat', (req, res) => {
                     socket.emit('chatMessage', { message });
                     messageInput.value = '';
                 } else if (!username) {
-                    alert('Please enter a username before sending messages.');
+                    alert('Please log in with Discord before sending messages.');
                 }
             });
+
+            // Handle chat history and user info from server session
+            window.onload = () => {
+                fetch('/get-user')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.username && data.avatar) {
+                            username = data.username;
+                            avatar = data.avatar;
+                            discordLoginBtn.style.display = 'none';
+                            socket.emit('joinChat', { username, avatar });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user data:', error);
+                    });
+            };
 
             function appendMessage(msg) {
                 // Sanitize message content
@@ -614,10 +719,48 @@ app.get('/chat', (req, res) => {
                 const pattern = new RegExp('^(https?:\\/\\/)[^\\s$.?#].[^\\s]*$', 'gm');
                 return pattern.test(url) ? url : '';
             }
+
+            // Dark Mode Toggle
+            toggleDarkModeBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    toggleDarkModeBtn.textContent = 'Light Mode';
+                } else {
+                    toggleDarkModeBtn.textContent = 'Dark Mode';
+                }
+            });
+
+            // Optional: Save user preference in localStorage
+            window.addEventListener('load', () => {
+                if (localStorage.getItem('darkMode') === 'enabled') {
+                    document.body.classList.add('dark-mode');
+                    toggleDarkModeBtn.textContent = 'Light Mode';
+                }
+            });
+
+            toggleDarkModeBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                    toggleDarkModeBtn.textContent = 'Light Mode';
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                    toggleDarkModeBtn.textContent = 'Dark Mode';
+                }
+            });
         </script>
     </body>
     </html>
   `);
+});
+
+// Endpoint to get user info from session
+app.get('/get-user', (req, res) => {
+  if (req.session.username && req.session.avatar) {
+    res.json({ username: req.session.username, avatar: req.session.avatar });
+  } else {
+    res.json({});
+  }
 });
 
 // POST /login - Handle Reserved Username Login
@@ -655,33 +798,24 @@ const io = new SocketIOServer(serverInstance, {
   },
 });
 
+// Share session with Socket.IO
+io.use(sharedSession(sessionMiddleware, {
+  autoSave: true
+}));
+
 io.on('connection', (socket) => {
   logger.info('A user connected via Socket.IO', { socketId: socket.id });
 
-  // Handle user joining the chat
-  socket.on('joinChat', (data) => {
-    let { username, authToken } = data;
-    if (!username) {
-      username = `Guest${Math.floor(Math.random() * 10000)}`; // Assign a random guest username
-    }
-
-    if (username.toLowerCase() === RESERVED_USERNAME.toLowerCase()) {
-      if (authToken && validTokens[authToken] && validTokens[authToken] === username) {
-        socket.username = username;
-        socket.avatar = getRandomProfilePicture(username);
-        logger.info(`User reconnected as ${socket.username}`, { socketId: socket.id });
-        io.emit('userConnected', socket.username);
-      } else {
-        socket.emit('loginRequired', { message: 'Login required for reserved username.' });
-        return;
-      }
-    } else {
-      socket.username = username;
-      socket.avatar = getRandomProfilePicture(username);
-      logger.info(`User joined the chat: ${socket.username}`, { socketId: socket.id });
-      io.emit('userConnected', socket.username);
-    }
-  });
+  const session = socket.handshake.session;
+  if (session && session.username) {
+    socket.username = session.username;
+    socket.avatar = session.avatar;
+    io.emit('userConnected', socket.username);
+  } else {
+    socket.emit('error', { message: 'Authentication required.' });
+    socket.disconnect();
+    return;
+  }
 
   // Handle incoming chat messages from clients
   socket.on('chatMessage', (data) => {
@@ -698,7 +832,7 @@ io.on('connection', (socket) => {
       username: socket.username,
       message: sanitizedMessage,
       timestamp: new Date().toISOString(),
-      avatar: socket.avatar || getRandomProfilePicture(socket.username),
+      avatar: socket.avatar || 'https://i.ibb.co/wgfvKYb/2.jpg',
     };
 
     chatHistory.push(chatMessage);
@@ -855,3 +989,75 @@ function sanitizeString(str) {
   if (typeof str !== 'string') return '';
   return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+// ================== Socket.IO Integration ================== //
+
+const ioServer = new SocketIOServer(serverInstance, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Share session with Socket.IO
+ioServer.use(sharedSession(sessionMiddleware, {
+  autoSave: true
+}));
+
+ioServer.on('connection', (socket) => {
+  logger.info('A user connected via Socket.IO', { socketId: socket.id });
+
+  const session = socket.handshake.session;
+  if (session && session.username) {
+    socket.username = session.username;
+    socket.avatar = session.avatar;
+    ioServer.emit('userConnected', socket.username);
+  } else {
+    socket.emit('error', { message: 'Authentication required.' });
+    socket.disconnect();
+    return;
+  }
+
+  // Handle incoming chat messages from clients
+  socket.on('chatMessage', (data) => {
+    const { message } = data;
+    if (!socket.username || !message) {
+      socket.emit('error', { message: 'Username and message are required.' });
+      return;
+    }
+
+    // Sanitize message on server side
+    const sanitizedMessage = sanitizeString(message);
+
+    const chatMessage = {
+      username: socket.username,
+      message: sanitizedMessage,
+      timestamp: new Date().toISOString(),
+      avatar: socket.avatar || 'https://i.ibb.co/wgfvKYb/2.jpg',
+    };
+
+    chatHistory.push(chatMessage);
+
+    logger.info('Received chat message', { username: socket.username, message: sanitizedMessage, socketId: socket.id });
+
+    // Broadcast the message to all connected clients
+    ioServer.emit('chatMessage', chatMessage);
+  });
+
+  // Handle user disconnect
+  socket.on('disconnect', () => {
+    if (socket.username) {
+      ioServer.emit('userDisconnected', socket.username);
+      logger.info('User disconnected', { username: socket.username, socketId: socket.id });
+      // Remove token if any
+      for (const token in validTokens) {
+        if (validTokens[token] === socket.username) {
+          delete validTokens[token];
+          break;
+        }
+      }
+    } else {
+      logger.info('A user disconnected', { socketId: socket.id });
+    }
+  });
+});
