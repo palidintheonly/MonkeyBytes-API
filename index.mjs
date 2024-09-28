@@ -75,6 +75,12 @@ async function getRandomDogImage() {
   }
 }
 
+function getRandomProfilePicture(username) {
+  const profilePictureUrl = `https://robohash.org/${encodeURIComponent(username)}.png`;
+  logger.debug('Generated random profile picture URL.', { profilePictureUrl, source: 'getRandomProfilePicture' });
+  return profilePictureUrl;
+}
+
 function generateRandomBotName() {
   const adjectives = [
     'Barking',
@@ -206,43 +212,37 @@ app.get('/', async (req, res) => {
           <h1>Welcome to the MonkeyBytes-API</h1>
           <div class="box">
               <h2>About the API</h2>
-              <p>This API allows users to interact with various endpoints, providing random images, bot names, and facts styled after medieval English.</p>
+              <p>This API allows users to interact with various endpoints, providing random images, bot names, and facts styled in medieval English, with Reddit RSS integration for Discord posting.</p>
           </div>
           <div class="box">
               <h2>Code Structure</h2>
               <p>The code is organized into multiple sections:</p>
               <ul>
                   <li><strong>Configuration Constants:</strong> This section defines constants like port numbers, URLs, and reserved credentials.</li>
-                  <li><strong>Utility Functions:</strong> Contains helper functions for shuffling images, generating random names, and retrieving updates.</li>
-                  <li><strong>Routes:</strong> Defines the API endpoints, including this root route and others like <code>/testing</code>.</li>
+                  <li><strong>Setup Directory Paths:</strong> Defines directory paths and filenames using <code>fileURLToPath</code> and <code>path</code> utilities.</li>
+                  <li><strong>Initialize Express App:</strong> Sets up the Express app, applying security middleware like <code>helmet</code>.</li>
+                  <li><strong>Initialize Logger:</strong> Sets up Winston for logging application events with colorized output and timestamps.</li>
+                  <li><strong>Utility Functions:</strong> Contains helper functions for reading update files, fetching random dog images, generating bot names, and more.</li>
+                  <li><strong>Routes:</strong> Describes the noble pathways through which honorable guests may interact with the realm's API:
+                      <ul>
+                          <li><strong>/:</strong> The gateway to the kingdom, where a noble lord or lady may learn of the API’s purpose and its latest decrees.</li>
+                          <li><strong>/testing:</strong> A path of great intrigue, where a visitor shall receive a randomized dog image, a bot name fit for a playful hound, and a fact worthy of any royal court's conversation.</li>
+                      </ul>
+                  </li>
+                  <li><strong>Asynchronous Tasks:</strong> Undertakes duties such as fetching and posting the latest from the Reddit kingdom to Discord.</li>
                   <li><strong>NPM Packages Used:</strong>
                       <ul>
-                          <li><strong>express:</strong> A web application framework for building APIs and handling HTTP requests and responses.</li>
-                          <li><strong>fs/promises:</strong> A promise-based API for interacting with the file system, used to read the updates.json file.</li>
-                          <li><strong>path:</strong> A utility module for handling and transforming file paths, used to locate files within the project.</li>
-                          <li><strong>winston:</strong> A versatile logging library for recording logs with timestamps and formatting them with colors.</li>
-                          <li><strong>helmet:</strong> A middleware that helps secure Express apps by setting various HTTP headers.</li>
-                          <li><strong>axios:</strong> A promise-based HTTP client used for making requests to external APIs like Reddit and Discord.</li>
-                          <li><strong>xml2js:</strong> A library for parsing XML data into JSON format, used to process Reddit's RSS feed.</li>
-                          <li><strong>html-entities:</strong> A library for decoding HTML entities, used to clean up text retrieved from external APIs.</li>
+                          <li><strong>express:</strong> A framework most versatile for building the castle’s web-based applications and handling the scrolls of request and response.</li>
+                          <li><strong>fs/promises:</strong> A promise-based API for engaging with the kingdom's file system, especially for reading the sacred updates.json scroll.</li>
+                          <li><strong>path:</strong> A utility module for navigating the labyrinth of file paths, ensuring safe passage to each desired location within the castle.</li>
+                          <li><strong>winston:</strong> A logging scribe, recording each event in the annals of history with color and precision.</li>
+                          <li><strong>helmet:</strong> A safeguard for the castle, fortifying its Express walls with headers that protect against invaders.</li>
+                          <li><strong>axios:</strong> A trusted messenger, delivering and receiving missives from far-off lands like Reddit and Discord.</li>
+                          <li><strong>xml2js:</strong> A wise translator, converting the arcane language of XML into JSON for easier understanding.</li>
+                          <li><strong>html-entities:</strong> A tool for decoding the magical symbols found within external scrolls and messages.</li>
                       </ul>
                   </li>
               </ul>
-          </div>
-          <div class="box">
-              <h2>Features</h2>
-              <div class="box">
-                  <h3>Random Images</h3>
-                  <p>This API provides randomly selected images from the Dog CEO API, ensuring a unique experience with every request.</p>
-              </div>
-              <div class="box">
-                  <h3>Random Bot Names</h3>
-                  <p>Need a bot name? This API can generate a random name composed of an adjective and noun, with a four-digit number appended.</p>
-              </div>
-              <div class="box">
-                  <h3>Fun Facts</h3>
-                  <p>For a bit of fun, the API also returns facts about man’s first best friend styled in the speech of 1066 UK, adding a whimsical touch to your interactions.</p>
-              </div>
           </div>
           <div class="box">
               <h2>Guide for Dummies</h2>
@@ -320,6 +320,7 @@ app.get('/testing', async (req, res) => {
     const botName = generateRandomBotName();
     const randomIndex = Math.floor(Math.random() * facts.length);
     const randomFact = { ...facts[randomIndex] };
+    const avatarUrl = getRandomProfilePicture(botName);
 
     logger.debug('Random fact selected.', { factId: randomFact.id, source: '/testing' });
 
@@ -327,6 +328,7 @@ app.get('/testing', async (req, res) => {
     randomFact.testimage1 = testImage1Url;
     randomFact.testimage2 = testImage2Url;
     randomFact.testingBotName = botName;
+    randomFact.avatar = avatarUrl;
 
     res.json(randomFact);
   } catch (error) {
