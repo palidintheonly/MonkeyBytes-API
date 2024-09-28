@@ -172,7 +172,7 @@ const facts = [
 
 // Root Endpoint
 app.get('/', async (req, res) => {
-  logger.info('Root endpoint accessed.', { endpoint: '/' });
+  logger.info('The noble root endpoint hath been accessed.', { endpoint: '/' });
   try {
     const updates = await getUpdates();
     res.set('Content-Type', 'text/html; charset=utf-8');
@@ -181,7 +181,7 @@ app.get('/', async (req, res) => {
       <html lang="en">
       <head>
           <meta charset="UTF-8">
-          <title>MonkeyBytes-API Dashboard</title>
+          <title>MonkeyBytes-API Royal Court</title>
           <style>
               body { 
                   font-family: Arial, sans-serif; 
@@ -209,28 +209,28 @@ app.get('/', async (req, res) => {
           </style>
       </head>
       <body>
-          <h1>Welcome to the MonkeyBytes-API</h1>
+          <h1>Welcome to the MonkeyBytes-API Royal Court</h1>
           <div class="box">
               <h2>About the API</h2>
-              <p>This API allows users to interact with various endpoints, providing random images, bot names, and facts styled in medieval English, with Reddit RSS integration for Discord posting.</p>
+              <p>This API alloweth the honored user to engage with sundry endpoints, granting random images, bot names, and facts spun in the tongue of medieval England, with tidings from the land of Reddit posted to the realm of Discord.</p>
           </div>
           <div class="box">
               <h2>Code Structure</h2>
-              <p>The code is organized into multiple sections:</p>
+              <p>The script is most wisely organized into several noble sections:</p>
               <ul>
-                  <li><strong>Configuration Constants:</strong> This section defines constants like port numbers, URLs, and reserved credentials.</li>
-                  <li><strong>Setup Directory Paths:</strong> Defines directory paths and filenames using <code>fileURLToPath</code> and <code>path</code> utilities.</li>
-                  <li><strong>Initialize Express App:</strong> Sets up the Express app, applying security middleware like <code>helmet</code>.</li>
-                  <li><strong>Initialize Logger:</strong> Sets up Winston for logging application events with colorized output and timestamps.</li>
-                  <li><strong>Utility Functions:</strong> Contains helper functions for reading update files, fetching random dog images, generating bot names, and more.</li>
-                  <li><strong>Routes:</strong> Describes the noble pathways through which honorable guests may interact with the realm's API:
+                  <li><strong>Configuration Constants:</strong> Herein are defined the constants of the realm, such as port numbers, URLs, and sacred credentials.</li>
+                  <li><strong>Setup Directory Paths:</strong> The pathways and filenames are established using <code>fileURLToPath</code> and <code>path</code> to guide the way.</li>
+                  <li><strong>Initialize Express App:</strong> The Express app is readied, with security ensured through the application of the <code>helmet</code> middleware.</li>
+                  <li><strong>Initialize Logger:</strong> Winston, the trusted scribe, is set to record all events of note with color and precision, as time passes in the kingdom.</li>
+                  <li><strong>Utility Functions:</strong> The realm is blessed with helper functions for reading scrolls, fetching random images of hounds, generating bot names, and more.</li>
+                  <li><strong>Routes:</strong> These noble pathways allow guests to interact with the kingdom's API:
                       <ul>
-                          <li><strong>/:</strong> The gateway to the kingdom, where a noble lord or lady may learn of the API’s purpose and its latest decrees.</li>
-                          <li><strong>/testing:</strong> A path of great intrigue, where a visitor shall receive a randomized dog image, a bot name fit for a playful hound, and a fact worthy of any royal court's conversation.</li>
+                          <li><strong>/:</strong> The grand gateway to the kingdom, where noble lords and ladies may learn of the API’s purpose and latest decrees.</li>
+                          <li><strong>/testing:</strong> A path of great intrigue, where visitors shall receive a randomized image of a hound, a bot name fit for a playful pup, and a fact worthy of any royal court's conversation.</li>
                       </ul>
                   </li>
-                  <li><strong>Asynchronous Tasks:</strong> Undertakes duties such as fetching and posting the latest from the Reddit kingdom to Discord.</li>
-                  <li><strong>NPM Packages Used:</strong>
+                  <li><strong>Asynchronous Tasks:</strong> Duties are undertaken to fetch and post the latest from the Reddit kingdom to the Discord realm.</li>
+                  <li><strong>NPM Packages Used:</strong> 
                       <ul>
                           <li><strong>express:</strong> A framework most versatile for building the castle’s web-based applications and handling the scrolls of request and response.</li>
                           <li><strong>fs/promises:</strong> A promise-based API for engaging with the kingdom's file system, especially for reading the sacred updates.json scroll.</li>
@@ -245,16 +245,16 @@ app.get('/', async (req, res) => {
               </ul>
           </div>
           <div class="box">
-              <h2>Guide for Dummies</h2>
-              <p>Using this API is as simple as pie:</p>
+              <h2>A Guide for the Unenlightened</h2>
+              <p>Using this API is as simple as breaking one's fast:</p>
               <ol>
-                  <li>To get a random image, simply send a GET request to <code>/testing</code>.</li>
-                  <li>If you want a random bot name, you'll also find it in the response from <code>/testing</code>.</li>
-                  <li>Want a fun fact? You guessed it—<code>/testing</code> will give you one, too!</li>
+                  <li>To receive a random image, simply dispatch a GET request to <code>/testing</code>.</li>
+                  <li>If thou dost desire a random bot name, it shall also be found in the response from <code>/testing</code>.</li>
+                  <li>If a fun fact is what thou seekest, verily—<code>/testing</code> shall bestow one upon thee!</li>
               </ol>
           </div>
           <div class="box">
-              <h2>Latest Updates</h2>
+              <h2>Latest Decrees</h2>
               ${updates
                 .map(
                   (update) => `
@@ -312,7 +312,7 @@ app.get('/', async (req, res) => {
 
 // Testing Endpoint
 app.get('/testing', async (req, res) => {
-  logger.info('Endpoint accessed.', { endpoint: '/testing' });
+  logger.info('The testing endpoint hath been accessed.', { endpoint: '/testing' });
 
   try {
     const testImage1Url = await getRandomDogImage();
@@ -342,22 +342,22 @@ app.get('/testing', async (req, res) => {
 // ================== Asynchronous Tasks ================== //
 
 async function fetchRedditRSS() {
-  logger.info('Commencing fetch of Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
+  logger.info('Commencing the fetch of the Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
   try {
     const response = await axios.get(REDDIT_RSS_URL);
     const rssData = response.data;
     const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
     const jsonData = await parser.parseStringPromise(rssData);
-    logger.info('Reddit RSS feed successfully fetched and parsed.', { source: 'fetchRedditRSS' });
+    logger.info('The Reddit RSS feed was successfully fetched and parsed.', { source: 'fetchRedditRSS' });
     return jsonData;
   } catch (error) {
-    logger.error('Error whilst fetching Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
+    logger.error('An error hath occurred whilst fetching the Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
     return null;
   }
 }
 
 async function postNewestToDiscord() {
-  logger.info('Initiating the process to post newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
+  logger.info('Initiating the process to post the newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
   const redditData = await fetchRedditRSS();
 
   if (!redditData || !redditData.feed || !redditData.feed.entry) {
@@ -367,10 +367,10 @@ async function postNewestToDiscord() {
 
   const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
   const newestPosts = entries.slice(0, 5);
-  logger.info('Extracted the newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
+  logger.info('The newest posts have been extracted from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
 
   if (newestPosts.length === 0) {
-    logger.warn('No new posts found to dispatch.', { source: 'postNewestToDiscord' });
+    logger.warn('No new posts were found to dispatch.', { source: 'postNewestToDiscord' });
     return;
   }
 
@@ -388,9 +388,9 @@ async function postNewestToDiscord() {
 
   try {
     await axios.post(DISCORD_WEBHOOK_URL, payload);
-    logger.info('Initial message posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+    logger.info('The initial message was posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
   } catch (error) {
-    logger.error('Error whilst posting initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+    logger.error('An error hath occurred whilst posting the initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
     if (error.response && error.response.data) {
       logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
     }
@@ -434,9 +434,9 @@ async function postNewestToDiscord() {
 
     try {
       await axios.post(DISCORD_WEBHOOK_URL, payload);
-      logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+      logger.info('The embed was posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
     } catch (error) {
-      logger.error('Error whilst posting embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+      logger.error('An error hath occurred whilst posting the embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
       if (error.response && error.response.data) {
         logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
       }
@@ -450,13 +450,13 @@ setInterval(postNewestToDiscord, 30000);
 // ================== Start the Server ================== //
 
 app.listen(PORT, '0.0.0.0', () => {
-  logger.info(`Server running at http://us2.bot-hosting.net:${PORT}`);
+  logger.info(`The server is running at http://us2.bot-hosting.net:${PORT}`);
 });
 
 // ================== 404 Error Handler ================== //
 
 app.use((req, res) => {
-  logger.warn('Unknown endpoint accessed.', { path: req.path, source: '404Handler' });
+  logger.warn('An unknown endpoint hath been accessed.', { path: req.path, source: '404Handler' });
   res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
 
