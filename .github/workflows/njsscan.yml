@@ -10,10 +10,10 @@ name: njsscan sarif
 
 on:
   push:
-    branches: [ "BETA" ]
+    branches: [ "LIVE-PRODUCTION" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "BETA" ]
+    branches: [ "LIVE-PRODUCTION" ]
   schedule:
     - cron: '16 15 * * 0'
 
