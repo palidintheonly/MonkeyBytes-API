@@ -77,27 +77,27 @@ async function getRandomDogImage() {
 
 function generateRandomBotName() {
   const adjectives = [
-    'Ghooghle',
-    'Alphabeta',
-    'Betacode',
-    'Qyantum',
-    'Novus',
-    'Nebulab',
-    'Ethereon',
-    'Lumina',
-    'Mysticus',
+    'Barking',
+    'Waggy',
+    'Sniffy',
+    'Drooly',
+    'Furry',
+    'Pawsy',
+    'Playful',
+    'Chewy',
+    'Fluffy',
   ];
 
   const nouns = [
-    'Gliph',
-    'Cypher',
-    'Runic',
-    'Scriptum',
-    'Atlaz',
-    'Echoom',
-    'Vortyx',
-    'Reyalm',
-    'Spectyr',
+    'Tailwagger',
+    'Bonechaser',
+    'Pawsome',
+    'Snoutster',
+    'Whisker',
+    'Furball',
+    'Barker',
+    'Woofster',
+    'Pupper',
   ];
 
   const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
@@ -105,7 +105,7 @@ function generateRandomBotName() {
   const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
 
   const botName = `${randomAdjective}${randomNoun}${number}`;
-  logger.debug('Generated random bot name.', { botName, source: 'generateRandomBotName' });
+  logger.debug('Generated random doggy bot name.', { botName, source: 'generateRandomBotName' });
   return botName;
 }
 
