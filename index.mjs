@@ -11,8 +11,10 @@ import { decode } from 'html-entities';
 // ================== Configuration Constants ================== //
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+const DISCORD_WEBHOOK_URL_ALT = 'https://discord.com/api/webhooks/1289677050554224661/F8BUQn0hQvsNFlfeJvfXCNcBfWpINo_wcvaWi-uyKLOIYXKkA-F8Rj716bqOBScUetwy';
 const PORT = 21560;
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
+const REDDIT_RSS_URL_ALT = 'https://www.reddit.com/r/discord/new/.rss';
 
 // ================== Setup Directory Paths ================== //
 
@@ -341,24 +343,23 @@ app.get('/testing', async (req, res) => {
 
 // ================== Asynchronous Tasks ================== //
 
-async function fetchRedditRSS() {
-  logger.info('Commencing the fetch of the Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
+async function fetchRedditRSS(url) {
+  logger.info(`Commencing fetch of Reddit RSS feed from ${url}.`, { url, source: 'fetchRedditRSS' });
   try {
-    const response = await axios.get(REDDIT_RSS_URL);
+    const response = await axios.get(url);
     const rssData = response.data;
     const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
     const jsonData = await parser.parseStringPromise(rssData);
-    logger.info('The Reddit RSS feed was successfully fetched and parsed.', { source: 'fetchRedditRSS' });
+    logger.info('Reddit RSS feed successfully fetched and parsed.', { source: 'fetchRedditRSS' });
     return jsonData;
   } catch (error) {
-    logger.error('An error hath occurred whilst fetching the Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
+    logger.error('Error whilst fetching Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
     return null;
   }
 }
 
-async function postNewestToDiscord() {
-  logger.info('Initiating the process to post the newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
-  const redditData = await fetchRedditRSS();
+async function postNewestToDiscord(webhookUrl, redditData) {
+  logger.info(`Initiating the process to post the newest Reddit posts to Discord via webhook ${webhookUrl}.`, { source: 'postNewestToDiscord' });
 
   if (!redditData || !redditData.feed || !redditData.feed.entry) {
     logger.error('Invalid Reddit RSS feed data received.', { data: redditData, source: 'postNewestToDiscord' });
@@ -367,10 +368,10 @@ async function postNewestToDiscord() {
 
   const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
   const newestPosts = entries.slice(0, 5);
-  logger.info('The newest posts have been extracted from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
+  logger.info('Extracted the newest posts from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
 
   if (newestPosts.length === 0) {
-    logger.warn('No new posts were found to dispatch.', { source: 'postNewestToDiscord' });
+    logger.warn('No new posts found to dispatch.', { source: 'postNewestToDiscord' });
     return;
   }
 
@@ -387,10 +388,10 @@ async function postNewestToDiscord() {
   };
 
   try {
-    await axios.post(DISCORD_WEBHOOK_URL, payload);
-    logger.info('The initial message was posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+    await axios.post(webhookUrl, payload);
+    logger.info('Initial message posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
   } catch (error) {
-    logger.error('An error hath occurred whilst posting the initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+    logger.error('Error whilst posting initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
     if (error.response && error.response.data) {
       logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
     }
@@ -433,10 +434,10 @@ async function postNewestToDiscord() {
     };
 
     try {
-      await axios.post(DISCORD_WEBHOOK_URL, payload);
-      logger.info('The embed was posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
+      await axios.post(webhookUrl, payload);
+      logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
     } catch (error) {
-      logger.error('An error hath occurred whilst posting the embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+      logger.error('Error whilst posting embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
       if (error.response && error.response.data) {
         logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
       }
@@ -444,8 +445,18 @@ async function postNewestToDiscord() {
   }
 }
 
+// ================== Task Schedulers ================== //
+
+async function handleRedditFetches() {
+  const redditData1 = await fetchRedditRSS(REDDIT_RSS_URL);
+  const redditData2 = await fetchRedditRSS(REDDIT_RSS_URL_ALT);
+
+  await postNewestToDiscord(DISCORD_WEBHOOK_URL, redditData1);
+  await postNewestToDiscord(DISCORD_WEBHOOK_URL_ALT, redditData2);
+}
+
 // Fetch and post Reddit RSS data every 30 seconds
-setInterval(postNewestToDiscord, 30000);
+setInterval(handleRedditFetches, 30000);
 
 // ================== Start the Server ================== //
 
