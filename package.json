@@ -1,40 +1,48 @@
 {
-  "name": "monkey-bytes-api",
+  "name": "monkeybytes-api",
   "version": "1.0.0",
-  "description": "An Express API server enhanced with Socket.IO, Async, and ESLint integrations.",
-  "main": "server.mjs",
+  "description": "A fun and dog-themed API that serves random images, bot names, and facts styled in medieval English, with Reddit RSS integration for Discord posting.",
+  "main": "index.mjs",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "start": "node index.mjs",
+    "dev": "nodemon index.mjs"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "helmet": "^7.0.0",
+    "html-entities": "^2.3.3",
+    "winston": "^3.8.2",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/monkeybytes-api.git"
   },
   "keywords": [
     "express",
-    "socket.io",
     "api",
-    "winston",
-    "helmet",
-    "axios",
-    "xml2js",
-    "crypto",
-    "html-entities",
-    "async",
-    "eslint"
+    "dog",
+    "fun",
+    "medieval",
+    "random",
+    "bot",
+    "discord",
+    "reddit",
+    "rss"
   ],
   "author": "Your Name",
   "license": "MIT",
-  "dependencies": {
-    "async": "^3.2.4",
-    "axios": "^1.4.0",
-    "express": "^4.18.2",
-    "helmet": "^7.1.0",
-    "html-entities": "^2.3.3",
-    "socket.io": "^4.7.2",
-    "winston": "^3.9.0",
-    "xml2js": "^0.6.2"
+  "bugs": {
+    "url": "https://github.com/yourusername/monkeybytes-api/issues"
   },
-  "devDependencies": {
-    "eslint": "^9.11.1"
-  }
+  "homepage": "https://github.com/yourusername/monkeybytes-api#readme"
 }
