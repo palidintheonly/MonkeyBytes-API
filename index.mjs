@@ -5,12 +5,14 @@ import { fileURLToPath } from 'url';
 import winston from 'winston';
 import helmet from 'helmet';
 import axios from 'axios';
+import xml2js from 'xml2js';
 import { decode } from 'html-entities';
 
 // ================== Configuration Constants ================== //
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 const PORT = 21560;
+const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
 
 // ================== Setup Directory Paths ================== //
 
@@ -221,6 +223,7 @@ app.get('/', async (req, res) => {
                           <li><strong>winston:</strong> A versatile logging library for recording logs with timestamps and formatting them with colors.</li>
                           <li><strong>helmet:</strong> A middleware that helps secure Express apps by setting various HTTP headers.</li>
                           <li><strong>axios:</strong> A promise-based HTTP client used for making requests to external APIs like Reddit and Discord.</li>
+                          <li><strong>xml2js:</strong> A library for parsing XML data into JSON format, used to process Reddit's RSS feed.</li>
                           <li><strong>html-entities:</strong> A library for decoding HTML entities, used to clean up text retrieved from external APIs.</li>
                       </ul>
                   </li>
@@ -337,9 +340,9 @@ app.get('/testing', async (req, res) => {
 // ================== Asynchronous Tasks ================== //
 
 async function fetchRedditRSS() {
-  logger.info('Commencing fetch of Reddit RSS feed.', { source: 'fetchRedditRSS' });
+  logger.info('Commencing fetch of Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
   try {
-    const response = await axios.get('https://www.reddit.com/r/all/new/.rss');
+    const response = await axios.get(REDDIT_RSS_URL);
     const rssData = response.data;
     const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
     const jsonData = await parser.parseStringPromise(rssData);
