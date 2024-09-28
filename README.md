@@ -6,8 +6,8 @@ Welcome, noble traveler, to the realm of MonkeyBytes-API. Herein lies your gatew
 
 ## ⚔️ Available Routes
 
-- **`/`** - An overview of the server's status and the latest proclamations.
-- **`/testing`** - A pathway that bestows upon thee random tales accompanied by images from the loyal hounds of distant lands.
+- **`/`** - The grand gateway to the kingdom, where noble lords and ladies may learn of the API’s purpose and its latest proclamations.
+- **`/testing`** - A pathway of great intrigue, bestowing upon thee random tales of hounds from distant lands, along with images of these loyal creatures.
 
 ## ⏳ Server Status
 
@@ -17,12 +17,11 @@ Our server hath remained steadfast for **X days, Y hours, Z minutes, and A secon
 
 Stay informed with the most recent decrees:
 
-- **Integrated Reddit RSS Feed** - *Our server now fetches the latest posts from Reddit every 30 seconds and shares them upon our Discord channel.*
-- **Added `/testing` Route** - *Embark upon the new `/testing` endpoint to receive random facts accompanied by images from random.dog and RoboHash.*
-- **Enhanced Security with Helmet** - *Implemented Helmet to secure our API by setting various HTTP headers, warding off common threats.*
-- **Comprehensive Logging with Winston** - *Set up Winston to chronicle detailed logs of server events and errors, ensuring transparency.*
-- **Random Profile Picture Generation** - *Utilized crypto for secure randomization and RoboHash for generating random profile pictures.*
-- **Improved Error Handling** - *Enhanced error responses to ensure users receive meaningful messages when encountering issues.*
+- **Comprehensive API Overhaul and Medieval Theming** - *The API hath been fully transformed with responses, logs, and texts in the style of 1066 UK nobility, enriching the user experience.*
+- **Enhanced `/testing` Route** - *Venture forth to the `/testing` endpoint to receive randomized images of loyal hounds, bot names of medieval flair, and tales of days of yore.*
+- **Integration of Redis Caching** - *Implemented Redis as an in-memory store to cache frequently accessed data, ensuring swifter responses and reduced server strain.*
+- **Refinement of Discord Notifications** - *Discord messages are now dispatched with improved formatting and structured embeds, enhancing clarity and readability.*
+- **Randomized Profile Picture Generation** - *Employed Robohash to generate random avatars, adding variety to the visual identity of each bot.*
 
 ## 🔍 Behind the Scenes
 
@@ -33,11 +32,11 @@ Discover the noble technologies and tools that empower MonkeyBytes-API:
 - **Axios** - Our swift messenger, Axios, fetches tales and images from distant lands.
 - **xml2js** - The translator that converts the mystical RSS feed into a language our server can comprehend.
 - **crypto** - Provides secure randomization for various functionalities.
-- **Reddit RSS Feed** - Every 30 seconds, our server fetches the latest proclamations from Reddit and shares them upon our Discord channel.
+- **Redis Caching** - Employed to store and quickly retrieve frequently accessed data, ensuring the server’s efficiency.
 
 ## 📖 The `/testing` Route
 
-Upon traversing the **`/testing`** route, thou shalt receive a random tale of the first automaton, narrated in the words of a noble from days of yore, accompanied by a depiction of a loyal hound. These tales are inscribed within our code, ensuring their consistency.
+Upon traversing the **`/testing`** route, thou shalt receive a random tale of loyal hounds, narrated in the words of a noble from days of yore, accompanied by a depiction of these faithful creatures. Each response is inscribed with care, ensuring a unique experience with every request.
 
 ## 📡 Reddit Feed
 
@@ -96,8 +95,8 @@ Ensure thou hast the following installed upon thy machine:
 
 ### Usage
 
-- **Root Route (`/`)**: Visit `http://localhost:21560/` to behold the server overview, including uptime and latest updates.
-- **Testing Route (`/testing`)**: Venture to `http://localhost:21560/testing` to receive a random fact accompanied by images.
+- **Root Route (`/`)**: Visit `http://localhost:21560/` to behold the server overview, including uptime and the latest updates.
+- **Testing Route (`/testing`)**: Venture to `http://localhost:21560/testing` to receive a random tale accompanied by images of loyal hounds.
 
 ### Contributing
 
