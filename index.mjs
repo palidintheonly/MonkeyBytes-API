@@ -77,6 +77,34 @@ async function fetchRedditRSS(url) {
   }
 }
 
+async function postEmbedsSeparately(webhookUrl, proclamationMessage, embeds) {
+  // Post the title message first
+  try {
+    await axios.post(webhookUrl, { content: proclamationMessage });
+    logger.info('Proclamation message posted to Discord successfully.', { source: 'postEmbedsSeparately' });
+  } catch (error) {
+    logger.error('Error posting the proclamation message to Discord.', { error: error.message, source: 'postEmbedsSeparately' });
+    return;
+  }
+
+  // Post each embed separately
+  for (const embed of embeds) {
+    const payload = {
+      embeds: [embed],
+    };
+
+    try {
+      await axios.post(webhookUrl, payload);
+      logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postEmbedsSeparately' });
+    } catch (error) {
+      logger.error('Error whilst posting an embed to Discord.', { error: error.message, source: 'postEmbedsSeparately' });
+      if (error.response && error.response.data) {
+        logger.error('Discord API Response:', { response: error.response.data, source: 'postEmbedsSeparately' });
+      }
+    }
+  }
+}
+
 async function postNewestToDiscord(webhookUrl, redditData, previousPostIds, urlKey) {
   logger.info(`Initiating the process to post the newest Reddit posts to Discord via webhook ${webhookUrl}.`, { source: 'postNewestToDiscord' });
 
@@ -162,20 +190,7 @@ async function postNewestToDiscord(webhookUrl, redditData, previousPostIds, urlK
   }
 
   if (embeds.length > 0) {
-    const payload = {
-      content: proclamationMessage,
-      embeds: embeds,
-    };
-
-    try {
-      await axios.post(webhookUrl, payload);
-      logger.info('Proclamation and embeds posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
-    } catch (error) {
-      logger.error('Error whilst posting proclamation and embeds to Discord.', { error: error.message, source: 'postNewestToDiscord' });
-      if (error.response && error.response.data) {
-        logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
-      }
-    }
+    await postEmbedsSeparately(webhookUrl, proclamationMessage, embeds);
   }
 
   lastPostIds[urlKey] = newPostIds;
