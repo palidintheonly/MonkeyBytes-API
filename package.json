@@ -1,8 +1,9 @@
 {
   "name": "monkeybytes-api",
-  "version": "1.0.0",
-  "description": "An API that fetches random cat images, generates random bot names, and posts updates to Discord.",
-  "main": "index.js",
+  "version": "1.0.6",
+  "description": "54th update: An API that fetches random cat images, generates random bot names, and posts updates to Discord.",
+  "type": "module",
+  "main": "index.mjs",
   "author": "XpalidinX",
   "license": "MIT",
   "dependencies": {
@@ -12,6 +13,8 @@
     "cors": "^2.8.5",
     "cookie-parser": "^1.4.6",
     "morgan": "^1.10.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "xml2js": "^0.4.23",
+    "html-entities": "^2.3.2"
   }
 }
