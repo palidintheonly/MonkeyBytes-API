@@ -400,3 +400,4 @@ app.use((req, res) => {
   logger.warn('An unknown endpoint hath been accessed.', { path: req.path, source: '404Handler' });
   res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
+//FIXING ROUTE ROUTE ENDPOINT (/)
