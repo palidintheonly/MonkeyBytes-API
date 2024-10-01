@@ -272,7 +272,7 @@ app.get('/testing', async (req, res) => {
     // Generate a random profile picture based on bot name
     const avatarUrl = getRandomProfilePicture(botName);
 
-    // UK Unix timestamp
+    // UK Unix timestamp as a plain Unix number
     const ukUnix = Math.floor(new Date().getTime() / 1000);
 
     const responseData = {
@@ -281,7 +281,7 @@ app.get('/testing', async (req, res) => {
       testimage2: testImage2.url,
       testingBotName: botName,
       avatar: avatarUrl,
-      ukUnix: `<t:${ukUnix}:F> | <t:${ukUnix}:R>`, // Formatted for Discord
+      ukUnix, // Plain Unix timestamp
     };
 
     res.json(responseData);
