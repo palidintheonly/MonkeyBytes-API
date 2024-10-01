@@ -208,19 +208,6 @@ app.get('/', async (req, res) => {
                       </ul>
                   </li>
                   <li><strong>Asynchronous Tasks:</strong> Duties are undertaken to fetch and post the latest from the Reddit kingdom to the Discord realm.</li>
-                  <li><strong>NPM Packages Used:</strong> 
-                      <ul>
-                          <li><strong>express:</strong> A framework most versatile for building the castle’s web-based applications and handling the scrolls of request and response.</li>
-                          <li><strong>fs/promises:</strong> A promise-based API for engaging with the kingdom's file system, especially for reading the sacred updates.json scroll.</li>
-                          <li><strong>path:</strong> A utility module for navigating the labyrinth of file paths, ensuring safe passage to each desired location within the castle.</li>
-                          <li><strong>winston:</strong> A logging scribe, recording each event in the annals of history with color and precision.</li>
-                          <li><strong>helmet:</strong> A safeguard for the castle, fortifying its Express walls with headers that protect against invaders.</li>
-                          <li><strong>axios:</strong> A trusted messenger, delivering and receiving missives from far-off lands like Reddit and Discord.</li>
-                          <li><strong>cors:</strong> A tool for allowing noble guests from across different domains to communicate with our API.</li>
-                          <li><strong>morgan:</strong> A scribe, chronicling each request made to the kingdom’s API for posterity.</li>
-                          <li><strong>cookie-parser:</strong> A tool to read and manage cookies, those delectable morsels shared across the land.</li>
-                      </ul>
-                  </li>
               </ul>
           </div>
       </body>
@@ -285,12 +272,16 @@ app.get('/testing', async (req, res) => {
     // Generate a random profile picture based on bot name
     const avatarUrl = getRandomProfilePicture(botName);
 
+    // UK Unix timestamp
+    const ukUnix = Math.floor(new Date().getTime() / 1000);
+
     const responseData = {
       testText: randomFactText,
       testimage1: testImage1.url,
       testimage2: testImage2.url,
       testingBotName: botName,
       avatar: avatarUrl,
+      ukUnix: `<t:${ukUnix}:F> | <t:${ukUnix}:R>`, // Formatted for Discord
     };
 
     res.json(responseData);
