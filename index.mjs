@@ -191,8 +191,8 @@ async function handleRedditFetches() {
   await postNewestToDiscord(DISCORD_WEBHOOK_URL_ALT, redditData2, lastPostIds[REDDIT_RSS_URL_ALT], REDDIT_RSS_URL_ALT);
 }
 
-// Fetch and post Reddit RSS data every 30 seconds
-setInterval(handleRedditFetches, 30000);
+// Fetch and post Reddit RSS data every 5 minutes (300000ms)
+setInterval(handleRedditFetches, 300000);
 
 // ================== Routes ================== //
 
