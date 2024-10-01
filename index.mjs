@@ -208,7 +208,42 @@ app.get('/', async (req, res) => {
                       </ul>
                   </li>
                   <li><strong>Asynchronous Tasks:</strong> Duties are undertaken to fetch and post the latest from the Reddit kingdom to the Discord realm.</li>
+                  <li><strong>NPM Packages Used:</strong> 
+                      <ul>
+                          <li><strong>express:</strong> A framework most versatile for building the castle’s web-based applications and handling the scrolls of request and response.</li>
+                          <li><strong>fs/promises:</strong> A promise-based API for engaging with the kingdom's file system, especially for reading the sacred updates.json scroll.</li>
+                          <li><strong>path:</strong> A utility module for navigating the labyrinth of file paths, ensuring safe passage to each desired location within the castle.</li>
+                          <li><strong>winston:</strong> A logging scribe, recording each event in the annals of history with color and precision.</li>
+                          <li><strong>helmet:</strong> A safeguard for the castle, fortifying its Express walls with headers that protect against invaders.</li>
+                          <li><strong>axios:</strong> A trusted messenger, delivering and receiving missives from far-off lands like Reddit and Discord.</li>
+                          <li><strong>cors:</strong> A tool for allowing noble guests from across different domains to communicate with our API.</li>
+                          <li><strong>morgan:</strong> A scribe, chronicling each request made to the kingdom’s API for posterity.</li>
+                          <li><strong>cookie-parser:</strong> A tool to read and manage cookies, those delectable morsels shared across the land.</li>
+                      </ul>
+                  </li>
               </ul>
+          </div>
+          <div class="box">
+              <h2>A Guide for the Unenlightened</h2>
+              <p>Using this API is as simple as breaking one's fast:</p>
+              <ol>
+                  <li>To receive a random image, simply dispatch a GET request to <code>/testing</code>.</li>
+                  <li>If thou dost desire a random bot name, it shall also be found in the response from <code>/testing</code>.</li>
+                  <li>If a fun fact is what thou seekest, verily—<code>/testing</code> shall bestow one upon thee!</li>
+              </ol>
+          </div>
+          <div class="box">
+              <h2>Latest Decrees</h2>
+              ${updates
+                .map(
+                  (update) => `
+              <div class="box">
+                  <h3>${update.updateText}</h3>
+                  <p>${update.description.replace(/\n/g, '<br>')}</p>
+              </div>
+              `
+                )
+                .join('')}
           </div>
       </body>
       </html>
@@ -272,16 +307,13 @@ app.get('/testing', async (req, res) => {
     // Generate a random profile picture based on bot name
     const avatarUrl = getRandomProfilePicture(botName);
 
-    // UK Unix timestamp as a plain Unix number
-    const ukUnix = Math.floor(new Date().getTime() / 1000);
-
     const responseData = {
       testText: randomFactText,
       testimage1: testImage1.url,
       testimage2: testImage2.url,
       testingBotName: botName,
       avatar: avatarUrl,
-      ukUnix, // Plain Unix timestamp
+      ukUnix: Math.floor(Date.now() / 1000),
     };
 
     res.json(responseData);
@@ -400,4 +432,3 @@ app.use((req, res) => {
   logger.warn('An unknown endpoint hath been accessed.', { path: req.path, source: '404Handler' });
   res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
-//FIXING ROUTE ROUTE ENDPOINT (/)
