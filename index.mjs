@@ -8,6 +8,9 @@ import axios from 'axios';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+import { getHeapCodeStatistics } from 'v8';
+import { Entitlement, TextableGuildChannelsWithoutThreadsTypes } from 'oceanic.js';
+import { endianness } from 'os';
 
 // ================== Configuration Constants ================== //
 
@@ -308,3 +311,18 @@ app.use((req, res) => {
     logger.warn('An unknown endpoint hath been accessed.', { path: req.path, source: '404Handler' });
     res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
+//shoot myself in thy face
+//why?
+//why not?
+
+###eat my screws,
+##nail somthing
+#happy HTMLTableRowElement
+[getHeapCodeStatistics]
+{TextableGuildChannelsWithoutThreadsTypes
+    endianness
+     Entitlement, morgan,debugger,document
+
+     endpoint
+}
+//fhuck
