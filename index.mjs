@@ -11,8 +11,10 @@ import { decode } from 'html-entities';
 // ================== Configuration Constants ================== //
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
+const DISCORD_WEBHOOK_URL_ALT = 'https://discord.com/api/webhooks/1289677050554224661/F8BUQn0hQvsNFlfeJvfXCNcBfWpINo_wcvaWi-uyKLOIYXKkA-F8Rj716bqOBScUetwy';
 const PORT = 21560;
 const REDDIT_RSS_URL = 'https://www.reddit.com/r/all/new/.rss';
+const REDDIT_RSS_URL_ALT = 'https://www.reddit.com/r/discordapp/new.rss';
 
 // ================== Setup Directory Paths ================== //
 
@@ -51,122 +53,164 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
+// ================== State Variables ================== //
+
+let lastPostIds = {
+  [REDDIT_RSS_URL]: [],
+  [REDDIT_RSS_URL_ALT]: [],
+};
+
 // ================== Utility Functions ================== //
 
-async function getUpdates() {
+async function fetchRedditRSS(url) {
+  logger.info(`Commencing fetch of Reddit RSS feed from ${url}.`, { url, source: 'fetchRedditRSS' });
   try {
-    const data = await fs.readFile(path.join(__dirname, 'updates.json'), 'utf-8');
-    logger.info('Updates file successfully read.', { source: 'getUpdates' });
-    return JSON.parse(data);
+    const response = await axios.get(url);
+    const rssData = response.data;
+    const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
+    const jsonData = await parser.parseStringPromise(rssData);
+    logger.info('Reddit RSS feed successfully fetched and parsed.', { source: 'fetchRedditRSS' });
+    return jsonData;
   } catch (error) {
-    logger.error('Error reading updates.json.', { error: error.message, source: 'getUpdates' });
-    return [];
+    logger.error('Error whilst fetching Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
+    return null;
   }
 }
 
-async function getRandomDogImage() {
+async function postEmbedsSeparately(webhookUrl, proclamationMessage, embeds) {
+  // Post the title message first
   try {
-    const response = await axios.get('https://dog.ceo/api/breeds/image/random');
-    logger.debug('Random dog image fetched.', { imageUrl: response.data.message, source: 'getRandomDogImage' });
-    return response.data.message;
+    await axios.post(webhookUrl, { content: proclamationMessage });
+    logger.info('Proclamation message posted to Discord successfully.', { source: 'postEmbedsSeparately' });
   } catch (error) {
-    logger.error('Error fetching random dog image.', { error: error.message, source: 'getRandomDogImage' });
-    return 'https://i.ibb.co/wgfvKYb/2.jpg';
+    logger.error('Error posting the proclamation message to Discord.', { error: error.message, source: 'postEmbedsSeparately' });
+    return;
+  }
+
+  // Post each embed separately
+  for (const embed of embeds) {
+    const payload = {
+      embeds: [embed],
+    };
+
+    try {
+      await axios.post(webhookUrl, payload);
+      logger.info('Embed posted to Discord successfully.', { payloadSent: true, source: 'postEmbedsSeparately' });
+    } catch (error) {
+      logger.error('Error whilst posting an embed to Discord.', { error: error.message, source: 'postEmbedsSeparately' });
+      if (error.response && error.response.data) {
+        logger.error('Discord API Response:', { response: error.response.data, source: 'postEmbedsSeparately' });
+      }
+    }
   }
 }
 
-function getRandomProfilePicture(username) {
-  const profilePictureUrl = `https://robohash.org/${encodeURIComponent(username)}.png`;
-  logger.debug('Generated random profile picture URL.', { profilePictureUrl, source: 'getRandomProfilePicture' });
-  return profilePictureUrl;
+async function postNewestToDiscord(webhookUrl, redditData, previousPostIds, urlKey) {
+  logger.info(`Initiating the process to post the newest Reddit posts to Discord via webhook ${webhookUrl}.`, { source: 'postNewestToDiscord' });
+
+  if (!redditData || !redditData.feed || !redditData.feed.entry) {
+    logger.error('Invalid Reddit RSS feed data received.', { data: redditData, source: 'postNewestToDiscord' });
+    return;
+  }
+
+  const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
+  const newestPosts = entries.slice(0, 5);
+
+  const newPostIds = newestPosts.map(post => post.id);
+  const isNewPostAvailable = newPostIds.some(id => !previousPostIds.includes(id));
+
+  if (!isNewPostAvailable) {
+    logger.info('No new posts to report.', { source: 'postNewestToDiscord' });
+
+    const ukTime = new Date().toLocaleTimeString('en-GB', {
+      timeZone: 'Europe/London',
+      hour12: true,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
+    const noNewPostsMessage = `📜 **Hear ye, noble lords and ladies!**\n🕰️ As of the hour of ${ukTime} UK time, no new proclamations hath been made from the land of Reddit. We shall keep watch for any new tidings.`;
+
+    try {
+      await axios.post(webhookUrl, { content: noNewPostsMessage });
+      logger.info('No new posts message sent to Discord successfully.', { source: 'postNewestToDiscord' });
+    } catch (error) {
+      logger.error('Error whilst posting no new posts message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
+    }
+    return;
+  }
+
+  const ukTime = new Date().toLocaleTimeString('en-GB', {
+    timeZone: 'Europe/London',
+    hour12: true,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+
+  const proclamationMessage = `📜 **Hear ye, noble lords and ladies! A new proclamation hath been made!**\n🕰️ As of the hour of ${ukTime} UK time.`;
+
+  const embeds = [];
+
+  for (const post of newestPosts) {
+    if (previousPostIds.includes(post.id)) continue;
+
+    const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
+    const postContentRaw = post.content
+      ? typeof post.content === 'string'
+        ? post.content
+        : post.content._ || ''
+      : 'No content provided';
+    const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
+    const postContent = decode(postContentStripped);
+    const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
+    const postAuthor =
+      post.author && post.author.name
+        ? typeof post.author.name === 'string'
+          ? post.author.name
+          : post.author.name._ || ''
+        : 'Unknown';
+    const postImage =
+      post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url
+        ? post['media:thumbnail'].$.url
+        : null;
+
+    const embed = {
+      title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
+      url: postLink,
+      description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent,
+      color: 0x1e90ff,
+      timestamp: new Date().toISOString(),
+      author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
+      image: postImage ? { url: postImage } : undefined,
+    };
+
+    embeds.push(embed);
+  }
+
+  if (embeds.length > 0) {
+    await postEmbedsSeparately(webhookUrl, proclamationMessage, embeds);
+  }
+
+  lastPostIds[urlKey] = newPostIds;
 }
 
-function generateRandomBotName() {
-  const adjectives = [
-    'Barking',
-    'Waggy',
-    'Sniffy',
-    'Drooly',
-    'Furry',
-    'Pawsy',
-    'Playful',
-    'Chewy',
-    'Fluffy',
-  ];
+// ================== Task Schedulers ================== //
 
-  const nouns = [
-    'Tailwagger',
-    'Bonechaser',
-    'Pawsome',
-    'Snoutster',
-    'Whisker',
-    'Furball',
-    'Barker',
-    'Woofster',
-    'Pupper',
-  ];
+async function handleRedditFetches() {
+  const redditData1 = await fetchRedditRSS(REDDIT_RSS_URL);
+  const redditData2 = await fetchRedditRSS(REDDIT_RSS_URL_ALT);
 
-  const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-  const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-
-  const botName = `${randomAdjective}${randomNoun}${number}`;
-  logger.debug('Generated random doggy bot name.', { botName, source: 'generateRandomBotName' });
-  return botName;
+  await postNewestToDiscord(DISCORD_WEBHOOK_URL, redditData1, lastPostIds[REDDIT_RSS_URL], REDDIT_RSS_URL);
+  await postNewestToDiscord(DISCORD_WEBHOOK_URL_ALT, redditData2, lastPostIds[REDDIT_RSS_URL_ALT], REDDIT_RSS_URL_ALT);
 }
 
-const facts = [
-  {
-    id: 'fact1',
-    testText:
-      "In days of old, the hound did serve as loyal guardian, ever watchful by the hearth and field.",
-  },
-  {
-    id: 'fact2',
-    testText:
-      'The noble hound dost know the way of the hunt, guiding its master with nose keen and eyes sharp.',
-  },
-  {
-    id: 'fact3',
-    testText:
-      'By the fire’s glow, the hound dost lay, a companion steadfast through cold and storm.',
-  },
-  {
-    id: 'fact4',
-    testText:
-      'No truer friend hath man than the hound, whose loyalty doth shine brighter than gold.',
-  },
-  {
-    id: 'fact5',
-    testText:
-      'In many a battle, the hound stood by its master’s side, fearless and true in the face of danger.',
-  },
-  {
-    id: 'fact6',
-    testText:
-      'The bark of a hound doth ward off evil spirits, or so the old tales tell.',
-  },
-  {
-    id: 'fact7',
-    testText:
-      'In the chase, the hound dost fly with speed unmatched, bringing swift end to the quarry.',
-  },
-  {
-    id: 'fact8',
-    testText:
-      'To a hound, the bond of friendship is as sacred as any vow, held strong through time and trial.',
-  },
-  {
-    id: 'fact9',
-    testText:
-      'The hound’s sense of smell doth rival even the sharpest of minds, discerning scent with unmatched skill.',
-  },
-  {
-    id: 'fact10',
-    testText:
-      'From pup to old age, the hound remains a source of joy and comfort, a true blessing in life’s journey.',
-  },
-];
+// Send webhooks at server startup
+handleRedditFetches();
+
+// Fetch and post Reddit RSS data every 5 minutes (300000ms)
+setInterval(handleRedditFetches, 300000);
 
 // ================== Routes ================== //
 
@@ -315,11 +359,18 @@ app.get('/testing', async (req, res) => {
   logger.info('The testing endpoint hath been accessed.', { endpoint: '/testing' });
 
   try {
+    // Fetch two random dog images
     const testImage1Url = await getRandomDogImage();
     const testImage2Url = await getRandomDogImage();
+
+    // Generate a random bot name
     const botName = generateRandomBotName();
+    
+    // Select a random fact
     const randomIndex = Math.floor(Math.random() * facts.length);
     const randomFact = { ...facts[randomIndex] };
+
+    // Generate a random profile picture based on bot name
     const avatarUrl = getRandomProfilePicture(botName);
 
     logger.debug('Random fact selected.', { factId: randomFact.id, source: '/testing' });
@@ -339,114 +390,6 @@ app.get('/testing', async (req, res) => {
   }
 });
 
-// ================== Asynchronous Tasks ================== //
-
-async function fetchRedditRSS() {
-  logger.info('Commencing the fetch of the Reddit RSS feed.', { url: REDDIT_RSS_URL, source: 'fetchRedditRSS' });
-  try {
-    const response = await axios.get(REDDIT_RSS_URL);
-    const rssData = response.data;
-    const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
-    const jsonData = await parser.parseStringPromise(rssData);
-    logger.info('The Reddit RSS feed was successfully fetched and parsed.', { source: 'fetchRedditRSS' });
-    return jsonData;
-  } catch (error) {
-    logger.error('An error hath occurred whilst fetching the Reddit RSS feed.', { error: error.message, source: 'fetchRedditRSS' });
-    return null;
-  }
-}
-
-async function postNewestToDiscord() {
-  logger.info('Initiating the process to post the newest Reddit posts to Discord.', { source: 'postNewestToDiscord' });
-  const redditData = await fetchRedditRSS();
-
-  if (!redditData || !redditData.feed || !redditData.feed.entry) {
-    logger.error('Invalid Reddit RSS feed data received.', { data: redditData, source: 'postNewestToDiscord' });
-    return;
-  }
-
-  const entries = Array.isArray(redditData.feed.entry) ? redditData.feed.entry : [redditData.feed.entry];
-  const newestPosts = entries.slice(0, 5);
-  logger.info('The newest posts have been extracted from Reddit.', { count: newestPosts.length, source: 'postNewestToDiscord' });
-
-  if (newestPosts.length === 0) {
-    logger.warn('No new posts were found to dispatch.', { source: 'postNewestToDiscord' });
-    return;
-  }
-
-  const ukTime = new Date().toLocaleTimeString('en-GB', {
-    timeZone: 'Europe/London',
-    hour12: true,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-
-  let payload = {
-    content: `📜 **Hear ye! A proclamation from the realm of Reddit!**\n🕰️ Fetched at the hour of ${ukTime} UK time`,
-  };
-
-  try {
-    await axios.post(DISCORD_WEBHOOK_URL, payload);
-    logger.info('The initial message was posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
-  } catch (error) {
-    logger.error('An error hath occurred whilst posting the initial message to Discord.', { error: error.message, source: 'postNewestToDiscord' });
-    if (error.response && error.response.data) {
-      logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
-    }
-    return;
-  }
-
-  for (const post of newestPosts) {
-    const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
-    const postContentRaw = post.content
-      ? typeof post.content === 'string'
-        ? post.content
-        : post.content._ || ''
-      : 'No content provided';
-    const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
-    const postContent = decode(postContentStripped);
-    const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
-    const postAuthor =
-      post.author && post.author.name
-        ? typeof post.author.name === 'string'
-          ? post.author.name
-          : post.author.name._ || ''
-        : 'Unknown';
-    const postImage =
-      post['media:thumbnail'] && post['media:thumbnail'].$ && post['media:thumbnail'].$.url
-        ? post['media:thumbnail'].$.url
-        : null;
-
-    const embed = {
-      title: postTitle.length > 256 ? postTitle.slice(0, 253) + '...' : postTitle,
-      url: postLink,
-      description: postContent.length > 2048 ? postContent.slice(0, 2045) + '...' : postContent,
-      color: 0x1e90ff,
-      timestamp: new Date().toISOString(),
-      author: { name: `Posted by ${postAuthor.length > 256 ? postAuthor.slice(0, 253) + '...' : postAuthor}` },
-      image: postImage ? { url: postImage } : undefined,
-    };
-
-    payload = {
-      embeds: [embed],
-    };
-
-    try {
-      await axios.post(DISCORD_WEBHOOK_URL, payload);
-      logger.info('The embed was posted to Discord successfully.', { payloadSent: true, source: 'postNewestToDiscord' });
-    } catch (error) {
-      logger.error('An error hath occurred whilst posting the embed to Discord.', { error: error.message, source: 'postNewestToDiscord' });
-      if (error.response && error.response.data) {
-        logger.error('Discord API Response:', { response: error.response.data, source: 'postNewestToDiscord' });
-      }
-    }
-  }
-}
-
-// Fetch and post Reddit RSS data every 30 seconds
-setInterval(postNewestToDiscord, 30000);
-
 // ================== Start the Server ================== //
 
 app.listen(PORT, '0.0.0.0', () => {
@@ -462,8 +405,121 @@ app.use((req, res) => {
 
 // ================== Helper Functions ================== //
 
-// Simple sanitization function to escape HTML characters
-function sanitizeString(str) {
-  if (typeof str !== 'string') return '';
-  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// Fetch a random dog image from dog.ceo API
+async function getRandomDogImage() {
+  try {
+    const response = await axios.get('https://dog.ceo/api/breeds/image/random');
+    logger.debug('Random dog image fetched.', { imageUrl: response.data.message, source: 'getRandomDogImage' });
+    return response.data.message;
+  } catch (error) {
+    logger.error('Error fetching random dog image.', { error: error.message, source: 'getRandomDogImage' });
+    return 'https://i.ibb.co/wgfvKYb/2.jpg'; // Fallback image
+  }
 }
+
+// Generate a random bot name
+function generateRandomBotName() {
+  const adjectives = [
+    'Barking',
+    'Waggy',
+    'Sniffy',
+    'Drooly',
+    'Furry',
+    'Pawsy',
+    'Playful',
+    'Chewy',
+    'Fluffy',
+  ];
+
+  const nouns = [
+    'Tailwagger',
+    'Bonechaser',
+    'Pawsome',
+    'Snoutster',
+    'Whisker',
+    'Furball',
+    'Barker',
+    'Woofster',
+    'Pupper',
+  ];
+
+  const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+  const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+
+  const botName = `${randomAdjective}${randomNoun}${number}`;
+  logger.debug('Generated random doggy bot name.', { botName, source: 'generateRandomBotName' });
+  return botName;
+}
+
+// Generate a random profile picture URL based on username
+function getRandomProfilePicture(username) {
+  const profilePictureUrl = `https://robohash.org/${encodeURIComponent(username)}.png`;
+  logger.debug('Generated random profile picture URL.', { profilePictureUrl, source: 'getRandomProfilePicture' });
+  return profilePictureUrl;
+}
+
+// Retrieve updates from the updates.json file
+async function getUpdates() {
+  try {
+    const data = await fs.readFile(path.join(__dirname, 'updates.json'), 'utf-8');
+    logger.info('Updates file successfully read.', { source: 'getUpdates' });
+    return JSON.parse(data);
+  } catch (error) {
+    logger.error('Error reading updates.json.', { error: error.message, source: 'getUpdates' });
+    return [];
+  }
+}
+
+const facts = [
+  {
+    id: 'fact1',
+    testText:
+      "In days of old, the hound did serve as loyal guardian, ever watchful by the hearth and field.",
+  },
+  {
+    id: 'fact2',
+    testText:
+      'The noble hound dost know the way of the hunt, guiding its master with nose keen and eyes sharp.',
+  },
+  {
+    id: 'fact3',
+    testText:
+      'By the fire’s glow, the hound dost lay, a companion steadfast through cold and storm.',
+  },
+  {
+    id: 'fact4',
+    testText:
+      'No truer friend hath man than the hound, whose loyalty doth shine brighter than gold.',
+  },
+  {
+    id: 'fact5',
+    testText:
+      'In many a battle, the hound stood by its master’s side, fearless and true in the face of danger.',
+  },
+  {
+    id: 'fact6',
+    testText:
+      'The bark of a hound doth ward off evil spirits, or so the old tales tell.',
+  },
+  {
+    id: 'fact7',
+    testText:
+      'In the chase, the hound dost fly with speed unmatched, bringing swift end to the quarry.',
+  },
+  {
+    id: 'fact8',
+    testText:
+      'To a hound, the bond of friendship is as sacred as any vow, held strong through time and trial.',
+  },
+  {
+    id: 'fact9',
+    testText:
+      'The hound’s sense of smell doth rival even the sharpest of minds, discerning scent with unmatched skill.',
+  },
+  {
+    id: 'fact10',
+    testText:
+      'From pup to old age, the hound remains a source of joy and comfort, a true blessing in life’s journey.',
+  },
+];
