@@ -1,7 +1,7 @@
 [
     {
-        "updateText": "The Fifth Edict: Comprehensive API Overhaul and Medieval Theming",
-        "description": "In this fifth edict, we have undertaken a comprehensive overhaul of the MonkeyBytes-API to bring forth a more immersive and thematic experience for our users:\n\n1. **Medieval Theming Across the API:**\n    - Recrafted all API responses, logs, and user-facing text in the style of 1066 UK nobility, imbuing the entire API with a noble and historical essence.\n\n2. **Enhanced `/testing` Endpoint:**\n    - Augmented the `/testing` endpoint with randomized dog images from the Dog CEO API, medieval-styled bot names, and facts. This endpoint now delivers a truly unique and thematic interaction with every request.\n\n3. **Bot Avatar Generation:**\n    - Integrated Robohash for generating random bot avatars, adding a visual element to the randomized bot identities."
+        "updateText": "The Sixth Edict: Feline Integration and Noble Enhancements",
+        "description": "In this most honorable sixth edict, the MonkeyBytes-API hath been further enriched with new features and improvements, all befitting of a royal court:\n\n1. **Feline Imagery Supplanting the Canine:**\n    - The Dog CEO API hath been replaced by The Cat API, now fetching randomized images of noble felines. The `/testing` endpoint now returns detailed images of these majestic creatures, complete with image dimensions and identification.\n\n2. **Noble Bot Name Generation:**\n    - The generation of bot names hath been adjusted to reflect the grace of felines, using adjectives and nouns befitting our feline companions. The new names are both playful and fitting for the medieval court.\n\n3. **Multiple Reddit Feeds and Discord Integration:**\n    - Our system now fetches posts from two distinct Reddit realms: `/r/all` and `/r/discordapp`. Each RSS feed is linked to its own Discord webhook, allowing the API to deliver fresh proclamations from both lands to their respective channels.\n\n4. **UK Unix Timestamps for Accurate Timekeeping:**\n    - UK-based Unix timestamps have been added to responses, ensuring that the passage of time is recorded with accuracy and nobility in every proclamation."
     },
     {
         "updateText": "Integration of Advanced Caching Mechanisms",
@@ -10,9 +10,5 @@
     {
         "updateText": "Refinement of Discord Notifications and Time Formatting",
         "description": "In this update, we have refined the formatting of Discord notifications to ensure clarity and ease of reading:\n\n1. **Adjusted Time Format:**\n    - The timestamp within Discord notifications hath been altered from a 24-hour format to a more familiar 12-hour format. This change enhances the readability of the messages, ensuring that users may more easily comprehend the time of each proclamation.\n\n2. **Improved Discord Webhook Integration:**\n    - Messages dispatched to Discord via webhook are now more refined, with better-formatted content and structured embeds, ensuring that each notification is clear and concise."
-    },
-    {
-        "updateText": "Optimized `/testing` Endpoint with New Content",
-        "description": "The `/testing` endpoint hath been enriched with more varied and randomized content for the delight of our users:\n\n1. **Randomized Cloud Facts, Images, and Bot Names:**\n    - The endpoint now serves randomized cloud facts, along with images from the newly updated `cloudImageList`, and dynamically generated bot names. These changes ensure that each interaction provides a unique and varied experience.\n\n2. **Enhanced Response Structure:**\n    - Each API response hath been structured to include a random cloud image, a RoboHash avatar, and an entertaining fact about our celestial formations. The endpoint continues to uphold the theme of medieval storytelling while delivering fresh content."
     }
 ]
