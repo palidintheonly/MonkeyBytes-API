@@ -153,6 +153,41 @@ app.get('/', async (req, res) => {
   logger.info('The noble root endpoint hath been accessed.', { endpoint: '/' });
   try {
     const updates = await getUpdates();
+
+    // Get server metrics
+    const serverUptime = process.uptime();
+    const serverDate = new Date().toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'Europe/London',
+    });
+    const serverTime = new Date().toLocaleTimeString('en-GB', {
+      hour12: true,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: 'Europe/London',
+    });
+
+    // Create a script to constantly update the server time on the front end
+    const timeUpdateScript = `
+      <script>
+        function updateTime() {
+          const now = new Date();
+          const options = { 
+            timeZone: 'Europe/London', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+          };
+          document.getElementById('server-time').innerText = now.toLocaleTimeString('en-GB', options);
+        }
+        setInterval(updateTime, 1000); // Update time every second
+      </script>
+    `;
+
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.send(`
       <!DOCTYPE html>
@@ -192,6 +227,7 @@ app.get('/', async (req, res) => {
               <h2>About the API</h2>
               <p>This API alloweth the honored user to engage with sundry endpoints, granting random images, bot names, and facts spun in the tongue of medieval England, with tidings from the land of Reddit posted to the realm of Discord.</p>
           </div>
+
           <div class="box">
               <h2>Code Structure</h2>
               <p>The script is most wisely organized into several noble sections:</p>
@@ -223,15 +259,7 @@ app.get('/', async (req, res) => {
                   </li>
               </ul>
           </div>
-          <div class="box">
-              <h2>A Guide for the Unenlightened</h2>
-              <p>Using this API is as simple as breaking one's fast:</p>
-              <ol>
-                  <li>To receive a random image, simply dispatch a GET request to <code>/testing</code>.</li>
-                  <li>If thou dost desire a random bot name, it shall also be found in the response from <code>/testing</code>.</li>
-                  <li>If a fun fact is what thou seekest, verily—<code>/testing</code> shall bestow one upon thee!</li>
-              </ol>
-          </div>
+
           <div class="box">
               <h2>Latest Decrees</h2>
               ${updates
@@ -245,6 +273,16 @@ app.get('/', async (req, res) => {
                 )
                 .join('')}
           </div>
+
+          <div class="box">
+              <h2>Server Metrics:</h2>
+              <p><strong>Lo and behold the metrics of the server, as known in the realm of England:</strong></p>
+              <p><strong>Thy server hath been up for:</strong> ${Math.floor(serverUptime / 3600)} hours, ${Math.floor((serverUptime % 3600) / 60)} minutes, and ${Math.floor(serverUptime % 60)} seconds, as of this very moment.</p>
+              <p><strong>The day of our Lord is:</strong> ${serverDate}.</p>
+              <p><strong>The hour doth strike:</strong> <span id="server-time">${serverTime}</span> in the fair lands of the United Kingdom.</p>
+          </div>
+
+          ${timeUpdateScript}  <!-- Script to update server time -->
       </body>
       </html>
     `);
@@ -432,5 +470,3 @@ app.use((req, res) => {
   logger.warn('An unknown endpoint hath been accessed.', { path: req.path, source: '404Handler' });
   res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
 });
-
-//EOD READY FOR TOMORROW/LATER
