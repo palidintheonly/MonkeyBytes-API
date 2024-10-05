@@ -13,7 +13,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "helmet": "^6.0.1",
+    "helmet": "^8.0.0",
     "html-entities": "^2.3.2",
     "morgan": "^1.10.0",
     "npm": "^10.9.0",
