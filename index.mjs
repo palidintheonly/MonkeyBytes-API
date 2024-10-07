@@ -8,8 +8,7 @@ import axios from 'axios';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import xml2js from 'xml2js';
-import { decode } from 'html-entities';
+import xml2js from 'xml2js';  // Fixed the missing import
 
 // ================== Configuration Constants ================== //
 
@@ -240,24 +239,6 @@ app.get('/', async (req, res) => {
           </div>
 
           <div class="box">
-              <h2>Code Structure</h2>
-              <p>The script is most wisely organized into several noble sections:</p>
-              <ul>
-                  <li><strong>Configuration Constants:</strong> Herein are defined the constants of the realm, such as port numbers, URLs, and sacred credentials.</li>
-                  <li><strong>Setup Directory Paths:</strong> The pathways and filenames are established using <code>fileURLToPath</code> and <code>path</code> to guide the way.</li>
-                  <li><strong>Initialize Express App:</strong> The Express app is readied, with security ensured through the application of the <code>helmet</code> middleware.</li>
-                  <li><strong>Initialize Logger:</strong> Winston, the trusted scribe, is set to record all events of note with color and precision, as time passes in the kingdom.</li>
-                  <li><strong>Utility Functions:</strong> The realm is blessed with helper functions for reading scrolls, fetching random images of cats, generating bot names, and more.</li>
-                  <li><strong>Routes:</strong> These noble pathways allow guests to interact with the kingdom's API:
-                      <ul>
-                          <li><strong>/:</strong> The grand gateway to the kingdom, where noble lords and ladies may learn of the API’s purpose and latest decrees.</li>
-                          <li><strong>/testing:</strong> A path of great intrigue, where visitors shall receive a randomized image of a cat, a bot name fit for a curious kitten, and a fact worthy of any royal court's conversation.</li>
-                      </ul>
-                  </li>
-              </ul>
-          </div>
-
-          <div class="box">
               <h2>Latest Decrees</h2>
               ${updates
                 .map(
@@ -334,9 +315,8 @@ app.get('/testing', async (req, res) => {
     const testImage2 = await getRandomCatImage();
 
     // Fetch a random cat fact from the catfact.ninja API
-    const factResponse = await axios.get('https://catfact.ninja/facts');
-    const facts = factResponse.data.data;
-    const randomFact = facts[Math.floor(Math.random() * facts.length)].fact;
+    const factResponse = await axios.get('https://catfact.ninja/fact');
+    const randomFact = factResponse.data.fact;
 
     // Generate a random bot name
     const botName = generateRandomBotName();
@@ -345,13 +325,12 @@ app.get('/testing', async (req, res) => {
     const avatarUrl = getRandomProfilePicture(botName);
 
     const responseData = {
-      testText: `Behold the mighty feline! Image with id "${testImage1.id}" has a width of ${testImage1.width} and height of ${testImage1.height}.`,
+      testText: `${randomFact}`,  // Removed "Cat fact:" prefix
       testimage1: testImage1.url,
       testimage2: testImage2.url,
       testingBotName: botName,
       avatar: avatarUrl,
       ukUnix: Math.floor(Date.now() / 1000),
-      catFact: randomFact // Adding the fetched random cat fact
     };
 
     res.json(responseData);
@@ -371,7 +350,7 @@ async function fetchRedditRSS(url) {
     const response = await axios.get(url);
     const rssData = response.data;
     const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
-    const jsonData = await parser.parseStringPromise(rssData);
+    const jsonData = await parser.parseStringPromise(rssData);  // Use xml2js to parse the feed
     logger.info('Reddit RSS feed fetched and parsed successfully.', { url });
     return jsonData;
   } catch (error) {
@@ -407,14 +386,14 @@ async function postToDiscord(webhookUrl, rssData) {
     logger.info('Proclamation posted to Discord successfully.');
 
     for (const post of newestPosts) {
-      const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
+      const postTitle = typeof post.title === 'string' ? post.title : post.title._ || '';
       const postContentRaw = post.content
         ? typeof post.content === 'string'
           ? post.content
           : post.content._ || ''
         : 'No content provided';
       const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
-      const postContent = decode(postContentStripped);
+      const postContent = postContentStripped;
       const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
       const postAuthor =
         post.author && post.author.name
