@@ -240,6 +240,24 @@ app.get('/', async (req, res) => {
           </div>
 
           <div class="box">
+              <h2>Code Structure</h2>
+              <p>The script is most wisely organized into several noble sections:</p>
+              <ul>
+                  <li><strong>Configuration Constants:</strong> Herein are defined the constants of the realm, such as port numbers, URLs, and sacred credentials.</li>
+                  <li><strong>Setup Directory Paths:</strong> The pathways and filenames are established using <code>fileURLToPath</code> and <code>path</code> to guide the way.</li>
+                  <li><strong>Initialize Express App:</strong> The Express app is readied, with security ensured through the application of the <code>helmet</code> middleware.</li>
+                  <li><strong>Initialize Logger:</strong> Winston, the trusted scribe, is set to record all events of note with color and precision, as time passes in the kingdom.</li>
+                  <li><strong>Utility Functions:</strong> The realm is blessed with helper functions for reading scrolls, fetching random images of cats, generating bot names, and more.</li>
+                  <li><strong>Routes:</strong> These noble pathways allow guests to interact with the kingdom's API:
+                      <ul>
+                          <li><strong>/:</strong> The grand gateway to the kingdom, where noble lords and ladies may learn of the API’s purpose and latest decrees.</li>
+                          <li><strong>/testing:</strong> A path of great intrigue, where visitors shall receive a randomized image of a cat, a bot name fit for a curious kitten, and a fact worthy of any royal court's conversation.</li>
+                      </ul>
+                  </li>
+              </ul>
+          </div>
+
+          <div class="box">
               <h2>Latest Decrees</h2>
               ${updates
                 .map(
@@ -311,26 +329,29 @@ app.get('/testing', async (req, res) => {
   logger.info('The testing endpoint hath been accessed.', { endpoint: '/testing' });
 
   try {
-    // Fetch two random cat images
+    // Fetch two random cat images from The Cat API
     const testImage1 = await getRandomCatImage();
     const testImage2 = await getRandomCatImage();
 
+    // Fetch a random cat fact from the catfact.ninja API
+    const factResponse = await axios.get('https://catfact.ninja/facts');
+    const facts = factResponse.data.data;
+    const randomFact = facts[Math.floor(Math.random() * facts.length)].fact;
+
     // Generate a random bot name
     const botName = generateRandomBotName();
-
-    // Use the cat image data for facts
-    const randomFactText = `Behold the mighty feline! Image with id "${testImage1.id}" has a width of ${testImage1.width} and height of ${testImage1.height}.`;
 
     // Generate a random profile picture based on bot name
     const avatarUrl = getRandomProfilePicture(botName);
 
     const responseData = {
-      testText: randomFactText,
+      testText: `Behold the mighty feline! Image with id "${testImage1.id}" has a width of ${testImage1.width} and height of ${testImage1.height}.`,
       testimage1: testImage1.url,
       testimage2: testImage2.url,
       testingBotName: botName,
       avatar: avatarUrl,
       ukUnix: Math.floor(Date.now() / 1000),
+      catFact: randomFact // Adding the fetched random cat fact
     };
 
     res.json(responseData);
