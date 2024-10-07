@@ -131,14 +131,14 @@ app.get('/', async (req, res) => {
     const hours = Math.floor(serverUptime / 3600);
     const minutes = Math.floor((serverUptime % 3600) / 60);
     const seconds = Math.floor(serverUptime % 60);
-    
+
     const serverDate = new Date().toLocaleDateString('en-GB', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       timeZone: 'Europe/London',
     });
-    
+
     const serverTime = new Date().toLocaleTimeString('en-GB', {
       hour12: true,
       hour: '2-digit',
@@ -147,7 +147,6 @@ app.get('/', async (req, res) => {
       timeZone: 'Europe/London',
     });
 
-    // Create a script to constantly update the server time on the frontend
     const timeUpdateScript = `
       <script>
         function updateTime() {
@@ -229,6 +228,7 @@ app.get('/', async (req, res) => {
       </html>
     `);
   } catch (error) {
+    logger.error('Error in root endpoint:', { error: error.message });
     res.status(500).send(`
       <!DOCTYPE html>
       <html lang="en">
@@ -261,7 +261,7 @@ app.get('/', async (req, res) => {
       <body>
           <div class="error-container">
               <h1>Oh dear! An error hath occurred.</h1>
-              <p>Please try again later.</p>
+              <p>${error.message}</p>
           </div>
       </body>
       </html>
