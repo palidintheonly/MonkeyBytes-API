@@ -229,6 +229,17 @@ app.get('/', async (req, res) => {
           </div>
 
           <div class="box">
+              <h2>A Dummy's Guide to the Noble API</h2>
+              <p>Fear not, noble user! For using this API is as easy as sipping mead from thy goblet. Follow these steps to engage with the realm:</p>
+              <ul>
+                  <li><strong>To get a random image of a cat:</strong> Send a GET request to <code>/testing</code>, and lo! An image shall be returned to thee.</li>
+                  <li><strong>To receive a name for thy noble bot:</strong> A GET request to <code>/testing</code> shall also bestow upon thee a worthy name for any bot of thy creation.</li>
+                  <li><strong>To obtain a fun fact:</strong> The same request to <code>/testing</code> shall provide thou with a fact to amuse and astound thy peers in the royal court.</li>
+              </ul>
+              <p>Worry not about the arcane complexities—simply call upon the endpoints, and the API shall serve thee faithfully.</p>
+          </div>
+
+          <div class="box">
               <h2>Code Structure</h2>
               <p>The script is most wisely organized into several noble sections:</p>
               <ul>
@@ -275,7 +286,7 @@ app.get('/', async (req, res) => {
           </div>
 
           <div class="box">
-              <h2>Server Metrics:</h2>
+              <h2>Server Metrics (UK Timezone)</h2>
               <p><strong>Lo and behold the metrics of the server, as known in the realm of England:</strong></p>
               <p><strong>Thy server hath been up for:</strong> ${Math.floor(serverUptime / 3600)} hours, ${Math.floor((serverUptime % 3600) / 60)} minutes, and ${Math.floor(serverUptime % 60)} seconds, as of this very moment.</p>
               <p><strong>The day of our Lord is:</strong> ${serverDate}.</p>
@@ -398,7 +409,8 @@ async function postToDiscord(webhookUrl, rssData) {
   });
 
   const payload = {
-    content: `📜 Hear ye, noble lords and ladies! A new proclamation hath been made!\n🕰️ As of the hour of ${ukTime} UK time.`,
+    content: `📜 Hear ye, noble lords and ladies! A new proclamation hath been made!
+🕒 As of the hour of ${ukTime} UK time.`,
   };
 
   try {
