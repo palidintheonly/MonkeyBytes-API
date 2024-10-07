@@ -8,7 +8,7 @@ import axios from 'axios';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import xml2js from 'xml2js';  // Fixed the missing import
+import xml2js from 'xml2js';
 
 // ================== Configuration Constants ================== //
 
@@ -27,11 +27,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Apply security-related headers
+// Apply security-related headers and disable Origin-Agent-Cluster
 app.use(
   helmet({
     contentSecurityPolicy: false,
-    crossOriginOpenerPolicy: false,
+    crossOriginOpenerPolicy: { policy: "same-origin" }, // Set to same-origin to avoid inconsistency
+    originAgentCluster: false // Disable the Origin-Agent-Cluster header
   })
 );
 
