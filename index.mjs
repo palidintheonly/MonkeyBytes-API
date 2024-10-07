@@ -126,6 +126,23 @@ app.get('/', async (req, res) => {
   try {
     const updates = await getUpdates();
 
+    // Check if updates is an array
+    const updatesHtml = Array.isArray(updates)
+      ? updates
+          .map(
+            (update) => `
+          <div class="box">
+              <h3>${update.updateText}</h3>
+              <p>${update.description.replace(/\n/g, '<br>')}</p>
+          </div>
+          `
+          )
+          .join('')
+      : `<div class="box">
+          <h3>${updates.updateText || 'No Updates'}</h3>
+          <p>${updates.description ? updates.description.replace(/\n/g, '<br>') : 'No description available'}</p>
+        </div>`;
+
     // Get server metrics
     const serverUptime = process.uptime();
     const hours = Math.floor(serverUptime / 3600);
@@ -147,6 +164,7 @@ app.get('/', async (req, res) => {
       timeZone: 'Europe/London',
     });
 
+    // Create a script to constantly update the server time on the frontend
     const timeUpdateScript = `
       <script>
         function updateTime() {
@@ -205,16 +223,7 @@ app.get('/', async (req, res) => {
           </div>
           <div class="box">
               <h2>Latest Decrees</h2>
-              ${updates
-                .map(
-                  (update) => `
-              <div class="box">
-                  <h3>${update.updateText}</h3>
-                  <p>${update.description.replace(/\n/g, '<br>')}</p>
-              </div>
-              `
-                )
-                .join('')}
+              ${updatesHtml}
           </div>
           <div class="box">
               <h2>Server Metrics (UK Timezone)</h2>
@@ -228,7 +237,6 @@ app.get('/', async (req, res) => {
       </html>
     `);
   } catch (error) {
-    logger.error('Error in root endpoint:', { error: error.message });
     res.status(500).send(`
       <!DOCTYPE html>
       <html lang="en">
@@ -261,7 +269,7 @@ app.get('/', async (req, res) => {
       <body>
           <div class="error-container">
               <h1>Oh dear! An error hath occurred.</h1>
-              <p>${error.message}</p>
+              <p>Please try again later.</p>
           </div>
       </body>
       </html>
