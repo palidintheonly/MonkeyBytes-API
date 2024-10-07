@@ -1,0 +1,26 @@
+{
+  "name": "monkeybytes-api",
+  "version": "1.0.0",
+  "description": "A Node.js API providing cat images, facts, and Reddit to Discord posting",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "author": "XpalidinX",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^6.1.0",
+    "morgan": "^1.10.0",
+    "pem": "^1.14.6",
+    "winston": "^3.8.2",
+    "xml2js": "^0.4.23"
+  },
+  "engines": {
+    "node": ">=21.0.0"
+  }
+}
