@@ -23,17 +23,17 @@
   "homepage": "https://github.com/XpalidinX/monkeybytes-api#readme",
   "dependencies": {
     "axios": "^1.4.0",
-    "cors": "^2.8.5",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.0",
     "express": "^4.18.2",
     "helmet": "^6.0.0",
-    "morgan": "^1.10.0",
-    "winston": "^3.7.2",
-    "xml2js": "^0.4.23",
     "html-entities": "^2.3.3",
-    "dotenv": "^16.0.0",
+    "morgan": "^1.10.0",
     "node-fetch": "^2.6.7",
-    "crypto": "^1.0.1"
-  },
-  "devDependencies": {}
+    "pem": "^1.14.8",
+    "winston": "^3.7.2",
+    "xml2js": "^0.4.23"
+  }
 }
