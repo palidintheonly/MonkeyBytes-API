@@ -240,38 +240,6 @@ app.get('/', async (req, res) => {
           </div>
 
           <div class="box">
-              <h2>Code Structure</h2>
-              <p>The script is most wisely organized into several noble sections:</p>
-              <ul>
-                  <li><strong>Configuration Constants:</strong> Herein are defined the constants of the realm, such as port numbers, URLs, and sacred credentials.</li>
-                  <li><strong>Setup Directory Paths:</strong> The pathways and filenames are established using <code>fileURLToPath</code> and <code>path</code> to guide the way.</li>
-                  <li><strong>Initialize Express App:</strong> The Express app is readied, with security ensured through the application of the <code>helmet</code> middleware.</li>
-                  <li><strong>Initialize Logger:</strong> Winston, the trusted scribe, is set to record all events of note with color and precision, as time passes in the kingdom.</li>
-                  <li><strong>Utility Functions:</strong> The realm is blessed with helper functions for reading scrolls, fetching random images of cats, generating bot names, and more.</li>
-                  <li><strong>Routes:</strong> These noble pathways allow guests to interact with the kingdom's API:
-                      <ul>
-                          <li><strong>/:</strong> The grand gateway to the kingdom, where noble lords and ladies may learn of the API’s purpose and latest decrees.</li>
-                          <li><strong>/testing:</strong> A path of great intrigue, where visitors shall receive a randomized image of a cat, a bot name fit for a curious kitten, and a fact worthy of any royal court's conversation.</li>
-                      </ul>
-                  </li>
-                  <li><strong>Asynchronous Tasks:</strong> Duties are undertaken to fetch and post the latest from the Reddit kingdom to the Discord realm.</li>
-                  <li><strong>NPM Packages Used:</strong> 
-                      <ul>
-                          <li><strong>express:</strong> A framework most versatile for building the castle’s web-based applications and handling the scrolls of request and response.</li>
-                          <li><strong>fs/promises:</strong> A promise-based API for engaging with the kingdom's file system, especially for reading the sacred updates.json scroll.</li>
-                          <li><strong>path:</strong> A utility module for navigating the labyrinth of file paths, ensuring safe passage to each desired location within the castle.</li>
-                          <li><strong>winston:</strong> A logging scribe, recording each event in the annals of history with color and precision.</li>
-                          <li><strong>helmet:</strong> A safeguard for the castle, fortifying its Express walls with headers that protect against invaders.</li>
-                          <li><strong>axios:</strong> A trusted messenger, delivering and receiving missives from far-off lands like Reddit and Discord.</li>
-                          <li><strong>cors:</strong> A tool for allowing noble guests from across different domains to communicate with our API.</li>
-                          <li><strong>morgan:</strong> A scribe, chronicling each request made to the kingdom’s API for posterity.</li>
-                          <li><strong>cookie-parser:</strong> A tool to read and manage cookies, those delectable morsels shared across the land.</li>
-                      </ul>
-                  </li>
-              </ul>
-          </div>
-
-          <div class="box">
               <h2>Latest Decrees</h2>
               ${updates
                 .map(
