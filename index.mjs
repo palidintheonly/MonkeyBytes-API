@@ -9,9 +9,9 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import xml2js from 'xml2js';
+import { decode } from 'html-entities';
 
 // ================== Configuration Constants ================== //
-
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1283861457007673506/w4zSpCb8m-hO5tf5IP4tcq-QiNgHmLz4mTUztPusDlZOhC0ULRhC64SMMZF2ZFTmM6eT';
 const DISCORD_WEBHOOK_URL_2 = 'https://discord.com/api/webhooks/1289677050554224661/F8BUQn0hQvsNFlfeJvfXCNcBfWpINo_wcvaWi-uyKLOIYXKkA-F8Rj716bqOBScUetwy';
 const PORT = 21560;
@@ -19,20 +19,17 @@ const REDDIT_RSS_URL_1 = 'https://www.reddit.com/r/all/new/.rss';
 const REDDIT_RSS_URL_2 = 'https://www.reddit.com/r/discordapp/new/.rss';
 
 // ================== Setup Directory Paths ================== //
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ================== Initialize Express App ================== //
-
 const app = express();
 
-// Apply security-related headers and disable Origin-Agent-Cluster
+// Apply security-related headers
 app.use(
   helmet({
     contentSecurityPolicy: false,
-    crossOriginOpenerPolicy: { policy: "same-origin" }, // Set to same-origin to avoid inconsistency
-    originAgentCluster: false // Disable the Origin-Agent-Cluster header
+    crossOriginOpenerPolicy: false,
   })
 );
 
@@ -44,7 +41,6 @@ app.use(cors());
 app.use(morgan('combined'));
 
 // ================== Initialize Logger ================== //
-
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
@@ -74,7 +70,6 @@ async function getRandomCatImage() {
 
     logger.debug('Random cat image fetched.', { imageUrl, imageId, width, height, source: 'getRandomCatImage' });
 
-    // Return all necessary data
     return {
       url: imageUrl,
       id: imageId,
@@ -94,34 +89,11 @@ async function getRandomCatImage() {
 
 // Generate a random bot name
 function generateRandomBotName() {
-  const adjectives = [
-    'Purring',
-    'Sneaky',
-    'Clawy',
-    'Fluffy',
-    'Whiskery',
-    'Playful',
-    'Curious',
-    'Cuddly',
-    'Mischievous',
-  ];
-
-  const nouns = [
-    'Furball',
-    'Whiskers',
-    'Meowster',
-    'Purrfect',
-    'Clawson',
-    'Kittypaw',
-    'Feline',
-    'Tailchaser',
-    'Napster',
-  ];
-
+  const adjectives = ['Purring', 'Sneaky', 'Clawy', 'Fluffy', 'Whiskery', 'Playful', 'Curious', 'Cuddly', 'Mischievous'];
+  const nouns = ['Furball', 'Whiskers', 'Meowster', 'Purrfect', 'Clawson', 'Kittypaw', 'Feline', 'Tailchaser', 'Napster'];
   const number = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
   const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
   const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-
   const botName = `${randomAdjective}${randomNoun}${number}`;
   logger.debug('Generated random cat bot name.', { botName, source: 'generateRandomBotName' });
   return botName;
@@ -148,7 +120,7 @@ async function getUpdates() {
 
 // ================== Routes ================== //
 
-// Root Endpoint
+// Root Endpoint with Server Metrics and Updates
 app.get('/', async (req, res) => {
   logger.info('The noble root endpoint hath been accessed.', { endpoint: '/' });
   try {
@@ -156,12 +128,17 @@ app.get('/', async (req, res) => {
 
     // Get server metrics
     const serverUptime = process.uptime();
+    const hours = Math.floor(serverUptime / 3600);
+    const minutes = Math.floor((serverUptime % 3600) / 60);
+    const seconds = Math.floor(serverUptime % 60);
+    
     const serverDate = new Date().toLocaleDateString('en-GB', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       timeZone: 'Europe/London',
     });
+    
     const serverTime = new Date().toLocaleTimeString('en-GB', {
       hour12: true,
       hour: '2-digit',
@@ -170,7 +147,7 @@ app.get('/', async (req, res) => {
       timeZone: 'Europe/London',
     });
 
-    // Create a script to constantly update the server time on the front end
+    // Create a script to constantly update the server time on the frontend
     const timeUpdateScript = `
       <script>
         function updateTime() {
@@ -227,18 +204,6 @@ app.get('/', async (req, res) => {
               <h2>About the API</h2>
               <p>This API alloweth the honored user to engage with sundry endpoints, granting random images, bot names, and facts spun in the tongue of medieval England, with tidings from the land of Reddit posted to the realm of Discord.</p>
           </div>
-
-          <div class="box">
-              <h2>A Dummy's Guide to the Noble API</h2>
-              <p>Fear not, noble user! For using this API is as easy as sipping mead from thy goblet. Follow these steps to engage with the realm:</p>
-              <ul>
-                  <li><strong>To get a random image of a cat:</strong> Send a GET request to <code>/testing</code>, and lo! An image shall be returned to thee.</li>
-                  <li><strong>To receive a name for thy noble bot:</strong> A GET request to <code>/testing</code> shall also bestow upon thee a worthy name for any bot of thy creation.</li>
-                  <li><strong>To obtain a fun fact:</strong> The same request to <code>/testing</code> shall provide thou with a fact to amuse and astound thy peers in the royal court.</li>
-              </ul>
-              <p>Worry not about the arcane complexities—simply call upon the endpoints, and the API shall serve thee faithfully.</p>
-          </div>
-
           <div class="box">
               <h2>Latest Decrees</h2>
               ${updates
@@ -252,16 +217,14 @@ app.get('/', async (req, res) => {
                 )
                 .join('')}
           </div>
-
           <div class="box">
               <h2>Server Metrics (UK Timezone)</h2>
-              <p><strong>Lo and behold the metrics of the server, as known in the realm of England:</strong></p>
-              <p><strong>Thy server hath been up for:</strong> ${Math.floor(serverUptime / 3600)} hours, ${Math.floor((serverUptime % 3600) / 60)} minutes, and ${Math.floor(serverUptime % 60)} seconds, as of this very moment.</p>
+              <p><strong>Thy server hath been up for:</strong> ${hours} hours, ${minutes} minutes, and ${seconds} seconds.</p>
               <p><strong>The day of our Lord is:</strong> ${serverDate}.</p>
               <p><strong>The hour doth strike:</strong> <span id="server-time">${serverTime}</span> in the fair lands of the United Kingdom.</p>
           </div>
 
-          ${timeUpdateScript}  <!-- Script to update server time -->
+          ${timeUpdateScript}
       </body>
       </html>
     `);
@@ -326,7 +289,7 @@ app.get('/testing', async (req, res) => {
     const avatarUrl = getRandomProfilePicture(botName);
 
     const responseData = {
-      testText: `${randomFact}`,  // Removed "Cat fact:" prefix
+      testText: `${randomFact}`,
       testimage1: testImage1.url,
       testimage2: testImage2.url,
       testingBotName: botName,
@@ -351,7 +314,7 @@ async function fetchRedditRSS(url) {
     const response = await axios.get(url);
     const rssData = response.data;
     const parser = new xml2js.Parser({ explicitArray: false, explicitCharkey: true });
-    const jsonData = await parser.parseStringPromise(rssData);  // Use xml2js to parse the feed
+    const jsonData = await parser.parseStringPromise(rssData);
     logger.info('Reddit RSS feed fetched and parsed successfully.', { url });
     return jsonData;
   } catch (error) {
@@ -378,8 +341,7 @@ async function postToDiscord(webhookUrl, rssData) {
   });
 
   const payload = {
-    content: `📜 Hear ye, noble lords and ladies! A new proclamation hath been made!
-🕒 As of the hour of ${ukTime} UK time.`,
+    content: `📜 Hear ye, noble lords and ladies! A new proclamation hath been made!\n🕰️ As of the hour of ${ukTime} UK time.`,
   };
 
   try {
@@ -387,14 +349,14 @@ async function postToDiscord(webhookUrl, rssData) {
     logger.info('Proclamation posted to Discord successfully.');
 
     for (const post of newestPosts) {
-      const postTitle = typeof post.title === 'string' ? post.title : post.title._ || '';
+      const postTitle = typeof post.title === 'string' ? decode(post.title) : decode(post.title._ || '');
       const postContentRaw = post.content
         ? typeof post.content === 'string'
           ? post.content
           : post.content._ || ''
         : 'No content provided';
       const postContentStripped = postContentRaw.replace(/<\/?[^>]+(>|$)/g, '').trim();
-      const postContent = postContentStripped;
+      const postContent = decode(postContentStripped);
       const postLink = post.link && post.link.href ? post.link.href : 'https://reddit.com';
       const postAuthor =
         post.author && post.author.name
@@ -440,13 +402,11 @@ setInterval(postNewestToDiscord, 300000);
 postNewestToDiscord();
 
 // ================== Start the Server ================== //
-
 app.listen(PORT, '0.0.0.0', () => {
   logger.info(`The server is running at http://localhost:${PORT}`);
 });
 
 // ================== 404 Error Handler ================== //
-
 app.use((req, res) => {
   logger.warn('An unknown endpoint hath been accessed.', { path: req.path, source: '404Handler' });
   res.status(404).json({ error: 'Oh dear! The page thou seekest is not to be found.' });
