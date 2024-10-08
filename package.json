@@ -31,7 +31,7 @@
     "helmet": "^6.0.0",
     "html-entities": "^2.3.3",
     "morgan": "^1.10.0",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "^3.3.2",
     "pem": "^1.14.8",
     "winston": "^3.7.2",
     "xml2js": "^0.5.0"
